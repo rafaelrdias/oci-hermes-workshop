@@ -8,12 +8,23 @@ Configuração aplicada:
 
 ```yaml
 model:
-  provider: custom
+  provider: custom:oci-genai
   default: openai.gpt-oss-120b
   base_url: https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1
   api_mode: chat_completions
   context_length: 128000
+
+custom_providers:
+  - name: oci-genai
+    base_url: https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1
+    key_env: OPENAI_API_KEY
+    model: openai.gpt-oss-120b
+    api_mode: chat_completions
 ```
+
+O provider nomeado e `key_env` são importantes nas versões recentes do Hermes:
+por segurança, o runtime não encaminha automaticamente `OPENAI_API_KEY` para
+hosts diferentes de `openai.com` sem essa associação explícita.
 
 O segredo fica em `~/.hermes/.env`:
 

@@ -32,7 +32,7 @@ fi
   "python-telegram-bot[webhooks]==22.6"
 
 hermes doctor --fix || true
-hermes config set model.provider custom
+hermes config set model.provider custom:oci-genai
 hermes config set model.default "$OCI_GENAI_MODEL"
 hermes config set model.base_url "$OCI_GENAI_BASE_URL"
 hermes config set model.api_mode chat_completions

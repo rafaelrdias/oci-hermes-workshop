@@ -12,7 +12,7 @@
 ## Modelo
 
 ```text
-provider: custom
+provider: custom:oci-genai
 model: openai.gpt-oss-120b
 region: us-chicago-1
 api_mode: chat_completions

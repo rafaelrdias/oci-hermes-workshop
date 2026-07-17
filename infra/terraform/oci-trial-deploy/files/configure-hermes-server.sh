@@ -90,11 +90,54 @@ if [[ "$mode" == "--full" || "$mode" == "--oci-only" ]]; then
   prompt_secret OCI_GENAI_API_KEY 'OCI Generative AI API key (input hidden): '
   upsert_env OPENAI_API_KEY "$OCI_GENAI_API_KEY"
 
-  hermes config set model.provider custom
+  hermes config set model.provider custom:oci-genai
   hermes config set model.default "$OCI_GENAI_MODEL"
   hermes config set model.base_url "$OCI_GENAI_BASE_URL"
   hermes config set model.api_mode chat_completions
   hermes config set model.context_length 128000
+
+  OCI_GENAI_MODEL="$OCI_GENAI_MODEL" \
+  OCI_GENAI_BASE_URL="$OCI_GENAI_BASE_URL" \
+  "$HOME/.hermes/hermes-agent/venv/bin/python" - <<'PY'
+import os
+
+from hermes_cli.config import load_config, save_config
+
+name = "oci-genai"
+base_url = os.environ["OCI_GENAI_BASE_URL"]
+model = os.environ["OCI_GENAI_MODEL"]
+config = load_config()
+providers = config.get("custom_providers") or []
+if not isinstance(providers, list):
+    providers = []
+
+entry = next(
+    (
+        provider
+        for provider in providers
+        if isinstance(provider, dict)
+        and (provider.get("name") == name or provider.get("base_url") == base_url)
+    ),
+    None,
+)
+if entry is None:
+    entry = {}
+    providers.append(entry)
+
+entry.update(
+    {
+        "name": name,
+        "base_url": base_url,
+        "key_env": "OPENAI_API_KEY",
+        "model": model,
+        "api_mode": "chat_completions",
+        "models": {model: {"context_length": 128000}},
+    }
+)
+entry.pop("api_key", None)
+config["custom_providers"] = providers
+save_config(config)
+PY
 
   printf 'Testing OCI Generative AI without printing the secret...\n'
   OPENAI_API_KEY="$OCI_GENAI_API_KEY" \
