@@ -65,6 +65,23 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 Confira token, allowlist e se outro processo usa o mesmo bot token. Um token não deve operar em dois gateways ao mesmo tempo.
 
+### `status=203/EXEC` no Oracle Linux com SELinux
+
+O bootstrap instala automaticamente um override quando o SELinux está em modo
+`Enforcing`. Ele inicia o Python do Hermes por `/usr/bin/bash`, mantendo o
+serviço como usuário `opc` e permitindo a transição SELinux adequada.
+
+Confirme que o drop-in foi carregado:
+
+```bash
+sudo systemctl cat hermes-gateway
+sudo systemctl daemon-reload
+sudo systemctl restart hermes-gateway
+```
+
+O status deve listar
+`/etc/systemd/system/hermes-gateway.service.d/selinux.conf`.
+
 ## Bot retorna código de pairing
 
 Comportamento esperado quando não há allowlist:

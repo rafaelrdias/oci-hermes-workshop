@@ -69,5 +69,5 @@ terraform destroy
 ## Estado da VM de demonstração
 
 Na VM `147.224.210.244`, o Hermes oficial está instalado, a chamada ao OCI
-Generative AI foi validada e a allowlist do Telegram foi registrada. O serviço
-`hermes-gateway` está habilitado, mas aguarda o token do bot para ser iniciado.
+Generative AI foi validada, a allowlist do Telegram foi registrada e o gateway
+está ativo. O bot de demonstração é `@rafadias_oci_bot`.

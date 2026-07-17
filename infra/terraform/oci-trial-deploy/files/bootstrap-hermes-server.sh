@@ -46,4 +46,24 @@ if ! sudo test -f /etc/systemd/system/hermes-gateway.service; then
     --system --run-as-user "$(id -un)" --no-start-now --start-on-login
 fi
 
+# On SELinux-enforcing Oracle Linux, systemd cannot directly execute a Python
+# interpreter stored below /home. Starting through the system bash binary keeps
+# the service unprivileged while allowing the normal SELinux domain transition.
+if command -v getenforce >/dev/null 2>&1 && [[ "$(getenforce)" == "Enforcing" ]]; then
+  systemd_override="$(mktemp)"
+  {
+    printf '%s\n' '[Service]'
+    printf '%s\n' 'ExecStart='
+    printf "ExecStart=/usr/bin/bash -lc 'exec %s/.hermes/hermes-agent/venv/bin/python -m hermes_cli.main gateway run'\n" "$HOME"
+    printf '%s\n' 'ExecStopPost='
+    printf "ExecStopPost=-/usr/bin/bash -lc 'exec %s/.hermes/hermes-agent/venv/bin/python -m gateway.cgroup_cleanup'\n" "$HOME"
+  } > "$systemd_override"
+  sudo install -d -o root -g root -m 0755 /etc/systemd/system/hermes-gateway.service.d
+  sudo install -o root -g root -m 0644 \
+    "$systemd_override" /etc/systemd/system/hermes-gateway.service.d/selinux.conf
+  rm -f "$systemd_override"
+  sudo restorecon -RF /etc/systemd/system/hermes-gateway.service.d
+  sudo systemctl daemon-reload
+fi
+
 printf 'Hermes bootstrap complete. Run: hermes-workshop-configure\n'
