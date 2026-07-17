@@ -7,4 +7,3 @@ terraform.tfvars
 .env
 *.pem
 *.key
-tmp/

@@ -26,18 +26,6 @@ infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip
 
 O ZIP inclui `files/bootstrap-hermes-server.sh` e `files/configure-hermes-server.sh`. Não inclui `.terraform`, state, plano ou `terraform.tfvars`.
 
-## Gerar o checklist do facilitador
-
-```bash
-python3 scripts/generate_facilitator_checklist_pdf.py
-```
-
-Saída:
-
-```text
-output/pdf/checklist-facilitador-hermes-oci.pdf
-```
-
 ## Verificar a VM
 
 ```bash

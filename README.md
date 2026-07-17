@@ -53,7 +53,6 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
-- [Checklist do facilitador (PDF)](output/pdf/checklist-facilitador-hermes-oci.pdf)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)
 - [Terraform](infra/terraform/oci-trial-deploy/README.md)
