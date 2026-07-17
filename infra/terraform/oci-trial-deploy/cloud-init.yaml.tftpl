@@ -1,0 +1,45 @@
+#cloud-config
+package_update: true
+package_upgrade: false
+
+packages:
+  - bash
+  - curl
+  - git
+  - jq
+  - openssh-server
+  - python3
+  - tar
+  - unzip
+  - xz
+
+write_files:
+  - path: /usr/local/bin/hermes-worker-ready
+    owner: root:root
+    permissions: "0755"
+    content: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      printf 'user=%s\n' "$(id -un)"
+      printf 'workdir=%s\n' "${remote_workdir}"
+      printf 'python=%s\n' "$(python3 --version 2>&1)"
+      printf 'hermes=%s\n' "$(/home/opc/.local/bin/hermes --version 2>/dev/null | head -n 1 || printf installing)"
+  - path: /usr/local/bin/hermes-workshop-bootstrap
+    owner: root:root
+    permissions: "0755"
+    encoding: b64
+    content: ${bootstrap_script_b64}
+  - path: /usr/local/bin/hermes-workshop-configure
+    owner: root:root
+    permissions: "0755"
+    encoding: b64
+    content: ${configure_script_b64}
+
+runcmd:
+  - [bash, -lc, "install -d -m 0700 -o opc -g opc ${remote_workdir}"]
+  - [bash, -lc, "printf '%s\n' 'Hermes OCI worker ready' > ${remote_workdir}/README.txt"]
+  - [bash, -lc, "chown opc:opc ${remote_workdir}/README.txt"]
+  - [bash, -lc, "systemctl enable --now sshd || systemctl enable --now ssh"]
+  - [bash, -lc, "runuser -u opc -- env HOME=/home/opc USER=opc HERMES_GIT_REF=${hermes_git_ref} HERMES_INSTALL_BROWSER_TOOLS=${install_browser_tools} OCI_GENAI_REGION=${genai_region} OCI_GENAI_MODEL=${genai_model} OCI_GENAI_BASE_URL=${hermes_base_url} /usr/local/bin/hermes-workshop-bootstrap > /var/log/hermes-bootstrap.log 2>&1"]
+
+final_message: "Hermes workshop bootstrap finished. Log: /var/log/hermes-bootstrap.log"

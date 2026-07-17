@@ -1,0 +1,27 @@
+region           = "sa-saopaulo-1"
+tenancy_ocid     = "ocid1.tenancy.oc1..example"
+compartment_ocid = "ocid1.compartment.oc1..example"
+prefix           = "hermes-worker"
+ssh_public_key   = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIexample hermes-oci"
+
+ssh_allowed_cidr = "203.0.113.10/32" # substitua pelo seu IP público/32
+ssh_config_alias = "hermes-oci"
+remote_workdir   = "/home/opc/hermes-tasks"
+
+create_genai_policy = true
+genai_region        = "us-chicago-1"
+genai_model         = "openai.gpt-oss-120b"
+hermes_git_ref      = "v2026.7.7.2"
+
+# false keeps cloud-init fast. Set true only if browser automation is part of the lab.
+install_browser_tools = false
+
+instance_shape         = "VM.Standard.E5.Flex"
+instance_ocpus         = 2
+instance_memory_in_gbs = 16
+boot_volume_size_gbs   = 80
+
+# Always Free alternative (capacity is not guaranteed):
+# instance_shape         = "VM.Standard.A1.Flex"
+# instance_ocpus         = 2
+# instance_memory_in_gbs = 12
