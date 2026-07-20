@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Abrir Stacks no OCI Resource Manager</title>
+  <desc id="desc">Tela ilustrativa mostrando Developer Services, Resource Manager, Stacks e o botão Create stack.</desc>
+  <defs><style>
+    .t{font:14px Arial,sans-serif;fill:#211f1d}.s{font:12px Arial,sans-serif;fill:#6b6661}.h{font:bold 28px Arial,sans-serif;fill:#211f1d}.h2{font:bold 16px Arial,sans-serif;fill:#211f1d}.nav{font:13px Arial,sans-serif;fill:#312d2a}.white{fill:#fff}.bold{font-weight:bold}.call{font:13px Arial,sans-serif;fill:#fff}
+  </style></defs>
+  <rect width="1200" height="720" fill="#f4f4f4"/><rect width="1200" height="54" fill="#fff"/><rect y="53" width="1200" height="1" fill="#d8d4cf"/>
+  <text x="25" y="34" font-family="Arial" font-size="22" font-weight="bold" fill="#c74634">ORACLE</text><text x="139" y="33" class="h2">Cloud Infrastructure</text>
+  <rect x="949" y="12" width="185" height="31" rx="3" fill="#f3f2f1"/><text x="968" y="32" class="s">Brazil East (São Paulo)</text>
+  <rect x="0" y="54" width="1200" height="42" fill="#fff"/><text x="25" y="80" class="s">Console OCI / Developer Services / Resource Manager / Stacks</text>
+  <rect x="0" y="96" width="235" height="624" fill="#fff"/><line x1="235" y1="96" x2="235" y2="720" stroke="#d8d4cf"/>
+  <text x="20" y="128" class="s bold">MENU DE NAVEGAÇÃO</text><text x="20" y="163" class="nav">Compute</text><text x="20" y="197" class="nav">Networking</text>
+  <rect x="10" y="215" width="215" height="36" rx="3" fill="#fbeeea"/><rect x="10" y="215" width="4" height="36" fill="#c74634"/><text x="25" y="238" class="nav bold">Developer Services</text>
+  <text x="40" y="278" class="nav bold" fill="#8f2d20">Resource Manager</text><rect x="28" y="294" width="197" height="34" rx="3" fill="#fbeeea"/><text x="48" y="316" class="nav bold">Stacks</text>
+  <text x="48" y="352" class="nav">Jobs</text><text x="48" y="386" class="nav">Private templates</text>
+  <text x="270" y="146" class="h">Stacks</text><text x="270" y="174" class="s">Gerencie configurações Terraform e o estado remoto no OCI Resource Manager.</text>
+  <rect x="270" y="200" width="126" height="40" rx="3" fill="#c74634"/><text x="291" y="225" class="white bold" font-family="Arial" font-size="14">Create stack</text>
+  <rect x="890" y="200" width="260" height="40" rx="3" fill="#fff" stroke="#8b8580"/><text x="907" y="225" class="t">Compartment: workshop-lab ▾</text>
+  <rect x="270" y="265" width="880" height="272" rx="4" fill="#fff" stroke="#d8d4cf"/><rect x="270" y="265" width="880" height="45" fill="#f5f4f2"/>
+  <text x="292" y="293" class="s bold">NAME</text><text x="615" y="293" class="s bold">STATE</text><text x="789" y="293" class="s bold">TERRAFORM VERSION</text>
+  <text x="635" y="418" class="s">No stacks found in this compartment.</text>
+  <circle cx="408" cy="200" r="17" fill="#312d2a"/><text x="403" y="206" class="white bold" font-family="Arial">1</text><path d="M420 208 L448 234" stroke="#312d2a" stroke-width="2"/>
+  <rect x="270" y="625" width="880" height="58" rx="4" fill="#312d2a"/><text x="290" y="649" class="call"><tspan font-weight="bold" fill="#f8cf75">Onde clicar:</tspan> menu ☰ → Developer Services → Resource Manager → Stacks → Create stack.</text>
+  <text x="1002" y="675" class="s">Tela ilustrativa</text>
+</svg>

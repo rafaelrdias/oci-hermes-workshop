@@ -166,7 +166,7 @@ Nunca:
 | Tempo | Atividade |
 |---:|---|
 | 0–10 | arquitetura e segurança |
-| 10–20 | configurar e aplicar Terraform |
+| 10–20 | criar Stack, revisar Plan e executar Apply na Console OCI |
 | 20–35 | criar API key OCI e bot enquanto cloud-init roda |
 | 35–45 | SSH e configuração interativa |
 | 45–55 | Telegram, pairing e primeiro prompt |
@@ -178,12 +178,23 @@ Os 30 minutos restantes absorvem dúvidas e recuperação.
 
 # Checkpoint 1 — Terraform
 
-```bash
-terraform init
-terraform validate
-terraform plan -out workshop.tfplan
-terraform apply workshop.tfplan
+```text
+Console OCI
+  → Developer Services
+  → Resource Manager
+  → Stacks
+  → Create stack
+  → My configuration / .Zip file
 ```
+
+1. carregar `oci-hermes-resource-manager.zip`;
+2. preencher as variáveis sem segredos;
+3. criar com **Run apply** desmarcado;
+4. executar **Plan** e revisar os Logs;
+5. executar **Apply** usando o último Plan;
+6. copiar `public_ip` em **Outputs**.
+
+Passo a passo: [guia visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md).
 
 Em paralelo: criar OCI Generative AI API key em Chicago e bot no `@BotFather`.
 
@@ -192,9 +203,9 @@ Em paralelo: criar OCI Generative AI API key em Chicago e bot no `@BotFather`.
 # Checkpoint 2 — bootstrap e segredos
 
 ```bash
-ssh hermes-oci 'cloud-init status --wait'
-ssh hermes-oci 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
-ssh -t hermes-oci 'hermes-workshop-configure'
+ssh -i <chave-privada> opc@<public_ip> 'cloud-init status --wait'
+ssh -i <chave-privada> opc@<public_ip> 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
+ssh -t -i <chave-privada> opc@<public_ip> 'hermes-workshop-configure'
 ```
 
 O configurador testa o modelo antes de iniciar o gateway.

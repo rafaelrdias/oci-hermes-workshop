@@ -117,11 +117,24 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 ## 7. OCI Resource Manager
 
+Baixe o pacote pronto:
+
+[Download de `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/raw/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip)
+
+Ou gere o pacote a partir do código atual:
+
 ```bash
 ./build-resource-manager-zip.sh
 ```
 
-Crie uma Stack em Developer Services → Resource Manager → Stacks e envie `dist/oci-hermes-resource-manager.zip`.
+Depois, siga o [passo a passo com telas da Console OCI](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_RESOURCE_MANAGER_CONSOLE.md) para:
+
+1. criar a Stack em **Developer Services → Resource Manager → Stacks**;
+2. enviar `dist/oci-hermes-resource-manager.zip`;
+3. configurar as variáveis sem incluir segredos;
+4. executar e revisar **Plan**;
+5. executar **Apply** e consultar **Outputs**;
+6. executar **Destroy** antes de excluir a Stack.
 
 ## 8. Custo e destruição
 

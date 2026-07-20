@@ -13,24 +13,19 @@ Material do workshop Oracle no TDC Florianópolis. O laboratório provisiona uma
 
 ## Começo rápido
 
-Pré-requisitos: Terraform 1.5+, credenciais OCI configuradas, OCIDs da tenancy e do compartment, chave SSH e um IP/CIDR autorizado para SSH.
+O caminho recomendado para os participantes é executar o Terraform pelo **OCI Resource Manager**, sem instalar Terraform ou OCI CLI no computador:
+
+1. baixe [`oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/raw/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip);
+2. siga o [passo a passo visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md);
+3. execute **Plan**, revise os Logs e somente então execute **Apply** selecionando o Plan mais recente;
+4. abra o job de Apply e copie `public_ip` em **Outputs**.
+
+Depois, substitua os valores entre `<...>` e execute:
 
 ```bash
-cd infra/terraform/oci-trial-deploy
-cp terraform.tfvars.example terraform.tfvars
-# edite terraform.tfvars
-terraform init
-terraform validate
-terraform plan -out workshop.tfplan
-terraform apply workshop.tfplan
-```
-
-Copie `terraform output ssh_config_entry` para `~/.ssh/config`, substitua `<private-key-file>` e execute:
-
-```bash
-ssh hermes-oci 'cloud-init status --wait'
-ssh hermes-oci 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
-ssh -t hermes-oci 'hermes-workshop-configure'
+ssh -i <caminho-da-chave-privada> opc@<public_ip> 'cloud-init status --wait'
+ssh -i <caminho-da-chave-privada> opc@<public_ip> 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
+ssh -t -i <caminho-da-chave-privada> opc@<public_ip> 'hermes-workshop-configure'
 ```
 
 O último comando solicita, com entrada oculta:
@@ -42,7 +37,7 @@ O último comando solicita, com entrada oculta:
 Depois, envie `/new` ao bot. Se optou por pairing, envie qualquer mensagem e aprove o código na VM:
 
 ```bash
-ssh hermes-oci 'hermes pairing approve telegram CODIGO'
+ssh -i <caminho-da-chave-privada> opc@<public_ip> 'hermes pairing approve telegram CODIGO'
 ```
 
 Para preparar as credenciais em momentos diferentes, use `--oci-only`,
@@ -52,6 +47,7 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 ## Material do workshop
 
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
+- [Guia visual — Terraform pela Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)
@@ -59,11 +55,7 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 
 ## Segurança
 
-Não grave API keys ou tokens em `terraform.tfvars`, código, prints ou chat. O Telegram dá acesso às ferramentas do agente na VM; nunca habilite `GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e destrua os ambientes dos participantes ao final:
-
-```bash
-terraform destroy
-```
+Não grave API keys ou tokens em variáveis da Stack, `terraform.tfvars`, código, prints ou chat. O Telegram dá acesso às ferramentas do agente na VM; nunca habilite `GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e, ao final, execute **Destroy** no Resource Manager antes de excluir a Stack.
 
 ## Estado da VM de demonstração
 
