@@ -1,7 +1,12 @@
 variable "region" {
-  description = "OCI region used for the network and VM. Use the trial tenancy home region."
+  description = "OCI region for the Resource Manager stack, network and VM. The workshop is fixed to US Midwest (Chicago), region key ORD."
   type        = string
-  default     = "sa-saopaulo-1"
+  default     = "us-chicago-1"
+
+  validation {
+    condition     = var.region == "us-chicago-1"
+    error_message = "This workshop must run in US Midwest (Chicago): region must be us-chicago-1 (ORD)."
+  }
 }
 
 variable "tenancy_ocid" {
@@ -27,9 +32,14 @@ variable "create_genai_policy" {
 }
 
 variable "genai_region" {
-  description = "OCI Generative AI region. Chicago supports on-demand gpt-oss and OpenAI SDK API-key access."
+  description = "OCI Generative AI region. Fixed to US Midwest (Chicago) so all regional workshop resources stay in ORD."
   type        = string
   default     = "us-chicago-1"
+
+  validation {
+    condition     = var.genai_region == "us-chicago-1"
+    error_message = "OCI Generative AI must run in US Midwest (Chicago): genai_region must be us-chicago-1 (ORD)."
+  }
 }
 
 variable "genai_model" {

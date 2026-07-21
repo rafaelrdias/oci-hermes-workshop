@@ -1,4 +1,4 @@
-region           = "sa-saopaulo-1"
+region           = "us-chicago-1" # US Midwest (Chicago), region key ORD
 tenancy_ocid     = "ocid1.tenancy.oc1..example"
 compartment_ocid = "ocid1.compartment.oc1..example"
 prefix           = "hermes-worker"
@@ -9,7 +9,7 @@ ssh_config_alias = "hermes-oci"
 remote_workdir   = "/home/opc/hermes-tasks"
 
 create_genai_policy = true
-genai_region        = "us-chicago-1"
+genai_region        = "us-chicago-1" # mesma região da VM e da rede
 genai_model         = "openai.gpt-oss-120b"
 hermes_git_ref      = "v2026.7.7.2"
 

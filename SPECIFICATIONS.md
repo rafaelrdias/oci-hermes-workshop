@@ -28,6 +28,8 @@ context_length: 128000
 
 ## Infraestrutura
 
+- região única: US Midwest (Chicago), `us-chicago-1`, region key `ORD`;
+- Resource Manager, rede, Compute e OCI Generative AI na mesma região;
 - VCN `10.20.0.0/16`;
 - subnet pública `10.20.10.0/24`;
 - entrada TCP/22 restrita por variável;

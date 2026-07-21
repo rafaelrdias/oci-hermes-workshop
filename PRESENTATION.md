@@ -15,9 +15,9 @@ Você
   ↓ mensagem
 Telegram Bot API
   ↓ long polling HTTPS
-Hermes Gateway em Oracle Linux
+Hermes Gateway em Oracle Linux — Chicago (ORD)
   ↓ OpenAI-compatible Chat Completions
-OCI Generative AI — openai.gpt-oss-120b
+OCI Generative AI — Chicago (ORD) — openai.gpt-oss-120b
 ```
 
 Saída: um bot capaz de conversar, manter sessões, usar memória e executar ferramentas autorizadas na VM.
@@ -116,16 +116,19 @@ O modelo tem 128 mil tokens de contexto e function calling. Fontes: [model card]
 
 ---
 
-# Por que a VM pode ficar em São Paulo?
+# Uma única região para todo o laboratório
 
-São duas regiões independentes:
+Todos os recursos regionais ficam em Chicago:
 
 ```text
-sa-saopaulo-1 → Compute, rede e Hermes
-us-chicago-1  → inferência on-demand do modelo
+US Midwest (Chicago)
+Identificador: us-chicago-1
+Region key: ORD
+
+Resource Manager + rede + VM + Hermes + API key + modelo
 ```
 
-Chicago é o padrão porque combina suporte do SDK OpenAI com disponibilidade on-demand de `gpt-oss-120b`. A lista muda; valide antes do evento em [Models by Region](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm).
+Chicago combina suporte de API keys com SDK OpenAI e disponibilidade on-demand de `gpt-oss-120b`. A API key deve estar na mesma região do modelo. IAM policy é a única exceção: pertence à tenancy, não a uma região. Fontes: [Regions and Availability Domains](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm), [API keys](https://docs.oracle.com/en-us/iaas/Content/generative-ai/api-keys.htm) e [Models by Region](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm).
 
 ---
 
@@ -138,6 +141,8 @@ Chicago é o padrão porque combina suporte do SDK OpenAI com disponibilidade on
 - bootstrap do Hermes fixado em uma release;
 - serviço `systemd` do gateway;
 - policy limitada a Chat Completions + modelo do lab.
+
+Stack, jobs, rede, VM e OCI Generative AI usam `us-chicago-1`.
 
 Ele não recebe o token do Telegram nem a API key. Segredos não devem ir para o Terraform state.
 
@@ -180,6 +185,7 @@ Os 30 minutos restantes absorvem dúvidas e recuperação.
 
 ```text
 Console OCI
+  → Region: US Midwest (Chicago)
   → Developer Services
   → Resource Manager
   → Stacks
@@ -192,11 +198,11 @@ Console OCI
 3. criar com **Run apply** desmarcado;
 4. executar **Plan** e revisar os Logs;
 5. executar **Apply** usando o último Plan;
-6. copiar `public_ip` em **Outputs**.
+6. confirmar `deployment_region = us-chicago-1 (ORD)` e copiar `public_ip` em **Outputs**.
 
 Passo a passo: [guia visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md).
 
-Em paralelo: criar OCI Generative AI API key em Chicago e bot no `@BotFather`.
+Em paralelo: criar a OCI Generative AI API key na mesma região de Chicago e o bot no `@BotFather`.
 
 ---
 
@@ -282,9 +288,9 @@ O agente tem acesso às ferramentas do servidor. Trate o bot como uma identidade
 
 Ao terminar:
 
-```bash
-sudo systemctl stop hermes-gateway
-terraform destroy
-```
+1. abra a Stack em **US Midwest (Chicago)**;
+2. execute **Destroy** e aguarde `SUCCEEDED`;
+3. confirme que **Stack resources** está vazia;
+4. somente então use **Delete stack**.
 
 **Infraestrutura reproduzível. Modelo Enterprise AI. Agente no seu bolso.**

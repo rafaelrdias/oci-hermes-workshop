@@ -12,7 +12,7 @@ Peça a um administrador para criar a statement descrita em [ENTERPRISE_AI.md](E
 
 ## Terraform: `Out of host capacity`
 
-Ocorre com frequência em A1 Always Free. Tente outro Availability Domain ou use o preset E5 com créditos Trial.
+Ocorre com frequência em A1 Always Free. Permaneça em Chicago e tente outro Availability Domain de `us-chicago-1`, ou use o preset E5 com créditos Trial. Não troque a Stack para outra região durante o workshop.
 
 ## SSH não conecta
 
@@ -35,7 +35,7 @@ ssh hermes-oci 'sudo tail -f /var/log/hermes-bootstrap.log'
 ## OCI retorna 401
 
 - o segredo copiado não é uma OCI Generative AI API key;
-- a key foi criada em outra região;
+- a key não foi criada em US Midwest (Chicago);
 - ela expirou, foi desativada ou revogada;
 - `OPENAI_API_KEY` não foi gravada corretamente.
 
@@ -55,6 +55,8 @@ region: us-chicago-1
 model: openai.gpt-oss-120b
 base URL: https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/v1
 ```
+
+Se `terraform plan` rejeitar `region` ou `genai_region`, use `us-chicago-1` nos dois campos. A validação impede a criação de recursos regionais fora de ORD.
 
 ## Bot não responde
 

@@ -10,7 +10,7 @@ Ao final, uma mensagem enviada ao seu bot do Telegram chega ao Hermes na VM, o H
 
 Tenha:
 
-- acesso à OCI Console e à região home do Trial;
+- acesso à OCI Console e à região **US Midwest (Chicago)** habilitada na tenancy Trial;
 - acesso ao OCI Resource Manager;
 - tenancy OCID e compartment OCID;
 - uma chave pública SSH;
@@ -23,11 +23,15 @@ Tenha:
 ```text
 Pessoa → Telegram → Hermes Gateway → Hermes Agent → OCI Generative AI
                                              ↘ ferramentas na VM
+
+                           VM, rede e modelo: us-chicago-1 / ORD
 ```
 
 O Telegram usa long polling. A VM não recebe conexões do Telegram e não precisa expor webhook nem porta do Hermes.
 
 ## 10–20 min — preparar e aplicar o Terraform
+
+Antes do primeiro passo, selecione **US Midwest (Chicago)** no canto superior da Console. A Stack, rede, VM e OCI Generative AI permanecerão nessa região.
 
 Use o [guia visual da Console OCI](OCI_RESOURCE_MANAGER_CONSOLE.md):
 
@@ -45,7 +49,7 @@ Enquanto o cloud-init instala o Hermes, avance para as duas credenciais.
 
 ### OCI
 
-Mude a Console para **US Midwest (Chicago)** e abra Analytics & AI → Generative AI → API keys. Crie uma chave no compartment do laboratório e copie o segredo `sk-...`.
+Mantenha a Console em **US Midwest (Chicago)** e abra Analytics & AI → Generative AI → API keys. Crie uma chave no compartment do laboratório e copie o segredo `sk-...`.
 
 ### Telegram
 
@@ -60,7 +64,7 @@ Opcional: consulte seu ID numérico em `@userinfobot`. Sem ele, o pairing será 
 
 ## 35–45 min — acessar e configurar
 
-No job `apply-...` do Resource Manager, abra **Outputs** e copie `public_ip`. Depois substitua os valores entre `<...>`:
+No job `apply-...` do Resource Manager, abra **Outputs**, confirme `deployment_region = us-chicago-1 (ORD)` e copie `public_ip`. Depois substitua os valores entre `<...>`:
 
 ```bash
 ssh -i <caminho-da-chave-privada> opc@<public_ip> 'cloud-init status --wait'
@@ -123,7 +127,7 @@ Use este caminho somente se o facilitador optar pela execução local:
 git clone https://github.com/rafaelrdias/oci-hermes-workshop.git
 cd oci-hermes-workshop/infra/terraform/oci-trial-deploy
 cp terraform.tfvars.example terraform.tfvars
-# edite terraform.tfvars
+# edite terraform.tfvars e mantenha region/genai_region = "us-chicago-1"
 terraform init
 terraform validate
 terraform plan -out workshop.tfplan

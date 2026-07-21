@@ -6,7 +6,7 @@
   </style></defs>
   <rect width="1200" height="720" fill="#f4f4f4"/><rect width="1200" height="54" fill="#fff"/><rect y="53" width="1200" height="1" fill="#d8d4cf"/>
   <text x="25" y="34" font-family="Arial" font-size="22" font-weight="bold" fill="#c74634">ORACLE</text><text x="139" y="33" class="h2">Cloud Infrastructure</text>
-  <rect x="949" y="12" width="185" height="31" rx="3" fill="#f3f2f1"/><text x="968" y="32" class="s">Brazil East (São Paulo)</text>
+  <rect x="949" y="12" width="185" height="31" rx="3" fill="#f3f2f1"/><text x="968" y="32" class="s">US Midwest (Chicago)</text>
   <rect x="0" y="54" width="1200" height="42" fill="#fff"/><text x="25" y="80" class="s">Console OCI / Developer Services / Resource Manager / Stacks</text>
   <rect x="0" y="96" width="235" height="624" fill="#fff"/><line x1="235" y1="96" x2="235" y2="720" stroke="#d8d4cf"/>
   <text x="20" y="128" class="s bold">MENU DE NAVEGAÇÃO</text><text x="20" y="163" class="nav">Compute</text><text x="20" y="197" class="nav">Networking</text>
@@ -20,6 +20,6 @@
   <text x="292" y="293" class="s bold">NAME</text><text x="615" y="293" class="s bold">STATE</text><text x="789" y="293" class="s bold">TERRAFORM VERSION</text>
   <text x="635" y="418" class="s">No stacks found in this compartment.</text>
   <circle cx="408" cy="200" r="17" fill="#312d2a"/><text x="403" y="206" class="white bold" font-family="Arial">1</text><path d="M420 208 L448 234" stroke="#312d2a" stroke-width="2"/>
-  <rect x="270" y="625" width="880" height="58" rx="4" fill="#312d2a"/><text x="290" y="649" class="call"><tspan font-weight="bold" fill="#f8cf75">Onde clicar:</tspan> menu ☰ → Developer Services → Resource Manager → Stacks → Create stack.</text>
+  <rect x="270" y="625" width="880" height="58" rx="4" fill="#312d2a"/><text x="290" y="649" class="call"><tspan font-weight="bold" fill="#f8cf75">Região:</tspan> US Midwest (Chicago), us-chicago-1 / ORD. Depois clique em Create stack.</text>
   <text x="1002" y="675" class="s">Tela ilustrativa</text>
 </svg>

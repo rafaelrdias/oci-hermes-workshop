@@ -32,9 +32,11 @@ O segredo fica em `~/.hermes/.env`:
 OPENAI_API_KEY=sk-...
 ```
 
-## Por que Chicago
+## Região única: Chicago (ORD)
 
-Em julho de 2026, a documentação OCI limita o uso de API keys com SDKs OpenAI a Frankfurt, Hyderabad, Osaka, Ashburn, Chicago e Phoenix. `openai.gpt-oss-120b` está disponível on-demand em Chicago; em Ashburn e Phoenix ele aparece apenas para dedicated cluster. A VM pode continuar na região home do Trial, como São Paulo, e chamar o endpoint público em Chicago.
+Em julho de 2026, a documentação OCI identifica **US Midwest (Chicago)** como `us-chicago-1`, region key `ORD`. A região oferece `openai.gpt-oss-120b` on-demand e suporta API keys com SDKs OpenAI. Para simplificar o Trial e evitar troca de contexto regional, a Stack do Resource Manager, VCN, subnet, VM, API key do OCI Generative AI e endpoint do modelo ficam todos em Chicago.
+
+IAM policies não pertencem a uma região: elas são recursos da tenancy. Esta é a única exceção ao princípio de região única do laboratório.
 
 ## Policy criada pelo Terraform
 
@@ -64,4 +66,5 @@ Para produção em recursos OCI gerenciados, a Oracle recomenda IAM-based authen
 - [Policies para Generative AI API keys](https://docs.oracle.com/en-us/iaas/Content/generative-ai/add-api-permission.htm)
 - [OpenAI gpt-oss-120b na OCI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/openai-gpt-oss-120b.htm)
 - [Modelos por região](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
+- [Regiões e Availability Domains da OCI](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm)
 - [Hermes — providers customizados](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/integrations/providers.md)

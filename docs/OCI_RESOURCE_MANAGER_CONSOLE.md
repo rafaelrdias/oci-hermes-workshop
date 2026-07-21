@@ -2,6 +2,8 @@
 
 Este é o caminho recomendado para o workshop. O **OCI Resource Manager** executa o Terraform dentro da OCI, mantém o state da Stack e dispensa a instalação local do Terraform e da OCI CLI.
 
+Todo o fluxo deve ser executado em **US Midwest (Chicago)**: identificador `us-chicago-1`, region key `ORD`. A Stack e seus jobs são regionais; por isso, selecione Chicago antes de abrir o Resource Manager.
+
 > As telas abaixo são ilustrações fiéis ao fluxo atual da Console OCI. O idioma, a posição de alguns controles e a versão mais nova disponível do Terraform podem variar ligeiramente na tenancy.
 
 ## Resultado
@@ -9,17 +11,18 @@ Este é o caminho recomendado para o workshop. O **OCI Resource Manager** execut
 Ao concluir este roteiro, a Stack terá criado:
 
 - VCN, subnet pública, Internet Gateway, route table e security list;
-- VM Oracle Linux com acesso SSH restrito ao IP do participante;
+- VM Oracle Linux em Chicago com acesso SSH restrito ao IP do participante;
 - Hermes Agent e gateway do Telegram instalados pelo cloud-init;
+- configuração do Hermes apontando para o endpoint do OCI Generative AI em Chicago;
 - policy de menor privilégio para o OCI Generative AI, quando autorizada.
 
-Os segredos da API key do OCI Generative AI e do BotFather **não** passam pelo Terraform. Eles são inseridos depois, diretamente na VM.
+A API key do OCI Generative AI é criada manualmente em Chicago. Seu segredo e o token do BotFather **não** passam pelo Terraform; eles são inseridos depois, diretamente na VM.
 
 ## Antes de abrir a Stack
 
 Tenha em mãos:
 
-1. acesso à Console OCI e um compartment para o laboratório;
+1. acesso à Console OCI, inscrição em **US Midwest (Chicago)** e um compartment para o laboratório;
 2. `tenancy_ocid` e `compartment_ocid`;
 3. o conteúdo completo da chave SSH **pública** (`.pub`);
 4. seu IP público no formato CIDR, por exemplo `203.0.113.10/32`;
@@ -41,7 +44,7 @@ O arquivo gerado estará em `dist/oci-hermes-resource-manager.zip`. Não envie a
 
 Na Console OCI:
 
-1. confirme a região em que a VM será criada, como **Brazil East (São Paulo)**;
+1. no seletor de região, escolha **US Midwest (Chicago)** e confirme `us-chicago-1` / `ORD`;
 2. abra o menu de navegação `☰`;
 3. acesse **Developer Services → Resource Manager → Stacks**;
 4. selecione o compartment do laboratório;
@@ -82,7 +85,7 @@ Preencha pelo menos os campos sem valor padrão:
 
 | Variável | Valor para o workshop | Observação |
 |---|---|---|
-| `region` | `sa-saopaulo-1` | Região da rede e da VM. Use a região home do Trial. |
+| `region` | `us-chicago-1` | Região obrigatória da Stack, rede e VM: US Midwest (Chicago), ORD. |
 | `tenancy_ocid` | `ocid1.tenancy...` | OCID da tenancy; necessário para criar a policy de GenAI. |
 | `compartment_ocid` | `ocid1.compartment...` | Compartment em que a infraestrutura será criada. |
 | `ssh_public_key` | `ssh-ed25519 AAAA... participante` | Cole a linha completa do arquivo `.pub`, nunca a chave privada. |
@@ -93,7 +96,7 @@ Valores recomendados que já aparecem como padrão:
 | Variável | Valor recomendado | Quando alterar |
 |---|---|---|
 | `create_genai_policy` | `true` | Use `false` se o participante não puder criar policy na tenancy. |
-| `genai_region` | `us-chicago-1` | Região usada pelo modelo do laboratório. |
+| `genai_region` | `us-chicago-1` | Mesma região da VM; a validação bloqueia outro valor. |
 | `genai_model` | `openai.gpt-oss-120b` | Mantenha para acompanhar o workshop. |
 | `instance_shape` | `VM.Standard.E5.Flex` | Usa créditos Trial. A1 pode não ter capacidade disponível. |
 | `instance_ocpus` | `2` | Preset do laboratório. |
@@ -103,6 +106,8 @@ Valores recomendados que já aparecem como padrão:
 ![Preencher as variáveis da Stack sem incluir segredos](images/oci-resource-manager/04-variaveis.svg)
 
 > Nunca cole aqui o segredo `sk-...` do OCI Generative AI, o token do BotFather, uma chave SSH privada ou credenciais do GitHub. Variáveis podem aparecer no state e nos detalhes do job.
+
+As duas variáveis regionais devem permanecer como `us-chicago-1`. O Terraform rejeita outro valor para evitar uma implantação dividida entre regiões.
 
 Clique em **Next**.
 
@@ -144,7 +149,8 @@ Depois de revisar um Plan com sucesso:
 3. confirme em **Apply**;
 4. abra o job `apply-...` e aguarde **SUCCEEDED**;
 5. abra a guia **Outputs**;
-6. copie `public_ip`, `ssh_command` e, se desejar, `ssh_config_entry`.
+6. confirme `deployment_region = us-chicago-1 (ORD)`;
+7. copie `public_ip`, `ssh_command` e, se desejar, `ssh_config_entry`.
 
 ![Executar Apply, aguardar SUCCEEDED e consultar Outputs](images/oci-resource-manager/07-apply-outputs.svg)
 
@@ -199,6 +205,7 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 |---|---|---|
 | `NotAuthorizedOrNotFound` ao criar policy | O participante não administra policies no nível usado. | Defina `create_genai_policy = false` e peça ao administrador para criar a policy previamente. |
 | `Out of host capacity` | A shape não tem capacidade no Availability Domain escolhido. | Tente outro AD, aguarde e repita, ou altere a shape conforme orientação do facilitador. |
+| Terraform rejeita `region` ou `genai_region` | Foi informada uma região diferente de Chicago. | Use `us-chicago-1` nos dois campos e gere um novo Plan. |
 | `ssh_allowed_cidr` inválido | Foi informado apenas o IP ou uma faixa inválida. | Use o IPv4 público com `/32`, por exemplo `203.0.113.10/32`. |
 | Apply concluiu, mas o SSH não responde | Cloud-init em execução, IP de origem mudou ou porta 22 está restrita a outro CIDR. | Aguarde alguns minutos e confirme `public_ip` e `ssh_allowed_cidr`. |
 | SSH funciona, mas o Hermes não está pronto | Instalação ainda está em andamento ou falhou. | Execute `cloud-init status --wait` e consulte `/var/log/hermes-bootstrap.log`. |
@@ -213,3 +220,5 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 - [Consultar os Outputs de um job](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/list-job-outputs.htm)
 - [Obter os Logs de um job](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/get-job-logs.htm)
 - [Criar um job Destroy](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-destroy.htm)
+- [Regiões e Availability Domains da OCI](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm)
+- [API keys do OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/api-keys.htm)

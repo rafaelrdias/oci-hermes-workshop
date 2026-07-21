@@ -1,5 +1,7 @@
 # Terraform — ambiente OCI Trial para Hermes
 
+Todos os recursos regionais do laboratório ficam em **US Midwest (Chicago)**: identificador `us-chicago-1`, region key `ORD`. Isso inclui a Stack do Resource Manager, rede, VM, API key do OCI Generative AI e endpoint do modelo. IAM policies são globais na tenancy.
+
 ## Arquitetura criada
 
 ```text
@@ -23,6 +25,8 @@ Não é necessário abrir a porta 8642: o laboratório usa Telegram por long pol
 - chave pública SSH;
 - permissão para criar Compute, Networking e IAM policy.
 
+Antes de criar a Stack, confirme que a Console está em **US Midwest (Chicago)** e que a tenancy está inscrita nessa região.
+
 Descubra seu IP público e use `/32` sempre que possível:
 
 ```bash
@@ -38,14 +42,15 @@ cp terraform.tfvars.example terraform.tfvars
 Edite pelo menos:
 
 ```hcl
-region           = "sa-saopaulo-1" # região home do trial para a VM
+region           = "us-chicago-1" # US Midwest (Chicago), region key ORD
 tenancy_ocid     = "ocid1.tenancy.oc1..aaaa..."
 compartment_ocid = "ocid1.compartment.oc1..aaaa..."
 ssh_public_key   = "ssh-ed25519 AAAA..."
 ssh_allowed_cidr = "203.0.113.10/32"
+genai_region     = "us-chicago-1" # mesma região da VM e da rede
 ```
 
-O modelo usa `us-chicago-1` por padrão, pois Chicago suporta `openai.gpt-oss-120b` on-demand e o uso de API key com o SDK OpenAI. A região da VM e a região do modelo podem ser diferentes.
+O workshop valida tanto `region` quanto `genai_region` como `us-chicago-1`. Chicago suporta `openai.gpt-oss-120b` on-demand e o uso de API key com o SDK OpenAI.
 
 ## 3. Provisionar
 
@@ -60,6 +65,7 @@ terraform apply workshop.tfplan
 O `apply` termina antes do cloud-init. Espere a instalação:
 
 ```bash
+terraform output deployment_region # deve mostrar us-chicago-1 (ORD)
 terraform output ssh_config_entry
 # copie o bloco para ~/.ssh/config e ajuste IdentityFile
 ssh hermes-oci 'cloud-init status --wait'
@@ -70,7 +76,7 @@ ssh hermes-oci 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
 
 ### OCI Generative AI API key
 
-Na Console, selecione a região **US Midwest (Chicago)**:
+Mantenha a Console na região **US Midwest (Chicago)**:
 
 1. Analytics & AI → Generative AI → API keys;
 2. Create API key no compartment do laboratório;

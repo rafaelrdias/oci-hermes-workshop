@@ -8,6 +8,11 @@ output "public_ip" {
   value       = oci_core_instance.hermes.public_ip
 }
 
+output "deployment_region" {
+  description = "OCI region used for all regional workshop resources."
+  value       = "${var.region} (ORD)"
+}
+
 output "remote_workdir" {
   description = "Directory used for remote Hermes tasks."
   value       = var.remote_workdir
