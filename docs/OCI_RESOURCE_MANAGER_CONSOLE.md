@@ -1,6 +1,6 @@
 # Provisionar pela Console OCI — Resource Manager
 
-Este é o caminho recomendado para o workshop. O **OCI Resource Manager** executa o Terraform dentro da OCI, mantém o state da Stack e dispensa a instalação local do Terraform e da OCI CLI.
+O **OCI Resource Manager** executa o Terraform dentro da OCI, mantém o state da Stack e dispensa a instalação local do Terraform e da OCI CLI.
 
 Todo o fluxo deve ser executado em **US Midwest (Chicago)**: identificador `us-chicago-1`, region key `ORD`. A Stack e seus jobs são regionais; por isso, selecione Chicago antes de abrir o Resource Manager.
 
