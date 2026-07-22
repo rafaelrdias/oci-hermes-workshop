@@ -15,8 +15,10 @@ Tenha:
 - tenancy OCID e compartment OCID;
 - uma chave pública SSH;
 - seu IP público no formato `/32`;
-- o arquivo [`oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/raw/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip);
+- o arquivo [`oci-hermes-resource-manager.zip`](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip), baixado diretamente do GitHub;
 - Telegram instalado.
+
+Se faltar algum desses itens, conclua a seção de [preparação pela Console](OCI_RESOURCE_MANAGER_CONSOLE.md#preparação-pela-console--sem-instalar-ferramentas) antes de iniciar o cronômetro de 60 minutos.
 
 ## 0–10 min — entender o fluxo
 
@@ -35,13 +37,14 @@ Antes do primeiro passo, selecione **US Midwest (Chicago)** no canto superior da
 
 Use o [guia visual da Console OCI](OCI_RESOURCE_MANAGER_CONSOLE.md):
 
-1. abra **Developer Services → Resource Manager → Stacks**;
-2. clique em **Create stack** e escolha **My configuration → .Zip file**;
-3. envie `oci-hermes-resource-manager.zip`;
-4. preencha tenancy, compartment, chave SSH pública e seu IP `/32`;
-5. crie a Stack com **Run apply** desmarcado;
-6. execute **Plan**, revise os Logs e aguarde **SUCCEEDED**;
-7. execute **Apply** usando o último Plan e aguarde **SUCCEEDED**.
+1. se necessário, use a preparação visual do guia para obter Tenancy OCID, Compartment OCID e chaves SSH;
+2. abra **Developer Services → Resource Manager → Stacks**;
+3. clique em **Create stack** e escolha **My configuration → .Zip file**;
+4. envie `oci-hermes-resource-manager.zip`;
+5. preencha tenancy, compartment, chave SSH pública e seu IP `/32`;
+6. crie a Stack com **Run apply** desmarcado;
+7. execute **Plan**, revise os Logs e aguarde **SUCCEEDED**;
+8. execute **Apply** usando o último Plan e aguarde **SUCCEEDED**.
 
 Enquanto o cloud-init instala o Hermes, avance para as duas credenciais.
 

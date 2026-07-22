@@ -18,27 +18,107 @@ Ao concluir este roteiro, a Stack terá criado:
 
 A API key do OCI Generative AI é criada manualmente em Chicago. Seu segredo e o token do BotFather **não** passam pelo Terraform; eles são inseridos depois, diretamente na VM.
 
-## Antes de abrir a Stack
+## Preparação pela Console — sem instalar ferramentas
+
+Conclua estas etapas antes de criar a Stack. Você terminará com o ZIP, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o pacote.
+
+### A. Baixar o ZIP pronto
+
+Clique no link abaixo e salve o arquivo no computador:
+
+**[⬇️ Baixar `oci-hermes-resource-manager.zip`](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip)**
+
+O arquivo está versionado diretamente no GitHub e é servido como `application/zip`. Não descompacte: o próprio `.zip` será enviado ao Resource Manager.
+
+![Baixar o ZIP pronto diretamente no GitHub](images/oci-resource-manager/00a-download-zip.svg)
+
+> Não envie a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+
+### B. Copiar o Tenancy OCID
+
+Na Console OCI:
+
+1. abra o menu **Profile** no canto superior direito;
+2. selecione **Tenancy: `<nome-da-tenancy>`**;
+3. em **Tenancy information**, localize **Tenancy OCID**;
+4. clique em **Show**, se necessário, e depois em **Copy**;
+5. guarde o valor como `tenancy_ocid`.
+
+![Abrir os detalhes da tenancy e copiar o Tenancy OCID](images/oci-resource-manager/00b-tenancy-ocid.svg)
+
+O valor começa com `ocid1.tenancy`. Não use o OCID do usuário ou do identity domain.
+
+### C. Criar ou selecionar o compartment
+
+Se o facilitador já forneceu um compartment, não crie outro: abra o compartment informado e siga diretamente para a cópia do OCID.
+
+Para criar um compartment quando sua conta tiver permissão:
+
+1. abra `☰` → **Identity & Security → Identity → Compartments**;
+2. navegue até o parent compartment indicado pelo facilitador;
+3. clique em **Create compartment**;
+4. use um nome único, como `hermes-workshop-<suas-iniciais>`;
+5. informe uma descrição e confirme o parent compartment;
+6. clique em **Create compartment**;
+7. aguarde o lifecycle state **ACTIVE**.
+
+![Criar o compartment do participante](images/oci-resource-manager/00c-create-compartment.svg)
+
+Se o botão **Create compartment** não aparecer ou retornar `NotAuthorized`, use o compartment fornecido pelo facilitador. Participantes não devem criar policies ou compartments fora do escopo autorizado.
+
+Para copiar o ID:
+
+1. clique no nome do compartment;
+2. confirme que o lifecycle state é **ACTIVE**;
+3. em **Compartment information**, localize **Compartment OCID**;
+4. clique em **Copy** e guarde o valor como `compartment_ocid`.
+
+![Copiar o Compartment OCID](images/oci-resource-manager/00d-compartment-ocid.svg)
+
+O valor começa com `ocid1.compartment`. O Tenancy OCID e o Compartment OCID são diferentes, mesmo quando a Console mostra a tenancy como root compartment.
+
+### D. Gerar e baixar as chaves SSH pela Console
+
+A Console gera o par de chaves dentro do assistente de criação de instância. Use o assistente somente para baixar as chaves; **não crie uma VM manualmente**.
+
+1. confirme **US Midwest (Chicago)** no seletor de região;
+2. abra `☰` → **Compute → Instances**;
+3. clique em **Create instance**;
+4. localize a seção **Add SSH keys**;
+5. selecione **Generate a key pair for me**;
+6. clique em **Save Private Key**;
+7. clique também em **Save Public Key**;
+8. confirme que os dois arquivos foram baixados;
+9. clique em **Cancel** e saia do assistente sem criar a instância.
+
+![Gerar e baixar as chaves SSH e cancelar a criação manual da VM](images/oci-resource-manager/00e-ssh-key-pair.svg)
+
+Normalmente, os arquivos têm nomes semelhantes a:
+
+- `ssh-key-AAAA-MM-DD.key`: chave **privada**, usada depois no comando `ssh`;
+- `ssh-key-AAAA-MM-DD.key.pub`: chave **pública**, usada em `ssh_public_key`.
+
+Guarde a chave privada em local seguro e não a envie ao GitHub, Resource Manager, chat ou outras pessoas. Abra somente o arquivo `.pub` no Bloco de Notas, TextEdit ou outro editor de texto e copie a linha inteira, começando com `ssh-rsa` ou `ssh-ed25519`.
+
+> A mesma chave privada não pode ser recuperada depois que você sai do fluxo. Confirme os dois downloads antes de clicar em Cancel.
+
+### E. Descobrir o CIDR do seu IP
+
+No navegador, pesquise `qual é meu IP` e copie o endereço **IPv4** exibido. Acrescente `/32` ao final; por exemplo, o IPv4 `203.0.113.10` vira `203.0.113.10/32`. Esse será o valor de `ssh_allowed_cidr`.
+
+Se estiver em VPN, confirme com o facilitador se deve manter a VPN durante todo o laboratório. Uma mudança de IP depois do Apply impede o acesso SSH até que a variável seja atualizada e um novo Plan/Apply seja executado.
+
+### Checklist antes da Stack
 
 Tenha em mãos:
 
-1. acesso à Console OCI, inscrição em **US Midwest (Chicago)** e um compartment para o laboratório;
-2. `tenancy_ocid` e `compartment_ocid`;
-3. o conteúdo completo da chave SSH **pública** (`.pub`);
-4. seu IP público no formato CIDR, por exemplo `203.0.113.10/32`;
-5. permissão para usar Resource Manager e criar Compute, Networking e, opcionalmente, IAM policy.
-
-Use somente o arquivo ZIP preparado para o Resource Manager:
-
-- [baixar `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/raw/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip); ou
-- gerar localmente com os comandos abaixo.
-
-```bash
-cd infra/terraform/oci-trial-deploy
-./build-resource-manager-zip.sh
-```
-
-O arquivo gerado estará em `dist/oci-hermes-resource-manager.zip`. Não envie a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+- `oci-hermes-resource-manager.zip`, ainda compactado;
+- `tenancy_ocid`, começando com `ocid1.tenancy`;
+- `compartment_ocid`, começando com `ocid1.compartment`;
+- conteúdo completo da chave SSH pública `.pub`;
+- caminho local da chave SSH privada `.key`;
+- seu IP público no formato CIDR, por exemplo `203.0.113.10/32`;
+- acesso ao Resource Manager e permissão para criar Compute e Networking no compartment.
 
 ## 1. Abrir o OCI Resource Manager
 
@@ -222,3 +302,6 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 - [Criar um job Destroy](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-destroy.htm)
 - [Regiões e Availability Domains da OCI](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm)
 - [API keys do OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/api-keys.htm)
+- [Localizar o Tenancy OCID](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm)
+- [Criar um compartment](https://docs.oracle.com/en-us/iaas/Content/Identity/compartments/To_create_a_compartment.htm)
+- [Gerar chaves SSH no assistente Create instance](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/launchinginstance.htm)
