@@ -69,12 +69,10 @@ O valor começa com `ocid1.tenancy`. Não use o OCID do usuário ou do identity 
 
 ### C. Criar ou selecionar o compartment
 
-Se o facilitador já forneceu um compartment, não crie outro: abra o compartment informado e siga diretamente para a cópia do OCID.
-
 Para criar um compartment quando sua conta tiver permissão:
 
 1. abra `☰` → **Identity & Security → Identity → Compartments**;
-2. navegue até o parent compartment indicado pelo facilitador;
+2. navegue até o parent compartment;
 3. clique em **Create compartment**;
 4. use um nome único, como `hermes-workshop-<suas-iniciais>`;
 5. informe uma descrição e confirme o parent compartment;
@@ -82,8 +80,6 @@ Para criar um compartment quando sua conta tiver permissão:
 7. aguarde o lifecycle state **ACTIVE**.
 
 ![Criar o compartment do participante](images/oci-resource-manager/00c-create-compartment.svg)
-
-Se o botão **Create compartment** não aparecer ou retornar `NotAuthorized`, use o compartment fornecido pelo facilitador. Participantes não devem criar policies ou compartments fora do escopo autorizado.
 
 Para copiar o ID:
 
