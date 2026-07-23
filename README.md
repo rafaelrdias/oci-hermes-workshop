@@ -61,10 +61,3 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 Não grave API keys ou tokens em variáveis da Stack, `terraform.tfvars`, código, prints ou chat. O Telegram dá acesso às ferramentas do agente na VM; nunca habilite `GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e, ao final, execute **Destroy** no Resource Manager antes de excluir a Stack.
 
 IAM policies pertencem à tenancy e não são recursos regionais. A Stack, seus jobs, rede, VM, API key do OCI Generative AI e endpoint do modelo devem permanecer em Chicago.
-
-## Estado da VM de demonstração
-
-Na VM `147.224.210.244`, em `us-chicago-1` / ORD, o Hermes oficial está
-instalado, a chamada ao OCI Generative AI foi validada, a allowlist do Telegram
-foi registrada e o gateway está ativo. O bot de demonstração é
-`@rafadias_oci_bot`.
