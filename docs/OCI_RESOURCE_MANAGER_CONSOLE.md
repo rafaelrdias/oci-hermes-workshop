@@ -26,13 +26,19 @@ Conclua estas etapas antes de criar a Stack. Você terminará com o ZIP, dois OC
 
 Clique no link abaixo e salve o arquivo no computador:
 
-**[⬇️ Baixar `oci-hermes-resource-manager.zip`](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip)**
+**[⬇️ Baixar `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)**
 
-O arquivo está versionado diretamente no GitHub e é servido como `application/zip`. Não descompacte: o próprio `.zip` será enviado ao Resource Manager.
+O arquivo é um asset da [GitHub Release do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/releases/tag/workshop-terraform-ord-v2). O GitHub força o download com o nome `oci-hermes-resource-manager.zip`. Não descompacte: o próprio `.zip` será enviado ao Resource Manager.
 
-![Baixar o ZIP pronto diretamente no GitHub](images/oci-resource-manager/00a-download-zip.svg)
+[![Baixar o ZIP pronto diretamente no GitHub](images/oci-resource-manager/00a-download-zip.svg)](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)
+
+O link em texto e a imagem acima apontam para o mesmo asset `.zip`.
 
 > Não envie a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+
+> Não use **Code → Download ZIP** na página inicial do repositório: esse botão baixa o repositório inteiro. Use somente o asset `oci-hermes-resource-manager.zip` acima.
+
+Se o Safari mostrar uma pasta em vez do arquivo, ele expandiu o ZIP automaticamente. Abra **Safari → Settings → General**, desmarque **Open “safe” files after downloading** e baixe o asset novamente. Chrome e Firefox normalmente preservam o `.zip` sem essa configuração.
 
 ### B. Copiar o Tenancy OCID
 

@@ -170,7 +170,7 @@ Nunca:
 
 Antes da atividade, pela Console e pelo navegador:
 
-1. baixar o [ZIP pronto do Terraform](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip);
+1. baixar o [ZIP pronto pelo asset da GitHub Release](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip);
 2. copiar o Tenancy OCID;
 3. selecionar/criar o compartment e copiar seu OCID;
 4. gerar o par SSH em **Compute → Create instance → Add SSH keys**;

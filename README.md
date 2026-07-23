@@ -16,7 +16,7 @@ Material do workshop Oracle no TDC Florianópolis. O laboratório concentra todo
 O caminho recomendado para os participantes é executar o Terraform pelo **OCI Resource Manager**, sem instalar Terraform ou OCI CLI no computador:
 
 1. selecione **US Midwest (Chicago)** na Console OCI antes de abrir o Resource Manager;
-2. [baixe o ZIP pronto diretamente do GitHub](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip), sem clonar nem executar scripts;
+2. [baixe o ZIP pelo asset da GitHub Release](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip), sem clonar nem executar scripts;
 3. siga o [passo a passo visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md);
 4. execute **Plan**, revise os Logs e somente então execute **Apply** selecionando o Plan mais recente;
 5. abra o job de Apply, confirme `deployment_region = us-chicago-1 (ORD)` e copie `public_ip` em **Outputs**.

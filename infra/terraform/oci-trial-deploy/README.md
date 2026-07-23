@@ -125,7 +125,7 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 Baixe o pacote pronto:
 
-[Download direto de `oci-hermes-resource-manager.zip`](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip)
+[Download do asset `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)
 
 Ou gere o pacote a partir do código atual:
 

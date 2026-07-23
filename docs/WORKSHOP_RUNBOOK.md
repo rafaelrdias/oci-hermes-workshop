@@ -15,7 +15,7 @@ Tenha:
 - tenancy OCID e compartment OCID;
 - uma chave pública SSH;
 - seu IP público no formato `/32`;
-- o arquivo [`oci-hermes-resource-manager.zip`](https://raw.githubusercontent.com/rafaelrdias/oci-hermes-workshop/refs/heads/main/infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip), baixado diretamente do GitHub;
+- o arquivo [`oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip), baixado como asset da GitHub Release;
 - Telegram instalado.
 
 Se faltar algum desses itens, conclua a seção de [preparação pela Console](OCI_RESOURCE_MANAGER_CONSOLE.md#preparação-pela-console--sem-instalar-ferramentas) antes de iniciar o cronômetro de 60 minutos.
