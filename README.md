@@ -16,8 +16,8 @@ Material do workshop Oracle no TDC Florianópolis. O laboratório concentra todo
 O caminho recomendado para os participantes é executar o Terraform pelo **OCI Resource Manager**, sem instalar Terraform ou OCI CLI no computador:
 
 1. selecione **US Midwest (Chicago)** na Console OCI antes de abrir o Resource Manager;
-2. na [página do repositório](https://github.com/rafaelrdias/oci-hermes-workshop), use **Code → Download ZIP** e abra a pasta baixada;
-3. dentro dela, localize `infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip` — este é o arquivo que será enviado à Stack;
+2. use o link **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)** e abra a pasta `oci-hermes-workshop-main`;
+3. no Resource Manager, escolha **My configuration → Folder** e selecione a pasta `infra/terraform/oci-trial-deploy`;
 4. siga o [passo a passo visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md);
 5. execute **Plan**, revise os Logs e somente então execute **Apply** selecionando o Plan mais recente;
 6. abra o job de Apply, confirme `deployment_region = us-chicago-1 (ORD)` e copie `public_ip` em **Outputs**.
@@ -49,11 +49,11 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 ## Material do workshop
 
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
-- [Guia visual — ZIP, OCIDs, chaves SSH e Terraform pela Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
+- [Guia visual — pasta Terraform, OCIDs, chaves SSH e Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)
-- [Apresentação PowerPoint — template Oracle](presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v2.pptx)
+- [Apresentação PowerPoint — template Oracle](presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v3.pptx)
 - [Terraform](infra/terraform/oci-trial-deploy/README.md)
 
 ## Segurança

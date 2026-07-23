@@ -4,12 +4,12 @@
   <rect width="1200" height="720" fill="#f4f4f4"/><rect width="1200" height="54" fill="#fff"/><text x="25" y="34" font-family="Arial" font-size="22" font-weight="bold" fill="#c74634">ORACLE</text><text x="139" y="33" class="h2">Cloud Infrastructure</text><rect y="54" width="1200" height="42" fill="#fff"/><text x="25" y="80" class="s">Create stack / Review</text>
   <rect x="0" y="96" width="235" height="624" fill="#fff"/><text x="20" y="130" class="s">CREATE STACK</text><text x="32" y="174" class="t">✓ Stack information</text><text x="32" y="215" class="t">✓ Configure variables</text><rect x="16" y="234" width="203" height="37" fill="#fbeeea"/><text x="32" y="258" class="t bold">3. Review</text>
   <text x="270" y="142" class="h">Review</text>
-  <rect x="270" y="175" width="272" height="86" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="290" y="208" class="h2">My configuration</text><text x="290" y="235" class="s">ZIP upload</text>
+  <rect x="270" y="175" width="272" height="86" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="290" y="208" class="h2">My configuration</text><text x="290" y="235" class="s">Folder</text>
   <rect x="562" y="175" width="272" height="86" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="582" y="208" class="h2">workshop-lab</text><text x="582" y="235" class="s">Compartment</text>
   <rect x="854" y="175" width="296" height="86" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="874" y="208" class="h2">Terraform 1.x</text><text x="874" y="235" class="s">Compatible version</text>
   <rect x="270" y="285" width="880" height="257" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="295" y="321" class="h2">Stack summary</text>
   <text x="295" y="361" class="s">Name</text><text x="550" y="361" class="t bold">hermes-oci-workshop</text><line x1="295" y1="378" x2="1125" y2="378" stroke="#e1ded9"/>
-  <text x="295" y="408" class="s">Configuration</text><text x="550" y="408" class="t">oci-hermes-resource-manager.zip</text><line x1="295" y1="425" x2="1125" y2="425" stroke="#e1ded9"/>
+  <text x="295" y="408" class="s">Configuration</text><text x="550" y="408" class="t">oci-trial-deploy</text><line x1="295" y1="425" x2="1125" y2="425" stroke="#e1ded9"/>
   <text x="295" y="455" class="s">Variables</text><text x="550" y="455" class="t">Reviewed - no secrets</text>
   <rect x="295" y="480" width="17" height="17" fill="#fff" stroke="#777"/><text x="325" y="494" class="t bold">Run apply</text><text x="410" y="494" class="s">Deixe desmarcado; execute Plan e revise primeiro.</text>
   <rect x="295" y="515" width="91" height="39" rx="3" fill="#c74634"/><text x="316" y="540" font-family="Arial" font-size="14" font-weight="bold" fill="#fff">Create</text>

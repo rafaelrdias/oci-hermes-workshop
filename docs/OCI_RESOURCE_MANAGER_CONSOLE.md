@@ -20,34 +20,38 @@ A API key do OCI Generative AI é criada manualmente em Chicago. Seu segredo e o
 
 ## Preparação pela Console — sem instalar ferramentas
 
-Conclua estas etapas antes de criar a Stack. Você terminará com a pasta do repositório, o ZIP interno do Terraform, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o pacote.
+Conclua estas etapas antes de criar a Stack. Você terminará com a pasta Terraform, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o material.
 
-### A. Baixar a pasta do workshop e localizar o ZIP da Stack
+### A. Baixar a pasta do workshop e localizar a pasta Terraform
 
-1. abra o repositório [`rafaelrdias/oci-hermes-workshop`](https://github.com/rafaelrdias/oci-hermes-workshop);
-2. clique em **Code**;
-3. escolha **Download ZIP**;
-4. abra o download. O arquivo externo normalmente se chama `oci-hermes-workshop-main.zip`;
-5. se o navegador não o expandir automaticamente, extraia esse ZIP uma vez;
-6. abra a pasta `oci-hermes-workshop-main`;
-7. navegue por `infra` → `terraform` → `oci-trial-deploy` → `dist`;
-8. localize `oci-hermes-resource-manager.zip`.
+1. clique em **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)**;
+2. abra o download. O GitHub transporta a pasta em um arquivo compactado chamado `oci-hermes-workshop-main.zip`;
+3. se o navegador não o expandir automaticamente, extraia esse arquivo uma vez;
+4. abra a pasta `oci-hermes-workshop-main`;
+5. navegue por `infra` → `terraform`;
+6. localize a pasta `oci-trial-deploy`.
 
-[![Baixar o repositório e localizar o ZIP interno](images/oci-resource-manager/00a-download-zip.svg)](https://github.com/rafaelrdias/oci-hermes-workshop)
+[![Baixar o repositório e localizar a pasta Terraform](images/oci-resource-manager/00a-download-folder.svg)](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)
 
-O download externo contém todo o material do workshop e pode aparecer como arquivo ZIP ou como pasta, principalmente no Safari. **As duas situações estão corretas.** O arquivo a enviar ao OCI Resource Manager é o ZIP interno neste caminho:
+O download contém todo o material do workshop e pode aparecer como arquivo compactado ou como pasta, principalmente no Safari. **As duas situações estão corretas.** No Resource Manager, selecione esta pasta:
 
 ```text
 oci-hermes-workshop-main/
-└── infra/terraform/oci-trial-deploy/dist/
-    └── oci-hermes-resource-manager.zip  ← envie este arquivo
+└── infra/terraform/
+    └── oci-trial-deploy/  ← selecione esta pasta
+        ├── main.tf
+        ├── variables.tf
+        ├── outputs.tf
+        └── files/
 ```
 
-Não extraia `oci-hermes-resource-manager.zip`. A Console OCI aceita esse pacote diretamente em **My configuration → .Zip file**.
+Use **My configuration → Folder**. A Console envia os arquivos Terraform e a subpasta `files/` a partir da pasta selecionada.
 
-> Não envie `oci-hermes-workshop-main.zip`, a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+> Não selecione a raiz `oci-hermes-workshop-main`, a subpasta `dist`, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
 
-Se o Safari mostrar diretamente a pasta `oci-hermes-workshop-main`, ele apenas expandiu o ZIP externo automaticamente. Continue a partir do passo 6; não é necessário alterar as preferências do navegador nem baixar novamente.
+Se o Safari mostrar diretamente a pasta `oci-hermes-workshop-main`, ele apenas expandiu o download automaticamente. Continue a partir do passo 4; não é necessário alterar as preferências do navegador nem baixar novamente.
+
+Também é possível [visualizar a pasta Terraform no GitHub](https://github.com/rafaelrdias/oci-hermes-workshop/tree/main/infra/terraform/oci-trial-deploy), mas a Console OCI precisa que ela esteja disponível localmente para o seletor de pastas.
 
 ### B. Copiar o Tenancy OCID
 
@@ -127,7 +131,7 @@ Se estiver em VPN, confirme com o facilitador se deve manter a VPN durante todo 
 
 Tenha em mãos:
 
-- pasta `oci-hermes-workshop-main` aberta e o arquivo interno `infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip`, ainda compactado;
+- pasta `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy` disponível localmente;
 - `tenancy_ocid`, começando com `ocid1.tenancy`;
 - `compartment_ocid`, começando com `ocid1.compartment`;
 - conteúdo completo da chave SSH pública `.pub`;
@@ -147,16 +151,16 @@ Na Console OCI:
 
 ![Abrir Stacks e clicar em Create stack](images/oci-resource-manager/01-abrir-stacks.svg)
 
-## 2. Carregar o ZIP do Terraform
+## 2. Selecionar a pasta do Terraform
 
 Na página **Create stack**:
 
 1. em **Stack configuration**, selecione **My configuration**;
-2. em **Configuration type**, selecione **.Zip file**;
-3. arraste ou procure `oci-hermes-resource-manager.zip`;
+2. em **Configuration type**, selecione **Folder**;
+3. clique em **Browse** e selecione `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy`;
 4. deixe **Use custom providers** desmarcado.
 
-![Selecionar My configuration e carregar o ZIP](images/oci-resource-manager/02-upload-zip.svg)
+![Selecionar My configuration, Folder e a pasta oci-trial-deploy](images/oci-resource-manager/02-select-folder.svg)
 
 O provider `oracle/oci` é baixado pelo próprio Resource Manager. A execução usa a identidade do serviço na tenancy; não é necessário fornecer fingerprint, arquivo PEM ou perfil da OCI CLI.
 
@@ -210,7 +214,7 @@ Clique em **Next**.
 
 Na etapa **Review**:
 
-1. confirme o ZIP, o compartment, a versão do Terraform e as variáveis;
+1. confirme a pasta `oci-trial-deploy`, o compartment, a versão do Terraform e as variáveis;
 2. mantenha **Run apply** desmarcado;
 3. clique em **Create**.
 
@@ -309,7 +313,7 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 ## Referências oficiais Oracle
 
 - [Listar Stacks e navegar até o Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/list-stacks.htm)
-- [Criar uma Stack a partir de um arquivo ZIP](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-stack-local.htm)
+- [Criar uma Stack a partir de uma pasta](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-stack-local-folder.htm)
 - [Criar um job Plan](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm)
 - [Criar um job Apply](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm)
 - [Consultar os Outputs de um job](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/list-job-outputs.htm)

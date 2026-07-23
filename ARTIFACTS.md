@@ -11,7 +11,15 @@ bash -n \
 git diff --check
 ```
 
-## Gerar Stack do OCI Resource Manager
+## Pasta do OCI Resource Manager
+
+Na Console OCI, use **My configuration → Folder** e selecione:
+
+```text
+infra/terraform/oci-trial-deploy
+```
+
+O pacote ZIP abaixo é opcional e permanece disponível somente para automação ou compatibilidade:
 
 ```bash
 infra/terraform/oci-trial-deploy/build-resource-manager-zip.sh
@@ -29,7 +37,7 @@ O ZIP inclui `files/bootstrap-hermes-server.sh` e `files/configure-hermes-server
 ## Apresentação do workshop
 
 ```text
-presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v2.pptx
+presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v3.pptx
 ```
 
 A apresentação reaproveita o template Oracle do material-base e cobre catálogo de LLMs, modalidades on-demand e Dedicated AI Cluster, Hermes Agent, arquitetura OCI + Telegram, segurança, cronograma e checkpoints da atividade.

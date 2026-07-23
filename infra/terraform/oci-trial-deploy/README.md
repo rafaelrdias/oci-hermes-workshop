@@ -123,24 +123,18 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 ## 7. OCI Resource Manager
 
-Para o workshop, abra o [repositório](https://github.com/rafaelrdias/oci-hermes-workshop), use **Code → Download ZIP** e abra a pasta `oci-hermes-workshop-main`. O pacote pronto para a Stack está em:
+Para o workshop, use o link **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)** e abra a pasta `oci-hermes-workshop-main`. No OCI Resource Manager, escolha **My configuration → Folder** e selecione:
 
 ```text
-infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip
+oci-hermes-workshop-main/infra/terraform/oci-trial-deploy
 ```
 
-O ZIP externo do repositório pode ser expandido; o ZIP interno acima deve permanecer compactado e será enviado ao Resource Manager.
-
-Ou gere o pacote a partir do código atual:
-
-```bash
-./build-resource-manager-zip.sh
-```
+O GitHub pode entregar o repositório como arquivo compactado; extraia-o uma vez e use a pasta acima. Não selecione a raiz do repositório nem a subpasta `dist`.
 
 Depois, siga o [passo a passo com telas da Console OCI](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_RESOURCE_MANAGER_CONSOLE.md) para:
 
 1. criar a Stack em **Developer Services → Resource Manager → Stacks**;
-2. enviar `dist/oci-hermes-resource-manager.zip`;
+2. selecionar a pasta `oci-trial-deploy` em **My configuration → Folder**;
 3. configurar as variáveis sem incluir segredos;
 4. executar e revisar **Plan**;
 5. executar **Apply** e consultar **Outputs**;
