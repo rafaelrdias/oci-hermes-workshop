@@ -7,3 +7,4 @@ terraform.tfvars
 .env
 *.pem
 *.key
+presentation/*.pptx

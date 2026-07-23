@@ -55,10 +55,12 @@ O ZIP inclui `files/bootstrap-hermes-server.sh` e `files/configure-hermes-server
 ## Apresentação do workshop
 
 ```text
-presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v3.pptx
+output/pdf/oci-enterprise-ai-hermes-agent-workshop-TDC_v2.pdf
 ```
 
-A apresentação reaproveita o template Oracle do material-base e cobre catálogo de LLMs, modalidades on-demand e Dedicated AI Cluster, Hermes Agent, arquitetura OCI + Telegram, segurança, cronograma e checkpoints da atividade.
+A apresentação em PDF reaproveita o template Oracle do material-base e cobre
+catálogo de LLMs, modalidades on-demand e Dedicated AI Cluster, Hermes Agent,
+arquitetura OCI + Telegram, segurança, cronograma e checkpoints da atividade.
 
 ## Verificar a VM
 

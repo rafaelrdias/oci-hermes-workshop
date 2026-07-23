@@ -59,7 +59,7 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)
-- [Apresentação PowerPoint — template Oracle](presentation/oci-enterprise-ai-hermes-agent-workshop-TDC_v3.pptx)
+- [Apresentação PDF — template Oracle](output/pdf/oci-enterprise-ai-hermes-agent-workshop-TDC_v2.pdf)
 - [Terraform](infra/terraform/oci-trial-deploy/README.md)
 
 ## Segurança
