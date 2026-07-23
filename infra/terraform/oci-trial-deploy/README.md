@@ -123,9 +123,13 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 ## 7. OCI Resource Manager
 
-Baixe o pacote pronto:
+Para o workshop, abra o [repositório](https://github.com/rafaelrdias/oci-hermes-workshop), use **Code → Download ZIP** e abra a pasta `oci-hermes-workshop-main`. O pacote pronto para a Stack está em:
 
-[Download do asset `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)
+```text
+infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip
+```
+
+O ZIP externo do repositório pode ser expandido; o ZIP interno acima deve permanecer compactado e será enviado ao Resource Manager.
 
 Ou gere o pacote a partir do código atual:
 

@@ -15,7 +15,7 @@ Tenha:
 - tenancy OCID e compartment OCID;
 - uma chave pública SSH;
 - seu IP público no formato `/32`;
-- o arquivo [`oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip), baixado como asset da GitHub Release;
+- a pasta baixada por **Code → Download ZIP** e o arquivo interno `infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip`;
 - Telegram instalado.
 
 Se faltar algum desses itens, conclua a seção de [preparação pela Console](OCI_RESOURCE_MANAGER_CONSOLE.md#preparação-pela-console--sem-instalar-ferramentas) antes de iniciar o cronômetro de 60 minutos.
@@ -39,8 +39,8 @@ Use o [guia visual da Console OCI](OCI_RESOURCE_MANAGER_CONSOLE.md):
 
 1. se necessário, use a preparação visual do guia para obter Tenancy OCID, Compartment OCID e chaves SSH;
 2. abra **Developer Services → Resource Manager → Stacks**;
-3. clique em **Create stack** e escolha **My configuration → .Zip file**;
-4. envie `oci-hermes-resource-manager.zip`;
+3. na pasta baixada, abra `infra/terraform/oci-trial-deploy/dist`;
+4. clique em **Create stack**, escolha **My configuration → .Zip file** e envie o `oci-hermes-resource-manager.zip` dessa pasta;
 5. preencha tenancy, compartment, chave SSH pública e seu IP `/32`;
 6. crie a Stack com **Run apply** desmarcado;
 7. execute **Plan**, revise os Logs e aguarde **SUCCEEDED**;

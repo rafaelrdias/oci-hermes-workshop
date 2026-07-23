@@ -170,11 +170,12 @@ Nunca:
 
 Antes da atividade, pela Console e pelo navegador:
 
-1. baixar o [ZIP pronto pelo asset da GitHub Release](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip);
-2. copiar o Tenancy OCID;
-3. selecionar/criar o compartment e copiar seu OCID;
-4. gerar o par SSH em **Compute → Create instance → Add SSH keys**;
-5. salvar as chaves privada e pública e cancelar o assistente sem criar a VM.
+1. no [repositório](https://github.com/rafaelrdias/oci-hermes-workshop), usar **Code → Download ZIP** e abrir a pasta `oci-hermes-workshop-main`;
+2. localizar o pacote interno `infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip`;
+3. copiar o Tenancy OCID;
+4. selecionar/criar o compartment e copiar seu OCID;
+5. gerar o par SSH em **Compute → Create instance → Add SSH keys**;
+6. salvar as chaves privada e pública e cancelar o assistente sem criar a VM.
 
 O [guia visual](docs/OCI_RESOURCE_MANAGER_CONSOLE.md#preparação-pela-console--sem-instalar-ferramentas) contém todas as telas.
 

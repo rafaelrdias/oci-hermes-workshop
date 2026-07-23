@@ -20,25 +20,34 @@ A API key do OCI Generative AI é criada manualmente em Chicago. Seu segredo e o
 
 ## Preparação pela Console — sem instalar ferramentas
 
-Conclua estas etapas antes de criar a Stack. Você terminará com o ZIP, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o pacote.
+Conclua estas etapas antes de criar a Stack. Você terminará com a pasta do repositório, o ZIP interno do Terraform, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o pacote.
 
-### A. Baixar o ZIP pronto
+### A. Baixar a pasta do workshop e localizar o ZIP da Stack
 
-Clique no link abaixo e salve o arquivo no computador:
+1. abra o repositório [`rafaelrdias/oci-hermes-workshop`](https://github.com/rafaelrdias/oci-hermes-workshop);
+2. clique em **Code**;
+3. escolha **Download ZIP**;
+4. abra o download. O arquivo externo normalmente se chama `oci-hermes-workshop-main.zip`;
+5. se o navegador não o expandir automaticamente, extraia esse ZIP uma vez;
+6. abra a pasta `oci-hermes-workshop-main`;
+7. navegue por `infra` → `terraform` → `oci-trial-deploy` → `dist`;
+8. localize `oci-hermes-resource-manager.zip`.
 
-**[⬇️ Baixar `oci-hermes-resource-manager.zip`](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)**
+[![Baixar o repositório e localizar o ZIP interno](images/oci-resource-manager/00a-download-zip.svg)](https://github.com/rafaelrdias/oci-hermes-workshop)
 
-O arquivo é um asset da [GitHub Release do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/releases/tag/workshop-terraform-ord-v2). O GitHub força o download com o nome `oci-hermes-resource-manager.zip`. Não descompacte: o próprio `.zip` será enviado ao Resource Manager.
+O download externo contém todo o material do workshop e pode aparecer como arquivo ZIP ou como pasta, principalmente no Safari. **As duas situações estão corretas.** O arquivo a enviar ao OCI Resource Manager é o ZIP interno neste caminho:
 
-[![Baixar o ZIP pronto diretamente no GitHub](images/oci-resource-manager/00a-download-zip.svg)](https://github.com/rafaelrdias/oci-hermes-workshop/releases/download/workshop-terraform-ord-v2/oci-hermes-resource-manager.zip)
+```text
+oci-hermes-workshop-main/
+└── infra/terraform/oci-trial-deploy/dist/
+    └── oci-hermes-resource-manager.zip  ← envie este arquivo
+```
 
-O link em texto e a imagem acima apontam para o mesmo asset `.zip`.
+Não extraia `oci-hermes-resource-manager.zip`. A Console OCI aceita esse pacote diretamente em **My configuration → .Zip file**.
 
-> Não envie a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+> Não envie `oci-hermes-workshop-main.zip`, a pasta inteira do repositório, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
 
-> Não use **Code → Download ZIP** na página inicial do repositório: esse botão baixa o repositório inteiro. Use somente o asset `oci-hermes-resource-manager.zip` acima.
-
-Se o Safari mostrar uma pasta em vez do arquivo, ele expandiu o ZIP automaticamente. Abra **Safari → Settings → General**, desmarque **Open “safe” files after downloading** e baixe o asset novamente. Chrome e Firefox normalmente preservam o `.zip` sem essa configuração.
+Se o Safari mostrar diretamente a pasta `oci-hermes-workshop-main`, ele apenas expandiu o ZIP externo automaticamente. Continue a partir do passo 6; não é necessário alterar as preferências do navegador nem baixar novamente.
 
 ### B. Copiar o Tenancy OCID
 
@@ -118,7 +127,7 @@ Se estiver em VPN, confirme com o facilitador se deve manter a VPN durante todo 
 
 Tenha em mãos:
 
-- `oci-hermes-resource-manager.zip`, ainda compactado;
+- pasta `oci-hermes-workshop-main` aberta e o arquivo interno `infra/terraform/oci-trial-deploy/dist/oci-hermes-resource-manager.zip`, ainda compactado;
 - `tenancy_ocid`, começando com `ocid1.tenancy`;
 - `compartment_ocid`, começando com `ocid1.compartment`;
 - conteúdo completo da chave SSH pública `.pub`;
