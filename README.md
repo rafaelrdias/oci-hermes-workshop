@@ -18,4 +18,9 @@ Guia completo com telas:
 
 https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_RESOURCE_MANAGER_CONSOLE.md
 
+Guia para criar a OCI Generative AI API key, configurar o `@BotFather`, abrir
+o bot e fazer o pairing:
+
+https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_API_KEY_TELEGRAM.md
+
 > Nunca adicione API keys, token do BotFather, chave SSH privada, `terraform.tfvars`, state ou a pasta `.terraform`.

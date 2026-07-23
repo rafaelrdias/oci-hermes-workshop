@@ -24,4 +24,8 @@ Pairing, se não foi usada allowlist:
 ssh hermes-oci 'hermes pairing approve telegram CODIGO'
 ```
 
+Passo a passo para obter as credenciais e abrir a primeira conversa:
+
+https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_API_KEY_TELEGRAM.md
+
 Nunca cole segredos em comandos SSH, pois eles podem ficar no histórico ou na lista de processos. Use o prompt interativo de `hermes-workshop-configure`.
