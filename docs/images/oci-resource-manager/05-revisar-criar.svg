@@ -9,7 +9,7 @@
   <rect x="854" y="175" width="296" height="86" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="874" y="208" class="h2">Terraform 1.x</text><text x="874" y="235" class="s">Compatible version</text>
   <rect x="270" y="285" width="880" height="257" rx="4" fill="#fff" stroke="#d8d4cf"/><text x="295" y="321" class="h2">Stack summary</text>
   <text x="295" y="361" class="s">Name</text><text x="550" y="361" class="t bold">hermes-oci-workshop</text><line x1="295" y1="378" x2="1125" y2="378" stroke="#e1ded9"/>
-  <text x="295" y="408" class="s">Configuration</text><text x="550" y="408" class="t">oci-trial-deploy</text><line x1="295" y1="425" x2="1125" y2="425" stroke="#e1ded9"/>
+  <text x="295" y="408" class="s">Configuration</text><text x="550" y="408" class="t">resource-manager-folder</text><line x1="295" y1="425" x2="1125" y2="425" stroke="#e1ded9"/>
   <text x="295" y="455" class="s">Variables</text><text x="550" y="455" class="t">Reviewed - no secrets</text>
   <rect x="295" y="480" width="17" height="17" fill="#fff" stroke="#777"/><text x="325" y="494" class="t bold">Run apply</text><text x="410" y="494" class="s">Deixe desmarcado; execute Plan e revise primeiro.</text>
   <rect x="295" y="515" width="91" height="39" rx="3" fill="#c74634"/><text x="316" y="540" font-family="Arial" font-size="14" font-weight="bold" fill="#fff">Create</text>

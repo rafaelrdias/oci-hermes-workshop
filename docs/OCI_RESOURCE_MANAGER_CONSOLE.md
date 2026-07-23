@@ -20,38 +20,34 @@ A API key do OCI Generative AI é criada manualmente em Chicago. Seu segredo e o
 
 ## Preparação pela Console — sem instalar ferramentas
 
-Conclua estas etapas antes de criar a Stack. Você terminará com a pasta Terraform, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o material.
+Conclua estas etapas antes de criar a Stack. Você terminará com uma pasta Terraform leve, dois OCIDs e um par de chaves SSH. Não é necessário clonar o repositório, instalar Terraform ou executar comandos para preparar o material.
 
 ### A. Baixar a pasta do workshop e localizar a pasta Terraform
 
-1. clique em **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)**;
-2. abra o download. O GitHub transporta a pasta em um arquivo compactado chamado `oci-hermes-workshop-main.zip`;
+1. clique em **[Baixar a pasta Terraform leve](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip)**;
+2. abra o download. O GitHub transporta a pasta em um arquivo compactado chamado `oci-hermes-workshop-resource-manager-folder.zip`;
 3. se o navegador não o expandir automaticamente, extraia esse arquivo uma vez;
-4. abra a pasta `oci-hermes-workshop-main`;
-5. navegue por `infra` → `terraform`;
-6. localize a pasta `oci-trial-deploy`.
+4. localize a pasta `oci-hermes-workshop-resource-manager-folder`.
 
-[![Baixar o repositório e localizar a pasta Terraform](images/oci-resource-manager/00a-download-folder.svg)](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)
+[![Baixar e abrir a pasta Terraform leve](images/oci-resource-manager/00a-download-folder.svg)](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip)
 
-O download contém todo o material do workshop e pode aparecer como arquivo compactado ou como pasta, principalmente no Safari. **As duas situações estão corretas.** No Resource Manager, selecione esta pasta:
+O download contém somente a configuração da Stack e pode aparecer como arquivo compactado ou como pasta, principalmente no Safari. **As duas situações estão corretas.** No Resource Manager, selecione a pasta extraída:
 
 ```text
-oci-hermes-workshop-main/
-└── infra/terraform/
-    └── oci-trial-deploy/  ← selecione esta pasta
-        ├── main.tf
-        ├── variables.tf
-        ├── outputs.tf
-        └── files/
+oci-hermes-workshop-resource-manager-folder/  ← selecione esta pasta
+├── main.tf
+├── variables.tf
+├── outputs.tf
+└── files/
 ```
 
 Use **My configuration → Folder**. A Console envia os arquivos Terraform e a subpasta `files/` a partir da pasta selecionada.
 
-> Não selecione a raiz `oci-hermes-workshop-main`, a subpasta `dist`, `terraform.tfvars`, arquivos de state, a chave SSH privada ou qualquer segredo.
+> Não selecione o repositório completo nem uma pasta que contenha `.terraform`, providers locais, `terraform.tfvars`, state, chave SSH privada ou segredos.
 
-Se o Safari mostrar diretamente a pasta `oci-hermes-workshop-main`, ele apenas expandiu o download automaticamente. Continue a partir do passo 4; não é necessário alterar as preferências do navegador nem baixar novamente.
+Se o Safari mostrar diretamente a pasta `oci-hermes-workshop-resource-manager-folder`, ele apenas expandiu o download automaticamente. Continue a partir do passo 4; não é necessário alterar as preferências do navegador nem baixar novamente.
 
-Também é possível [visualizar a pasta Terraform no GitHub](https://github.com/rafaelrdias/oci-hermes-workshop/tree/main/infra/terraform/oci-trial-deploy), mas a Console OCI precisa que ela esteja disponível localmente para o seletor de pastas.
+Também é possível [visualizar a pasta leve no GitHub](https://github.com/rafaelrdias/oci-hermes-workshop/tree/resource-manager-folder). A branch contém cerca de 60 KB e exclui `.terraform`, apresentações e demais artefatos que causavam o erro de limite de 11 MB.
 
 ### B. Copiar o Tenancy OCID
 
@@ -127,7 +123,7 @@ Se estiver em VPN, confirme com o facilitador se deve manter a VPN durante todo 
 
 Tenha em mãos:
 
-- pasta `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy` disponível localmente;
+- pasta `oci-hermes-workshop-resource-manager-folder` disponível localmente;
 - `tenancy_ocid`, começando com `ocid1.tenancy`;
 - `compartment_ocid`, começando com `ocid1.compartment`;
 - conteúdo completo da chave SSH pública `.pub`;
@@ -153,7 +149,7 @@ Na página **Create stack**:
 
 1. em **Stack configuration**, selecione **My configuration**;
 2. em **Configuration type**, selecione **Folder**;
-3. clique em **Browse** e selecione `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy`;
+3. clique em **Browse** e selecione `oci-hermes-workshop-resource-manager-folder`;
 4. deixe **Use custom providers** desmarcado.
 
 ![Selecionar My configuration, Folder e a pasta oci-trial-deploy](images/oci-resource-manager/02-select-folder.svg)
@@ -298,6 +294,7 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 
 | Sintoma | Causa provável | Ação |
 |---|---|---|
+| `After compression, this folder exceeds the maximum size (11 MB)` | Foi selecionado o repositório completo ou uma pasta que contém `.terraform` e providers locais. | Baixe novamente a [pasta Terraform leve](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip) e selecione somente `oci-hermes-workshop-resource-manager-folder`. |
 | `NotAuthorizedOrNotFound` ao criar policy | O participante não administra policies no nível usado. | Defina `create_genai_policy = false` e peça ao administrador para criar a policy previamente. |
 | `Out of host capacity` | A shape não tem capacidade no Availability Domain escolhido. | Tente outro AD, aguarde e repita, ou altere a shape conforme orientação do facilitador. |
 | Terraform rejeita `region` ou `genai_region` | Foi informada uma região diferente de Chicago. | Use `us-chicago-1` nos dois campos e gere um novo Plan. |

@@ -123,13 +123,13 @@ ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 
 ## 7. OCI Resource Manager
 
-Para o workshop, use o link **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)** e abra a pasta `oci-hermes-workshop-main`. No OCI Resource Manager, escolha **My configuration → Folder** e selecione:
+Para o workshop, use **[Baixar a pasta Terraform leve](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip)**. Extraia o download uma vez e, no OCI Resource Manager, escolha **My configuration → Folder** e selecione:
 
 ```text
-oci-hermes-workshop-main/infra/terraform/oci-trial-deploy
+oci-hermes-workshop-resource-manager-folder
 ```
 
-O GitHub pode entregar o repositório como arquivo compactado; extraia-o uma vez e use a pasta acima. Não selecione a raiz do repositório nem a subpasta `dist`.
+A branch de download contém somente os arquivos necessários à Stack e fica muito abaixo do limite de 11 MB. Não selecione o repositório completo nem uma pasta de desenvolvimento que contenha `.terraform`.
 
 Depois, siga o [passo a passo com telas da Console OCI](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/docs/OCI_RESOURCE_MANAGER_CONSOLE.md) para:
 

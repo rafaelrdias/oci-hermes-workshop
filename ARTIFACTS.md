@@ -13,13 +13,21 @@ git diff --check
 
 ## Pasta do OCI Resource Manager
 
-Na Console OCI, use **My configuration → Folder** e selecione:
+O download recomendado é a branch leve:
 
 ```text
-infra/terraform/oci-trial-deploy
+https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip
 ```
 
-O pacote ZIP abaixo é opcional e permanece disponível somente para automação ou compatibilidade:
+Depois de extrair, na Console OCI use **My configuration → Folder** e selecione:
+
+```text
+oci-hermes-workshop-resource-manager-folder
+```
+
+A pasta extraída tem cerca de 60 KB e não contém `.terraform`, providers locais, apresentações, state ou segredos.
+
+O pacote abaixo é opcional e permanece disponível somente para automação ou compatibilidade:
 
 ```bash
 infra/terraform/oci-trial-deploy/build-resource-manager-zip.sh

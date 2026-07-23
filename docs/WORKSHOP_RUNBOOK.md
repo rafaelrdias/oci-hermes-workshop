@@ -15,7 +15,7 @@ Tenha:
 - tenancy OCID e compartment OCID;
 - uma chave pública SSH;
 - seu IP público no formato `/32`;
-- a pasta `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy` baixada pelo [link do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip);
+- a pasta `oci-hermes-workshop-resource-manager-folder` obtida pelo [download leve do Terraform](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip);
 - Telegram instalado.
 
 Se faltar algum desses itens, conclua a seção de [preparação pela Console](OCI_RESOURCE_MANAGER_CONSOLE.md#preparação-pela-console--sem-instalar-ferramentas) antes de iniciar o cronômetro de 60 minutos.
@@ -39,7 +39,7 @@ Use o [guia visual da Console OCI](OCI_RESOURCE_MANAGER_CONSOLE.md):
 
 1. se necessário, use a preparação visual do guia para obter Tenancy OCID, Compartment OCID e chaves SSH;
 2. abra **Developer Services → Resource Manager → Stacks**;
-3. na pasta baixada, localize `infra/terraform/oci-trial-deploy`;
+3. extraia o download e localize `oci-hermes-workshop-resource-manager-folder`;
 4. clique em **Create stack**, escolha **My configuration → Folder** e selecione essa pasta;
 5. preencha tenancy, compartment, chave SSH pública e seu IP `/32`;
 6. crie a Stack com **Run apply** desmarcado;

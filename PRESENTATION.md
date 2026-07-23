@@ -170,8 +170,8 @@ Nunca:
 
 Antes da atividade, pela Console e pelo navegador:
 
-1. usar o link **[Baixar a pasta do workshop](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/main.zip)** e abrir `oci-hermes-workshop-main`;
-2. localizar a pasta `infra/terraform/oci-trial-deploy`;
+1. usar **[Baixar a pasta Terraform leve](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip)**;
+2. extrair e abrir `oci-hermes-workshop-resource-manager-folder`;
 3. copiar o Tenancy OCID;
 4. selecionar/criar o compartment e copiar seu OCID;
 5. gerar o par SSH em **Compute → Create instance → Add SSH keys**;
@@ -208,7 +208,7 @@ Console OCI
   → My configuration / Folder
 ```
 
-1. selecionar `oci-hermes-workshop-main/infra/terraform/oci-trial-deploy`;
+1. selecionar a pasta `oci-hermes-workshop-resource-manager-folder`;
 2. preencher as variáveis sem segredos;
 3. criar com **Run apply** desmarcado;
 4. executar **Plan** e revisar os Logs;

@@ -1,5 +1,25 @@
 # Troubleshooting rápido
 
+## Resource Manager: pasta excede 11 MB após compressão
+
+Mensagem:
+
+```text
+After compression, this folder exceeds the maximum size (11 MB).
+Reduce the size of the folder and try again.
+```
+
+Foi selecionado o repositório completo ou uma pasta de desenvolvimento com o diretório oculto `.terraform`, que pode conter centenas de megabytes de providers.
+
+Use a pasta limpa:
+
+1. baixe **[a pasta Terraform leve](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip)**;
+2. extraia o download uma vez;
+3. escolha **My configuration → Folder**;
+4. selecione somente `oci-hermes-workshop-resource-manager-folder`.
+
+Essa pasta contém cerca de 60 KB. Não selecione `oci-hermes-workshop-main`, `.terraform` ou o repositório de desenvolvimento.
+
 ## Terraform: `NotAuthorizedOrNotFound` ao criar policy
 
 O usuário não pode criar policies no root compartment. Defina:
