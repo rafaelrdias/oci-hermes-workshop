@@ -27,6 +27,16 @@ oci-hermes-workshop-resource-manager-folder
 
 A pasta extraída tem cerca de 60 KB e não contém `.terraform`, providers locais, apresentações, state ou segredos.
 
+## Credenciais e primeira conversa
+
+```text
+docs/OCI_API_KEY_TELEGRAM.md
+```
+
+O guia visual cobre a criação da OCI Generative AI API key OpenAI-compatible em
+Chicago, o fluxo `/newbot` no `@BotFather`, os valores que precisam ser
+guardados, o pairing seguro e o início da conversa pelo link do bot.
+
 O pacote abaixo é opcional e permanece disponível somente para automação ou compatibilidade:
 
 ```bash

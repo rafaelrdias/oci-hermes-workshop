@@ -256,6 +256,11 @@ O primeiro comando deve terminar com `status: done`. O segundo permite confirmar
 
 ## 8. Configurar OCI Generative AI e Telegram
 
+Antes de acessar a VM, conclua o
+[passo a passo visual para criar a API key, acionar o BotFather e abrir o bot](OCI_API_KEY_TELEGRAM.md).
+Ele mostra exatamente quais valores devem ser guardados e explica por que o
+Telegram user ID é opcional.
+
 Somente após o cloud-init terminar, execute:
 
 ```bash
@@ -268,11 +273,15 @@ O assistente solicita com entrada oculta:
 2. o token criado no `@BotFather`;
 3. opcionalmente, o Telegram user ID.
 
-Depois, envie `/new` ao bot. Se não informou o user ID, envie uma mensagem ao bot, copie o código de pairing e aprove na VM:
+Abra o link `https://t.me/<username>` entregue pelo BotFather e toque em
+**Start**. Se não informou o user ID, copie o código de pairing devolvido e
+aprove na VM:
 
 ```bash
 ssh -i <caminho-da-chave-privada> opc@<public_ip> 'hermes pairing approve telegram CODIGO'
 ```
+
+Depois da aprovação, envie `/new` para iniciar a conversa.
 
 ## 9. Destruir os recursos ao final
 
@@ -314,6 +323,8 @@ Faça backup de qualquer arquivo que precise manter. Depois:
 - [Criar um job Destroy](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-destroy.htm)
 - [Regiões e Availability Domains da OCI](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm)
 - [API keys do OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/api-keys.htm)
+- [Criar uma API key do OCI Generative AI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/create-api-key.htm)
+- [Criar um bot com o BotFather](https://core.telegram.org/bots/features#creating-a-new-bot)
 - [Localizar o Tenancy OCID](https://docs.oracle.com/en-us/iaas/Content/General/Concepts/identifiers.htm)
 - [Criar um compartment](https://docs.oracle.com/en-us/iaas/Content/Identity/compartments/To_create_a_compartment.htm)
 - [Gerar chaves SSH no assistente Create instance](https://docs.oracle.com/en-us/iaas/Content/Compute/Tasks/launchinginstance.htm)

@@ -74,6 +74,11 @@ ssh hermes-oci 'sudo tail -n 80 /var/log/hermes-bootstrap.log'
 
 ## 4. Criar os dois segredos fora do Terraform
 
+Use o
+**[guia visual de credenciais OCI e Telegram](../../../docs/OCI_API_KEY_TELEGRAM.md)**
+para acompanhar as telas, guardar somente os valores necessários e abrir a
+primeira conversa.
+
 ### OCI Generative AI API key
 
 Mantenha a Console na região **US Midwest (Chicago)**:
@@ -87,11 +92,11 @@ O Terraform já cria a policy que permite somente `generative-ai-chat` para `ope
 
 ### Telegram
 
-1. abra `@BotFather`;
+1. abra o `@BotFather` correto em <https://t.me/BotFather>;
 2. execute `/newbot`;
-3. escolha nome e username;
-4. copie o token;
-5. opcionalmente obtenha seu ID numérico com `@userinfobot`.
+3. escolha um nome e um username globalmente único terminado em `bot`;
+4. guarde o token, o username e o link `https://t.me/<username>`;
+5. deixe o Telegram user ID vazio no configurador para usar pairing seguro.
 
 ## 5. Configurar a VM
 
@@ -104,6 +109,9 @@ O comando testa o OCI Generative AI antes de iniciar o gateway. Se não informar
 ```bash
 ssh hermes-oci 'hermes pairing approve telegram CODIGO'
 ```
+
+Abra o link entregue pelo BotFather, toque em **Start**, aprove o código e então
+envie `/new`.
 
 Também é possível executar por etapas:
 

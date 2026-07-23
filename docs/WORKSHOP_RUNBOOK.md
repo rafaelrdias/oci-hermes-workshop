@@ -50,20 +50,16 @@ Enquanto o cloud-init instala o Hermes, avance para as duas credenciais.
 
 ## 20–35 min — criar OCI Generative AI API key e bot
 
-### OCI
+Siga o [guia visual de credenciais OCI e Telegram](OCI_API_KEY_TELEGRAM.md):
 
-Mantenha a Console em **US Midwest (Chicago)** e abra Analytics & AI → Generative AI → API keys. Crie uma chave no compartment do laboratório e copie o segredo `sk-...`.
+1. mantenha a Console em **US Midwest (Chicago)**;
+2. abra **Analytics & AI → AI Services → Generative AI → API keys**;
+3. crie a key no compartment do laboratório e copie o secret `sk-...`;
+4. abra o `@BotFather`, execute `/newbot` e escolha nome e username terminado em `bot`;
+5. guarde o token, o username e o link `https://t.me/<username>`.
 
-### Telegram
-
-No `@BotFather`:
-
-1. `/newbot`;
-2. escolha nome;
-3. escolha username terminado em `bot`;
-4. guarde o token.
-
-Opcional: consulte seu ID numérico em `@userinfobot`. Sem ele, o pairing será feito depois.
+O Telegram user ID não é fornecido pelo BotFather e não é obrigatório. No
+configurador, pressione **Enter** nesse campo para usar pairing seguro.
 
 ## 35–45 min — acessar e configurar
 
@@ -80,13 +76,17 @@ Configure os segredos de forma interativa:
 ssh -t -i <caminho-da-chave-privada> opc@<public_ip> 'hermes-workshop-configure'
 ```
 
-## 45–55 min — testar no Telegram
+## 45–55 min — abrir e testar no Telegram
 
-Com allowlist, envie `/new` ao bot. Com pairing, envie uma mensagem, copie o código e aprove:
+Abra o link `https://t.me/<username>` entregue pelo BotFather, toque em
+**Start** ou envie `/start`. Com pairing, copie o código devolvido e aprove:
 
 ```bash
 ssh -i <caminho-da-chave-privada> opc@<public_ip> 'hermes pairing approve telegram CODIGO'
 ```
+
+Depois da aprovação, envie `/new`. Com allowlist previamente configurada, basta
+abrir o bot e enviar `/new`.
 
 Prompts de teste:
 

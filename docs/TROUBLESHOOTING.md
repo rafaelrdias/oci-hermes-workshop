@@ -55,11 +55,13 @@ ssh hermes-oci 'sudo tail -f /var/log/hermes-bootstrap.log'
 ## OCI retorna 401
 
 - o segredo copiado não é uma OCI Generative AI API key;
+- foi copiado o OCID da API key em vez do secret `sk-...`;
 - a key não foi criada em US Midwest (Chicago);
 - ela expirou, foi desativada ou revogada;
 - `OPENAI_API_KEY` não foi gravada corretamente.
 
 Reexecute `hermes-workshop-configure`; ele substitui os valores sem mostrá-los.
+Consulte também o [guia visual de criação da API key](OCI_API_KEY_TELEGRAM.md#parte-1--criar-a-api-key-openai-compatible-na-oci).
 
 ## OCI retorna 403/404
 
@@ -80,12 +82,16 @@ Se `terraform plan` rejeitar `region` ou `genai_region`, use `us-chicago-1` nos 
 
 ## Bot não responde
 
+Confirme primeiro que você abriu o link `https://t.me/<username>` entregue pelo
+BotFather e tocou em **Start**. Bots não podem iniciar a conversa com usuários.
+
 ```bash
 ssh hermes-oci 'sudo systemctl status hermes-gateway --no-pager'
 ssh hermes-oci 'sudo journalctl -u hermes-gateway -n 100 --no-pager'
 ```
 
 Confira token, allowlist e se outro processo usa o mesmo bot token. Um token não deve operar em dois gateways ao mesmo tempo.
+Veja o [fluxo completo de BotFather, pairing e primeira conversa](OCI_API_KEY_TELEGRAM.md#parte-2--criar-o-bot-com-o-botfather).
 
 ### `status=203/EXEC` no Oracle Linux com SELinux
 

@@ -22,6 +22,11 @@ O caminho recomendado para os participantes é executar o Terraform pelo **OCI R
 5. execute **Plan**, revise os Logs e somente então execute **Apply** selecionando o Plan mais recente;
 6. abra o job de Apply, confirme `deployment_region = us-chicago-1 (ORD)` e copie `public_ip` em **Outputs**.
 
+Enquanto a VM é criada, siga o
+**[guia visual de credenciais OCI e Telegram](docs/OCI_API_KEY_TELEGRAM.md)**
+para criar a API key OpenAI-compatible, acionar o `@BotFather`, guardar o token
+e abrir a primeira conversa com o bot.
+
 Depois, substitua os valores entre `<...>` e execute:
 
 ```bash
@@ -50,6 +55,7 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
 - [Guia visual — pasta Terraform, OCIDs, chaves SSH e Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
+- [Guia visual — API key OpenAI-compatible, BotFather e primeira conversa](docs/OCI_API_KEY_TELEGRAM.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)

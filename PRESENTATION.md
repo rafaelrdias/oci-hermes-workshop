@@ -215,9 +215,13 @@ Console OCI
 5. executar **Apply** usando o último Plan;
 6. confirmar `deployment_region = us-chicago-1 (ORD)` e copiar `public_ip` em **Outputs**.
 
-Passo a passo: [guia visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md).
+Passos a passo:
 
-Em paralelo: criar a OCI Generative AI API key na mesma região de Chicago e o bot no `@BotFather`.
+- [guia visual da Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md);
+- [API key OpenAI-compatible, BotFather e primeira conversa](docs/OCI_API_KEY_TELEGRAM.md).
+
+Em paralelo: criar a OCI Generative AI API key na mesma região de Chicago,
+executar `/newbot` no `@BotFather` e guardar token, username e link do bot.
 
 ---
 
@@ -235,13 +239,18 @@ O configurador testa o modelo antes de iniciar o gateway.
 
 # Checkpoint 3 — Telegram
 
+Abra o link `https://t.me/<username>` entregue pelo BotFather e toque em
+**Start**.
+
 Allowlist: envie `/new`.
 
-Pairing: envie uma mensagem, receba o código e execute:
+Pairing: envie `/start`, receba o código e execute:
 
 ```bash
 hermes pairing approve telegram CODIGO
 ```
+
+Depois, envie `/new`.
 
 Primeiro prompt:
 
