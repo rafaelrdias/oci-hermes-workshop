@@ -21,6 +21,11 @@ Ao final, você também abrirá o bot, fará o pairing seguro e iniciará a prim
 
 ## Parte 1 — criar a API key OpenAI-compatible na OCI
 
+> As telas abaixo usam Chicago/ORD. Na variante
+> [São Paulo/GRU](GRU_RESOURCE_MANAGER.md), selecione **Brazil East
+> (São Paulo)**, crie a key em `sa-saopaulo-1` e use o Project criado pelo
+> Terraform GRU.
+
 ### 1. Confirmar região e compartment
 
 1. entre na [OCI Console](https://cloud.oracle.com/);

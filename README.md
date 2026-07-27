@@ -1,17 +1,35 @@
 # Hermes Agent + OCI Enterprise AI + Telegram
 
-Material do workshop Oracle no TDC Florianópolis. O laboratório concentra todos os recursos regionais em **US Midwest (Chicago)** — `us-chicago-1`, region key `ORD` —, provisiona uma VM Oracle Linux, instala o [Hermes Agent oficial da Nous Research](https://github.com/NousResearch/hermes-agent), configura o modelo `openai.gpt-oss-120b` no OCI Generative AI e publica a interação por Telegram.
+Material do workshop Oracle no TDC Florianópolis. O caminho principal usa
+**US Midwest (Chicago)** — `us-chicago-1`, region key `ORD`. Para tenancies
+Trial criadas em São Paulo, há uma variante completa em **Brazil East
+(São Paulo)** — `sa-saopaulo-1`, region key `GRU`. As duas provisionam uma VM
+Oracle Linux, instalam o
+[Hermes Agent oficial da Nous Research](https://github.com/NousResearch/hermes-agent),
+configuram OCI Generative AI e publicam a interação por Telegram.
 
 ## O que está automatizado
 
 - VCN, subnet pública, Internet Gateway, route table e security list;
-- VM Oracle Linux em Chicago com somente SSH exposto;
+- VM Oracle Linux na região da variante escolhida, com somente SSH exposto;
 - Hermes Agent `v2026.7.7.2`, Python 3.11 e gateway do Telegram;
 - serviço `systemd` para iniciar o gateway no boot;
 - policy de menor privilégio para Chat Completions no modelo do workshop;
 - comando interativo que grava os segredos diretamente na VM, sem colocá-los no Terraform state.
 
 ## Começo rápido
+
+### Escolha a região do seu Trial
+
+| Região | Download leve | Guia |
+|---|---|---|
+| Chicago — `us-chicago-1` / ORD | [Terraform ORD](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip) | [Console ORD](docs/OCI_RESOURCE_MANAGER_CONSOLE.md) |
+| São Paulo — `sa-saopaulo-1` / GRU | [Terraform GRU](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder-gru.zip) | [Console GRU](docs/GRU_RESOURCE_MANAGER.md) |
+
+As pastas são independentes. Não misture variáveis ou arquivos das duas
+regiões.
+
+### Caminho principal — ORD
 
 O caminho recomendado para os participantes é executar o Terraform pelo **OCI Resource Manager**, sem instalar Terraform ou OCI CLI no computador:
 
@@ -56,14 +74,18 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
 - [Guia visual — pasta Terraform, OCIDs, chaves SSH e Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
 - [Guia visual — API key OpenAI-compatible, BotFather e primeira conversa](docs/OCI_API_KEY_TELEGRAM.md)
+- [Alternativa para OCI Trial em São Paulo — GRU](docs/GRU_RESOURCE_MANAGER.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
 - [Apresentação em Markdown](PRESENTATION.md)
 - [Apresentação PDF — template Oracle](output/pdf/oci-enterprise-ai-hermes-agent-workshop-TDC_v2.pdf)
 - [Terraform](infra/terraform/oci-trial-deploy/README.md)
+- [Terraform alternativo GRU](infra/terraform/oci-trial-deploy-gru/README.md)
 
 ## Segurança
 
 Não grave API keys ou tokens em variáveis da Stack, `terraform.tfvars`, código, prints ou chat. O Telegram dá acesso às ferramentas do agente na VM; nunca habilite `GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e, ao final, execute **Destroy** no Resource Manager antes de excluir a Stack.
 
-IAM policies pertencem à tenancy e não são recursos regionais. A Stack, seus jobs, rede, VM, API key do OCI Generative AI e endpoint do modelo devem permanecer em Chicago.
+IAM policies pertencem à tenancy e não são recursos regionais. Dentro de cada
+variante, Stack, jobs, rede, VM, API key, Project quando aplicável e endpoint
+do modelo permanecem na região escolhida.

@@ -8,6 +8,11 @@ Ao final, uma mensagem enviada ao seu bot do Telegram chega ao Hermes na VM, o H
 
 ## Antes de começar
 
+Se o Trial foi criado em São Paulo/GRU, use o
+[roteiro alternativo para `sa-saopaulo-1`](GRU_RESOURCE_MANAGER.md) e a pasta
+`resource-manager-folder-gru`. O restante desta página descreve o caminho
+principal em Chicago/ORD.
+
 Tenha:
 
 - acesso à OCI Console e à região **US Midwest (Chicago)** habilitada na tenancy Trial;

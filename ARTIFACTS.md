@@ -13,7 +13,7 @@ git diff --check
 
 ## Pasta do OCI Resource Manager
 
-O download recomendado é a branch leve:
+O download ORD é a branch leve:
 
 ```text
 https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder.zip
@@ -26,6 +26,27 @@ oci-hermes-workshop-resource-manager-folder
 ```
 
 A pasta extraída tem cerca de 60 KB e não contém `.terraform`, providers locais, apresentações, state ou segredos.
+
+## Pasta alternativa GRU
+
+```text
+https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager-folder-gru.zip
+```
+
+Depois de extrair, selecione:
+
+```text
+oci-hermes-workshop-resource-manager-folder-gru
+```
+
+Fonte mantida em:
+
+```text
+infra/terraform/oci-trial-deploy-gru
+```
+
+Essa variante cria rede, VM, policy e OCI Generative AI Project em
+`sa-saopaulo-1` e usa o endpoint `/openai/v1`.
 
 ## Credenciais e primeira conversa
 

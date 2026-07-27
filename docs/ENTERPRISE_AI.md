@@ -38,6 +38,20 @@ Em julho de 2026, a documentação OCI identifica **US Midwest (Chicago)** como 
 
 IAM policies não pertencem a uma região: elas são recursos da tenancy. Esta é a única exceção ao princípio de região única do laboratório.
 
+## Alternativa: São Paulo (GRU)
+
+Para tenancies Trial criadas em `sa-saopaulo-1`, o repositório inclui uma
+[variante GRU](GRU_RESOURCE_MANAGER.md). Ela cria um OCI Generative AI Project
+e usa a nova base URL:
+
+```text
+https://inference.generativeai.sa-saopaulo-1.oci.oraclecloud.com/openai/v1
+```
+
+O Project OCID é encaminhado ao Hermes pelo header `OpenAI-Project`. O modelo
+padrão permanece `openai.gpt-oss-120b`; `openai.gpt-oss-20b` é o fallback da
+mesma família quando a tenancy não oferece o modelo maior.
+
 ## Policy criada pelo Terraform
 
 ```text
