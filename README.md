@@ -1,0 +1,21 @@
+# Terraform do stand Oracle — execução pela Console OCI
+
+[Abra o guia completo, sem comandos](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/stand/README.md).
+
+Esta pasta é publicada sozinha na branch `stand-resource-manager`, usada pelo
+botão **Deploy to Oracle Cloud**. Ela inclui `schema.yaml` para o formulário
+do Resource Manager e os arquivos de instalação da VM. Não inclua `.terraform`,
+state, variáveis pessoais, chaves, PDFs ou apresentações no pacote.
+
+Fluxo: **Create Stack → token sensível + aceite → Plan → revisar → Apply →
+Application information → revelar comando privado → enviar ao bot → aguardar**.
+
+ORD e GRU são suportadas, com Llama 3.3 70B on-demand na home region. Nenhuma
+API key OCI precisa ser criada. O token Telegram persiste em state/planos,
+variáveis e metadados da VM; o formulário exige aceite e uso de bot exclusivo.
+
+SSH é opcional e fechado por padrão. Para remover, use **Destroy na Console**
+antes de excluir a Stack. O disco/arquivos/histórico da VM serão apagados.
+
+Testes locais não substituem a homologação real em Trial:
+[veja o roteiro de aceite](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/stand/VALIDATION.md).

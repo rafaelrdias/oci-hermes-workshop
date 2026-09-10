@@ -1,0 +1,101 @@
+schemaVersion: 1.1.0
+version: '1.0.0'
+locale: en
+title: 'Hermes no Telegram — stand Oracle'
+description: 'Trial ORD ou GRU. Instalação e configuração automáticas, sem Cloud Shell ou SSH obrigatório.'
+informationalText: 'Apply cria a VM; depois copie o comando privado de pareamento abaixo e envie ao bot. Aguarde a mensagem de pronto no Telegram. Não compartilhe token, comando, state ou metadados.'
+variableGroups:
+  - title: '1. Região do Trial'
+    variables: [region, prefix]
+  - title: '2. Bot pessoal e segurança'
+    variables: [telegram_bot_token, acknowledge_secret_in_state]
+  - title: '3. Compute — consome créditos do Trial'
+    variables: [instance_shape, availability_domain_index]
+  - title: '4. Opcional — diagnóstico por SSH (deixe vazio para não abrir porta)'
+    variables: [ssh_public_key, ssh_allowed_cidr]
+  - title: 'Valores preenchidos pela Console'
+    visible: false
+    variables: [tenancy_ocid, image_ocid]
+variables:
+  tenancy_ocid:
+    type: string
+    visible: false
+  region:
+    type: enum
+    title: 'Home region do Trial'
+    description: 'Deve ser a mesma região selecionada no topo da Console: Chicago ou São Paulo.'
+    enum: [us-chicago-1, sa-saopaulo-1]
+    required: true
+  prefix:
+    type: string
+    title: 'Nome do ambiente'
+    default: hermes-stand
+    required: true
+  telegram_bot_token:
+    type: password
+    title: 'Token do BotFather (bot novo e exclusivo)'
+    description: 'Mascarado na tela, mas salvo no state/variáveis da Stack e no user-data da VM. Restrinja o acesso a esses recursos.'
+    required: true
+    confirmation: true
+  acknowledge_secret_in_state:
+    type: boolean
+    title: 'Entendo e aceito a persistência do token no state e nos metadados'
+    description: 'Demonstração pessoal. Não publicar state, variáveis, prints ou token. Sensitive mascara a saída; não elimina o segredo do state.'
+    default: false
+    required: true
+  instance_shape:
+    type: enum
+    title: 'Shape (1 OCPU / 8 GB RAM / 50 GB de boot)'
+    enum: [VM.Standard.E5.Flex, VM.Standard.E4.Flex, VM.Standard.A1.Flex]
+    default: VM.Standard.E5.Flex
+    description: 'E5/E4 usam créditos. A1 depende de quota/capacidade e elegibilidade gratuita da conta.'
+    required: true
+  availability_domain_index:
+    type: integer
+    title: 'Availability domain: 0 = primeiro'
+    default: 0
+    minimum: 0
+    description: 'Mantenha 0. Outro valor só se o AD existir na sua tenancy/região.'
+  ssh_public_key:
+    type: string
+    title: 'Chave pública SSH opcional'
+    required: false
+    default: ''
+  ssh_allowed_cidr:
+    type: string
+    title: 'IPv4 do administrador com /32, opcional'
+    description: 'Preencha junto da chave pública. Nunca use 0.0.0.0/0. Não é necessário para instalar ou conversar.'
+    required: false
+    default: ''
+  image_ocid:
+    type: string
+    visible: false
+    default: ''
+outputGroups:
+  - title: 'Próximo passo no Telegram'
+    outputs: [telegram_pairing_command, next_step]
+  - title: 'Ambiente criado'
+    outputs: [region, model, public_ip, instance_id, compartment_id]
+outputs:
+  telegram_pairing_command:
+    type: copyableString
+    title: 'Desbloqueie, copie e envie este comando em DM ao seu bot'
+    sensitive: true
+  next_step:
+    type: string
+    title: 'Como concluir'
+  region:
+    type: string
+    title: 'Região'
+  model:
+    type: string
+    title: 'Modelo OCI on-demand'
+  public_ip:
+    type: copyableString
+    title: 'IPv4 da VM (sem serviço web público)'
+  instance_id:
+    type: copyableString
+    title: 'OCID da VM'
+  compartment_id:
+    type: copyableString
+    title: 'Compartment criado automaticamente'
