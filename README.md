@@ -10,12 +10,20 @@ state, variáveis pessoais, chaves, PDFs ou apresentações no pacote.
 Fluxo: **Create Stack → token sensível + aceite → Plan → revisar → Apply →
 Application information → revelar comando privado → enviar ao bot → aguardar**.
 
-ORD e GRU são suportadas, com Llama 3.3 70B on-demand na home region. Nenhuma
+ORD e GRU são suportadas, com Llama 3.3 70B on-demand na região selecionada.
+A home region pode ser diferente: é detectada automaticamente e usada apenas
+pelo provider `oci.home` para criar IAM global. A região da instalação deve
+estar subscrita e `READY`. Nenhuma
 API key OCI precisa ser criada. O token Telegram persiste em state/planos,
 variáveis e metadados da VM; o formulário exige aceite e uso de bot exclusivo.
 
 SSH é opcional e fechado por padrão. Para remover, use **Destroy na Console**
 antes de excluir a Stack. O disco/arquivos/histórico da VM serão apagados.
+
+Já criou uma Stack com o pacote antigo? Baixe novamente este pacote e use
+**Edit Stack → configuração Terraform → Folder** para substituir os arquivos.
+Confira as variáveis, salve e execute novo **Plan → Apply**. Apenas repetir
+Plan não atualiza o código da Stack. Veja o guia completo para os detalhes.
 
 Testes locais não substituem a homologação real em Trial:
 [veja o roteiro de aceite](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/stand/VALIDATION.md).

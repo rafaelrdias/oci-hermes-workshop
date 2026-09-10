@@ -1,4 +1,5 @@
 locals {
+  home_region  = one([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.is_home_region])
   model        = "meta.llama-3.3-70b-instruct"
   tags         = { purpose = "hermes-oracle-stand", managed_by = "terraform" }
   image        = var.image_ocid != "" ? var.image_ocid : data.oci_core_images.ol9[0].images[0].id
@@ -26,6 +27,7 @@ resource "terraform_data" "bootstrap_revision" {
 }
 
 resource "oci_identity_compartment" "stand" {
+  provider       = oci.home
   compartment_id = var.tenancy_ocid
   name           = var.prefix
   description    = "Ambiente pessoal Hermes — demonstração Oracle, gerenciado por Terraform"
@@ -33,8 +35,8 @@ resource "oci_identity_compartment" "stand" {
   freeform_tags  = local.tags
   lifecycle {
     precondition {
-      condition     = contains([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.is_home_region], var.region)
-      error_message = "Selecione a HOME REGION do Trial na Console antes de criar esta Stack."
+      condition     = contains([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.state == "READY"], var.region)
+      error_message = "A região da instalação deve estar subscrita e READY nesta tenancy. Confira Manage Regions na Console. Ela não precisa ser a home region."
     }
   }
 }
@@ -161,6 +163,7 @@ resource "oci_core_instance" "hermes" {
 
 # Only THIS VM, not every instance in the tenancy or compartment.
 resource "oci_identity_dynamic_group" "hermes" {
+  provider       = oci.home
   compartment_id = var.tenancy_ocid
   name           = "${var.prefix}-vm"
   description    = "Identidade da única VM Hermes deste stand"
@@ -168,6 +171,7 @@ resource "oci_identity_dynamic_group" "hermes" {
 }
 
 resource "oci_identity_policy" "hermes" {
+  provider       = oci.home
   compartment_id = var.tenancy_ocid
   name           = "${var.prefix}-inference"
   description    = "Somente inferência Chat no modelo do stand, sem chaves de API"

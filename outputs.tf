@@ -3,6 +3,10 @@ output "instance_id" { value = oci_core_instance.hermes.id }
 output "compartment_id" { value = oci_identity_compartment.stand.id }
 output "image_id" { value = oci_core_instance.hermes.source_details[0].source_id }
 output "region" { value = var.region }
+output "iam_home_region" {
+  value       = local.home_region
+  description = "Endpoint usado para criar IAM global. VM, rede e modelo permanecem em region."
+}
 output "model" { value = local.model }
 output "next_step" {
   value = "Copie telegram_pairing_command e envie em mensagem privada ao seu bot. Ele avisará quando inferência, ferramentas e gateway estiverem prontos. Apply não comprova a conversa final."

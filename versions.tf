@@ -17,3 +17,11 @@ provider "oci" {
   region       = var.region
   tenancy_ocid = var.tenancy_ocid
 }
+
+# IAM is global, but its write API must use the tenancy's home region.
+# Authentication is also injected by Resource Manager for this provider alias.
+provider "oci" {
+  alias        = "home"
+  region       = local.home_region
+  tenancy_ocid = var.tenancy_ocid
+}

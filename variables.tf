@@ -8,7 +8,7 @@ variable "tenancy_ocid" {
 
 variable "region" {
   type        = string
-  description = "Home region do Trial. Todos os recursos regionais ficam aqui."
+  description = "Região da instalação (ORD ou GRU), subscrita nesta tenancy. Pode ser diferente da home region."
   validation {
     condition     = contains(["us-chicago-1", "sa-saopaulo-1"], var.region)
     error_message = "Esta edição suporta apenas ORD ou GRU, sem fallback entre regiões."

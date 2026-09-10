@@ -1,11 +1,11 @@
 schemaVersion: 1.1.0
-version: '1.0.0'
+version: '1.1.0'
 locale: en
 title: 'Hermes no Telegram — stand Oracle'
 description: 'Trial ORD ou GRU. Instalação e configuração automáticas, sem Cloud Shell ou SSH obrigatório.'
 informationalText: 'Apply cria a VM; depois copie o comando privado de pareamento abaixo e envie ao bot. Aguarde a mensagem de pronto no Telegram. Não compartilhe token, comando, state ou metadados.'
 variableGroups:
-  - title: '1. Região do Trial'
+  - title: '1. Região da instalação'
     variables: [region, prefix]
   - title: '2. Bot pessoal e segurança'
     variables: [telegram_bot_token, acknowledge_secret_in_state]
@@ -22,8 +22,8 @@ variables:
     visible: false
   region:
     type: enum
-    title: 'Home region do Trial'
-    description: 'Deve ser a mesma região selecionada no topo da Console: Chicago ou São Paulo.'
+    title: 'Região da instalação'
+    description: 'Chicago ou São Paulo, subscrita e selecionada na Console. Não precisa ser a home region; IAM usa a home region automaticamente.'
     enum: [us-chicago-1, sa-saopaulo-1]
     required: true
   prefix:
@@ -75,7 +75,7 @@ outputGroups:
   - title: 'Próximo passo no Telegram'
     outputs: [telegram_pairing_command, next_step]
   - title: 'Ambiente criado'
-    outputs: [region, model, public_ip, instance_id, compartment_id]
+    outputs: [region, iam_home_region, model, public_ip, instance_id, compartment_id]
 outputs:
   telegram_pairing_command:
     type: copyableString
@@ -87,6 +87,9 @@ outputs:
   region:
     type: string
     title: 'Região'
+  iam_home_region:
+    type: string
+    title: 'Home region detectada (somente endpoint IAM global)'
   model:
     type: string
     title: 'Modelo OCI on-demand'
