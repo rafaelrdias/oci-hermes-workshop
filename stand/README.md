@@ -19,11 +19,16 @@ OCI, identifica o dono do bot e inicia o Telegram automaticamente.
 1. Cadastre-se no [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/) e
    conclua as verificações. Escolha **US Midwest (Chicago)** — ORD,
    `us-chicago-1` — ou **Brazil East (São Paulo)** — GRU, `sa-saopaulo-1`,
-   como home region desta demonstração.
+   como home region se estiver criando um Trial para esta demonstração.
+   **Se já possui uma tenancy com outras regiões, não precisa mudar a home
+   region:** a instalação pode usar Chicago ou São Paulo desde que a região
+   esteja subscrita e pronta (`READY`).
 2. Aguarde a ativação e entre na [Console OCI](https://cloud.oracle.com/) com a
    conta do próprio visitante, com permissão administrativa.
-3. No seletor superior, escolha a **home region do Trial**. O Terraform valida
-   essa escolha: não muda de região nem contrata serviço dedicado como fallback.
+3. No seletor superior, escolha a **região da instalação: Chicago ou São Paulo**.
+   VM, rede e inferência ficam nessa região. O Terraform detecta a home region
+   e usa seu endpoint apenas para criar compartment, dynamic group e policy
+   (IAM global). Não muda a região da VM nem contrata modelo dedicado como fallback.
 4. Confirme créditos, limites de Compute e acesso a OCI Generative AI on-demand.
 
 Cadastro, validação cadastral, liberação da conta, capacidade e eventuais
@@ -49,7 +54,7 @@ a esta edição**: aqui a VM usa Instance Principals, sem chave OCI persistente.
 
 ## 3. Abra a Stack diretamente pela Console
 
-Com a Console já na home region, clique:
+Com a Console já na região da instalação (Chicago ou São Paulo), clique:
 
 [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https%3A%2F%2Fgithub.com%2Frafaelrdias%2Foci-hermes-workshop%2Farchive%2Frefs%2Fheads%2Fstand-resource-manager.zip)
 
@@ -88,7 +93,7 @@ Na tela **Configure variables**:
 
 | Campo | O que fazer |
 |---|---|
-| Home region do Trial | Confira `us-chicago-1` ou `sa-saopaulo-1`, igual ao seletor superior |
+| Região da instalação | Confira `us-chicago-1` ou `sa-saopaulo-1`, igual ao seletor superior; não precisa ser a home region |
 | Nome do ambiente | Mantenha `hermes-stand`; se já houver outro, use um nome diferente e outro bot |
 | Token do BotFather | Cole o token no campo mascarado e na confirmação |
 | Aceite de persistência | Leia e marque somente se concordar com o token em state/metadados |
@@ -228,7 +233,32 @@ compartment da demonstração. Fechar a aba, parar o chat ou excluir a Stack
 A [matriz regional da Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
 lista `meta.llama-3.3-70b-instruct` on-demand em ORD e GRU; GPT-OSS em GRU está
 listado somente como dedicado. Criar um Project não muda essa modalidade.
-Nesta edição, rede/VM/inferência permanecem na home region; IAM é global.
+Nesta edição, rede/VM/inferência permanecem na região selecionada (ORD ou GRU).
+A home region pode ser outra: IAM é global e é criado pelo endpoint da home
+region detectada automaticamente. Veja a saída `iam_home_region` na Stack.
+Outras regiões de VM/LLM ainda não estão habilitadas neste pacote: o modelo
+e a modalidade on-demand precisam estar disponíveis na região escolhida.
+
+## Atualizar uma Stack que bloqueou por home region
+
+O erro antigo **“Selecione a HOME REGION do Trial”** foi removido na versão 1.1.0.
+Uma Stack criada por Folder/ZIP ou pelo botão de deploy mantém uma cópia do
+Terraform; **somente executar outro Plan não baixa a atualização do GitHub**.
+
+1. Baixe novamente o [pacote leve atualizado](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/stand-resource-manager.zip)
+   e extraia a pasta `oci-hermes-workshop-stand-resource-manager`.
+2. Na Console, abra **Resource Manager → Stacks → a mesma Stack que falhou**.
+3. Clique **Edit / Edit Stack** e, na configuração Terraform, selecione
+   **Folder** e carregue a pasta extraída atualizada. Não use o repositório inteiro.
+4. Avance, confira as variáveis preservadas (região, token e aceite) e salve.
+   O formulário atualizado mostra **Região da instalação**, não “Home region do Trial”.
+5. Execute um **novo Plan**, revise e depois **Apply** usando esse novo Plan.
+   O erro relatado ocorreu no Plan; não é necessário Destroy para corrigi-lo.
+   Se esta Stack já tiver recursos de outras execuções, revise qualquer
+   substituição/destruição antes de aprovar.
+
+A Stack e sua VM podem ficar em Chicago com home region em Ashburn, por exemplo.
+Não remova manualmente as validações nem altere o tenancy OCID para contornar erros.
 
 - [Arquitetura e componentes](ARCHITECTURE.md)
 - [Problemas, rotação e recuperação](TROUBLESHOOTING.md)

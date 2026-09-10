@@ -14,9 +14,14 @@ flowchart LR
 ```
 
 O visitante não executa Terraform no notebook ou Cloud Shell. A Stack recebe
-tenancy/região da Console; o Terraform valida home region ORD/GRU e cria um
+tenancy/região da Console; o Terraform valida a subscrição READY em ORD/GRU e cria um
 compartment para a demonstração. A Stack fica no root ou em outro compartment
 administrativo existente, fora do compartment que ela removerá.
+
+O provider padrão usa a região escolhida para rede/Compute e descoberta de
+imagens/ADs. `oci.home` usa a home region detectada em region subscriptions
+para compartment, dynamic group e policy. Esses recursos IAM são globais;
+a home region pode ser diferente de ORD/GRU. Nenhuma credencial extra é solicitada.
 
 ## Responsabilidades
 

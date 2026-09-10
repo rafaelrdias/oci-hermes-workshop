@@ -4,9 +4,10 @@
 |---|---|
 | Botão de deploy retorna 400 | Use o download leve → extraia → Resource Manager → Create Stack → My configuration → Folder |
 | Folder excede 11 MB | Selecione somente a pasta da branch `stand-resource-manager`, não o repositório principal ou pasta com `.terraform` |
-| Plan rejeita região | Escolha a home region ORD/GRU no topo e no formulário. Não há fallback para outra região |
+| Plan rejeita região | Escolha ORD/GRU subscrita e READY no topo e no formulário. A home region pode ser outra; não há fallback de VM/LLM |
+| Erro antigo “Selecione a HOME REGION do Trial” | Atualize o pacote da mesma Stack por Edit Stack → Folder e execute novo Plan. Veja o guia principal; repetir Plan com arquivos antigos não resolve |
 | Plan pede aceite | Leia o aviso: token persiste em variáveis/state/metadados. Marque apenas se concordar |
-| `NotAuthorizedOrNotFound` criando IAM | Use o administrador do Trial, na home region da tenancy |
+| `NotAuthorizedOrNotFound` criando IAM | Use administrador com permissão para criar IAM. O provider oci.home seleciona automaticamente o endpoint da home region |
 | `Out of host capacity` | Aguarde/reexecute Plan/Apply; ou escolha outra shape/AD explicitamente em Edit Stack. Capacidade não é garantida |
 | `LimitExceeded` | Confira créditos, Service Limits e recursos existentes. O template não amplia quota nem transforma conta em paga |
 | Apply succeeded, bot silencioso | Bootstrap ainda pode estar em andamento. Revele/copie o comando de pareamento nos Outputs e envie em DM |

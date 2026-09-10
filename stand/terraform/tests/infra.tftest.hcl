@@ -1,6 +1,6 @@
 mock_provider "oci" {
   mock_data "oci_identity_region_subscriptions" {
-    defaults = { region_subscriptions = [{ is_home_region = true, region_name = "sa-saopaulo-1", region_key = "GRU", state = "READY", tenancy_id = "ocid1.tenancy.oc1..test" }] }
+    defaults = { region_subscriptions = [{ is_home_region = true, region_name = "sa-saopaulo-1", region_key = "GRU", state = "READY" }] }
   }
   mock_data "oci_identity_availability_domains" {
     defaults = { availability_domains = [{ name = "test:AD-1", id = "ad1", compartment_id = "ocid1.tenancy.oc1..test" }] }
@@ -10,6 +10,9 @@ mock_provider "oci" {
   }
 }
 mock_provider "random" {}
+mock_provider "oci" {
+  alias = "home"
+}
 
 variables {
   tenancy_ocid                = "ocid1.tenancy.oc1..test"
@@ -49,7 +52,7 @@ run "ord" {
   variables { region = "us-chicago-1" }
   override_data {
     target = data.oci_identity_region_subscriptions.tenancy
-    values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY", tenancy_id = "ocid1.tenancy.oc1..test" }] }
+    values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
   }
   assert {
     condition     = output.region == "us-chicago-1"
@@ -87,8 +90,51 @@ run "require_consent_for_secret" {
   expect_failures = [var.acknowledge_secret_in_state]
 }
 
-run "reject_wrong_home_region" {
+run "ord_with_ashburn_home" {
+  command = apply
+  variables { region = "us-chicago-1" }
+  override_data {
+    target = data.oci_identity_region_subscriptions.tenancy
+    values = { region_subscriptions = [
+      { is_home_region = true, region_name = "us-ashburn-1", region_key = "IAD", state = "READY" },
+      { is_home_region = false, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }
+    ] }
+  }
+  assert {
+    condition     = output.region == "us-chicago-1" && output.iam_home_region == "us-ashburn-1"
+    error_message = "VM/modelo devem ficar em ORD e IAM deve usar a home region IAD."
+  }
+}
+
+run "gru_with_frankfurt_home" {
+  command = plan
+  override_data {
+    target = data.oci_identity_region_subscriptions.tenancy
+    values = { region_subscriptions = [
+      { is_home_region = true, region_name = "eu-frankfurt-1", region_key = "FRA", state = "READY" },
+      { is_home_region = false, region_name = "sa-saopaulo-1", region_key = "GRU", state = "READY" }
+    ] }
+  }
+  assert {
+    condition     = output.region == "sa-saopaulo-1" && output.iam_home_region == "eu-frankfurt-1"
+    error_message = "Home region não deve restringir a região da instalação."
+  }
+}
+
+run "reject_unsubscribed_region" {
   command = plan
   variables { region = "us-chicago-1" }
+  expect_failures = [oci_identity_compartment.stand]
+}
+
+run "reject_region_not_ready" {
+  command = plan
+  override_data {
+    target = data.oci_identity_region_subscriptions.tenancy
+    values = { region_subscriptions = [
+      { is_home_region = true, region_name = "us-ashburn-1", region_key = "IAD", state = "READY" },
+      { is_home_region = false, region_name = "sa-saopaulo-1", region_key = "GRU", state = "IN_PROGRESS" }
+    ] }
+  }
   expect_failures = [oci_identity_compartment.stand]
 }

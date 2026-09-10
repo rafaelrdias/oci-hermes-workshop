@@ -5,7 +5,7 @@
 Validações locais em 10/09/2026, sem tokens reais ou criação de recursos na nuvem:
 
 - Terraform `fmt`, `init -backend=false`, `validate`;
-- **7 testes Terraform aprovados** com provider simulado: ORD/GRU, home region, IAM mínimo, VM 1 OCPU/8 GB,
+- **10 testes Terraform aprovados** com providers simulados: ORD/GRU, home region diferente (IAD/FRA), rejeição de região não subscrita/não READY, IAM mínimo, VM 1 OCPU/8 GB,
   tamanho do user-data, SSH fechado por padrão, rejeição de SSH aberto e
   aceite obrigatório para persistência do token;
 - **18 testes Python aprovados** de pareamento privado, entrada malformada,
@@ -48,7 +48,8 @@ Nenhuma das etapas reais abaixo está declarada como aprovada nesta entrega.
 3. Confirmar tenancy/região preenchidas, token mascarado/confirmado e aceite
    obrigatório. Não publicar prints contendo token ou comando de vínculo.
 4. Executar Plan, revisar custo/shape/rede/IAM e Apply pela Console.
-5. Confirmar que todos os recursos regionais estão na home region e que
+5. Confirmar que todos os recursos regionais estão na região selecionada,
+   que `iam_home_region` corresponde à home region real da tenancy e que
    somente a VM criada pertence ao dynamic group.
 6. Medir separadamente: provisionamento, bootstrap, propagação IAM e pareamento.
 7. Revelar comando privado na aba Application information, enviar em DM e
