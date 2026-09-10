@@ -1,0 +1,25 @@
+#cloud-config
+package_update: true
+package_upgrade: false
+packages: [git, curl, tar, gzip, python3, unzip]
+write_files:
+  - path: /etc/hermes-stand-secrets.json
+    owner: root:root
+    permissions: '0600'
+    encoding: b64
+    content: ${secrets}
+  - path: /etc/hermes-stand.json
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${config}
+%{ for name, payload in payloads ~}
+  - path: /opt/hermes-stand/${name}
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${payload}
+%{ endfor ~}
+runcmd:
+  - [bash, -lc, 'bash /opt/hermes-stand/bootstrap.sh > /var/log/hermes-stand-bootstrap.log 2>&1']
+final_message: 'Bootstrap encerrado. Envie o comando de pareamento dos Outputs ao bot e aguarde a mensagem de pronto.'

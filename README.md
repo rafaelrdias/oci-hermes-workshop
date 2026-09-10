@@ -19,6 +19,15 @@ configuram OCI Generative AI e publicam a interação por Telegram.
 
 ## Começo rápido
 
+### Edição rápida para o stand Oracle
+
+**[Instalação automatizada: seu Hermes no Telegram](stand/README.md)** — um
+formulário no **OCI Resource Manager** executa Terraform, instala o Hermes,
+configura acesso OCI via identidade da VM e vincula o Telegram ao dono.
+Todo o fluxo pela Console, sem Cloud Shell, API key OCI ou SSH obrigatório.
+O token do bot é informado como variável sensível; confira o aviso de segurança.
+Inclui operação, remoção e roteiro de homologação antes de oferecer ao público.
+
 ### Escolha a região do seu Trial
 
 | Região | Download leve | Guia |
@@ -84,7 +93,14 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 
 ## Segurança
 
-Não grave API keys ou tokens em variáveis da Stack, `terraform.tfvars`, código, prints ou chat. O Telegram dá acesso às ferramentas do agente na VM; nunca habilite `GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e, ao final, execute **Destroy** no Resource Manager antes de excluir a Stack.
+No workshop tradicional, não grave API keys ou tokens em variáveis da Stack,
+`terraform.tfvars`, código, prints ou chat. A **[edição stand](stand/README.md)**
+tem um fluxo diferente, inteiramente pela Console: recebe o token Telegram
+como variável sensível, com aceite explícito de sua persistência no state e
+nos metadados. Leia o aviso de segurança dessa edição antes de utilizá-la.
+O Telegram dá acesso às ferramentas do agente na VM; nunca habilite
+`GATEWAY_ALLOW_ALL_USERS=true`. Use allowlist ou pairing e, ao final, execute
+**Destroy** no Resource Manager antes de excluir a Stack.
 
 IAM policies pertencem à tenancy e não são recursos regionais. Dentro de cada
 variante, Stack, jobs, rede, VM, API key, Project quando aplicável e endpoint

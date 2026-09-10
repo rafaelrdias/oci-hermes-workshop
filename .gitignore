@@ -8,3 +8,7 @@ terraform.tfvars
 *.pem
 *.key
 presentation/*.pptx
+__pycache__/
+*.pyc
+*.auto.tfvars.json
+stand/.test-data/

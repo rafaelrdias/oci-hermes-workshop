@@ -1,5 +1,12 @@
 # Variante GRU — OCI Trial criado em São Paulo
 
+> **Atenção — disponibilidade revisada em 10/09/2026:** GPT-OSS em GRU aparece
+> como **dedicated only** na [matriz Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm).
+> Criar Project não o transforma em on-demand. Não use o GPT-OSS desta variante
+> histórica como promessa de implantação Trial sem cluster. Para a edição
+> automatizada com modelo on-demand em GRU, use [stand/](../stand/README.md),
+> que escolhe Llama 3.3 70B e não cria infraestrutura dedicada.
+
 Este é o caminho alternativo para participantes cuja tenancy Trial usa
 **Brazil East (São Paulo)** como home region:
 
