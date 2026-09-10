@@ -110,7 +110,10 @@ Clique **Next**. Em **Review**, desmarque **Run apply**, revise e clique **Creat
    O token deve aparecer mascarado, nunca como texto legível.
 3. Volte à Stack e clique **Apply**.
 4. Escolha o **Plan mais recente que você revisou** e confirme o Apply.
-5. Aguarde **Succeeded** e abra **Application information** ou **Outputs**.
+5. Aguarde o **Apply** ficar **Succeeded**. Volte aos detalhes **da mesma Stack
+   cujo Apply você acabou de executar** e abra **Application information /
+   Informações da aplicação**. Essa aba fica na Stack, não na VM nem nos logs
+   do job. Siga o passo 6 abaixo para copiar o comando do Telegram.
 
 **Succeeded no Apply significa infraestrutura criada.** A instalação do
 software e os testes do modelo continuam na VM. Não crie outra Stack porque
@@ -118,15 +121,33 @@ o bot ainda não respondeu.
 
 ## 6. Vincule o bot à sua conta
 
-1. Em **Application information**, localize `telegram_pairing_command`.
-2. Clique **Unlock/Desbloquear** e copie o comando completo, começando por
-   `/start stand_...`. Se estiver em Outputs, use a opção de revelar/copiar o
-   valor sensível; a aba Application information foi preparada para isso.
-3. Abra o bot pelo link recebido do BotFather e toque **Start/Iniciar**.
-4. Cole o comando de pareamento **em mensagem privada para seu bot**.
+**Acesse a informação na própria Stack cujo Apply acabou de concluir com
+Succeeded. Não procure na página da VM, em outra Stack ou nos logs do Plan.**
+
+1. Na Console OCI, mantenha a região em que fez a instalação e acesse
+   **☰ → Developer Services → Resource Manager → Stacks**.
+2. Selecione o **compartment onde você criou a Stack** (não necessariamente
+   o compartment criado pelo Terraform para a VM) e clique no **nome da
+   mesma Stack que acabou de executar**. Se estiver nos logs do Apply,
+   volte aos detalhes dela pelo nome da Stack no caminho de navegação.
+3. Nos detalhes dessa Stack, abra **Application information / Informações
+   da aplicação**. No grupo **Próximo passo no Telegram**, localize o campo
+   **Desbloqueie, copie e envie este comando em DM ao seu bot**. Esse é o
+   nome exibido para a saída Terraform `telegram_pairing_command`.
+4. Clique **Unlock/Desbloquear** e copie o comando completo, começando por
+   `/start stand_` e incluindo todo o código que vem depois. Não copie
+   apenas `/start`, o nome da variável ou o texto `<sensitive>`.
+5. Abra o bot pelo link recebido do BotFather e toque **Start/Iniciar**.
+6. Cole o comando de pareamento **em mensagem privada para seu próprio bot,
+   não para o @BotFather nem em um grupo**.
    Um `/start` simples não basta: envie também o código mostrado na Stack.
-5. Aguarde: o bot confirma o vínculo, testa acesso OCI e ferramentas e envia
+7. Aguarde: o bot confirma o vínculo, testa acesso OCI e ferramentas e envia
    a mensagem **“Configuração concluída!”** quando o gateway está ativo.
+
+Se não encontrar a aba, nessa **mesma Stack** abra **Jobs → Apply concluído
+com Succeeded → Outputs** e procure `telegram_pairing_command`. Se o valor
+estiver mascarado e não houver opção de revelar, não envie `<sensitive>`
+ao bot; peça ajuda ao facilitador, sem compartilhar tokens ou códigos.
 
 O ID numérico da sua conta é identificado automaticamente. Não é necessário
 `@userinfobot`, aprovação por SSH ou criação de uma allowlist manual.
