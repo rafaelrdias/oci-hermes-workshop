@@ -60,9 +60,50 @@ run "ord" {
   }
 }
 
-run "reject_open_ssh" {
+run "reject_open_ssh_without_consent" {
   command = plan
   variables { ssh_allowed_cidr = "0.0.0.0/0" }
+  expect_failures = [oci_core_security_list.stand]
+}
+
+run "allow_public_ssh_with_key_and_consent" {
+  command = plan
+  variables {
+    ssh_allowed_cidr       = "0.0.0.0/0"
+    acknowledge_public_ssh = true
+  }
+  assert {
+    condition = length([for rule in oci_core_security_list.stand.ingress_security_rules : rule
+      if rule.protocol == "6" && rule.source == "0.0.0.0/0" &&
+      alltrue([for ports in rule.tcp_options : ports.min == 22 && ports.max == 22])
+    ]) == 1
+    error_message = "Aceite deve liberar somente TCP/22 para qualquer IPv4."
+  }
+  assert {
+    condition     = oci_core_instance.hermes.metadata.ssh_authorized_keys == trimspace(var.ssh_public_key)
+    error_message = "Chave pública deve ser entregue à instância."
+  }
+}
+
+run "reject_public_ssh_without_key" {
+  command = plan
+  variables {
+    ssh_public_key         = ""
+    ssh_allowed_cidr       = "0.0.0.0/0"
+    acknowledge_public_ssh = true
+  }
+  expect_failures = [oci_core_instance.hermes]
+}
+
+run "reject_invalid_ssh_cidr" {
+  command = plan
+  variables { ssh_allowed_cidr = "999.1.1.1/32" }
+  expect_failures = [var.ssh_allowed_cidr]
+}
+
+run "reject_ipv6_ssh_cidr" {
+  command = plan
+  variables { ssh_allowed_cidr = "::/0" }
   expect_failures = [var.ssh_allowed_cidr]
 }
 

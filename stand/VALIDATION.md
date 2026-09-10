@@ -5,8 +5,9 @@
 Validações locais em 10/09/2026, sem tokens reais ou criação de recursos na nuvem:
 
 - Terraform `fmt`, `init -backend=false`, `validate`;
-- **10 testes Terraform aprovados** com providers simulados: ORD/GRU, home region diferente (IAD/FRA), rejeição de região não subscrita/não READY, IAM mínimo, VM 1 OCPU/8 GB,
-  tamanho do user-data, SSH fechado por padrão, rejeição de SSH aberto e
+- **14 testes Terraform aprovados** com providers simulados: ORD/GRU, home region diferente (IAD/FRA), rejeição de região não subscrita/não READY, IAM mínimo, VM 1 OCPU/8 GB,
+  tamanho do user-data, SSH fechado por padrão, acesso público somente com
+  chave e aceite, rejeição de CIDR inválido/IPv6 e
   aceite obrigatório para persistência do token;
 - **18 testes Python aprovados** de pareamento privado, entrada malformada,
   mascaramento de erros, configuração, permissões, streaming e tradução nativa de ferramentas OCI;

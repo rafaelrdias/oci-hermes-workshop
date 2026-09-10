@@ -84,6 +84,12 @@ resource "oci_core_security_list" "stand" {
   compartment_id = oci_identity_compartment.stand.id
   vcn_id         = oci_core_vcn.stand.id
   display_name   = "${var.prefix}-ssh-restrito"
+  lifecycle {
+    precondition {
+      condition     = var.ssh_allowed_cidr != "0.0.0.0/0" || var.acknowledge_public_ssh
+      error_message = "Para liberar SSH a qualquer IPv4 (0.0.0.0/0), marque o aceite de exposição pública. Prefira /32 quando possível e restrinja novamente após o evento."
+    }
+  }
   egress_security_rules {
     destination = "0.0.0.0/0"
     protocol    = "all"
@@ -148,7 +154,7 @@ resource "oci_core_instance" "hermes" {
     replace_triggered_by = [terraform_data.bootstrap_revision]
     precondition {
       condition     = (var.ssh_allowed_cidr == "") == (var.ssh_public_key == "")
-      error_message = "Para habilitar SSH, preencha chave pública E CIDR /32, ou deixe ambos vazios."
+      error_message = "Para habilitar SSH, preencha chave pública E CIDR (/32 ou 0.0.0.0/0 com aceite), ou deixe ambos vazios."
     }
     precondition {
       condition     = length(local.user_data) < 30000

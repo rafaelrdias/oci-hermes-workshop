@@ -20,6 +20,13 @@ variáveis e metadados da VM; o formulário exige aceite e uso de bot exclusivo.
 SSH é opcional e fechado por padrão. Para remover, use **Destroy na Console**
 antes de excluir a Stack. O disco/arquivos/histórico da VM serão apagados.
 
+Na versão 1.2.0, para diagnóstico com IPs variáveis: informe chave pública,
+`ssh_allowed_cidr = 0.0.0.0/0` e marque `acknowledge_public_ssh` no formulário.
+Isso expõe somente TCP/22 a qualquer IPv4; não habilita login por senha.
+Após o evento, restrinja a `/32` ou deixe chave/CIDR vazios, desmarque o aceite
+e aplique novo Plan/Apply. Não há expiração automática. Em uma VM existente
+sem chave, a atualização dos metadados pode não instalar a chave no SO.
+
 Já criou uma Stack com o pacote antigo? Baixe novamente este pacote e use
 **Edit Stack → configuração Terraform → Folder** para substituir os arquivos.
 Confira as variáveis, salve e execute novo **Plan → Apply**. Apenas repetir

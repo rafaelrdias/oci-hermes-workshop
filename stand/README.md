@@ -99,13 +99,46 @@ Na tela **Configure variables**:
 | Aceite de persistência | Leia e marque somente se concordar com o token em state/metadados |
 | Shape | Padrão E5.Flex: 1 OCPU, 8 GB RAM, 50 GB de boot; usa créditos |
 | Availability domain | Mantenha `0` (primeiro AD) |
-| Chave SSH / IPv4 `/32` | **Deixe ambos vazios**. Não são necessários para instalar/conversar |
+| Chave pública SSH / origem IPv4 | Por padrão, **deixe ambos vazios**. Para diagnóstico, informe a chave `.pub` e um IPv4 `/32`, ou `0.0.0.0/0` com o aceite abaixo |
+| Aceito expor a porta SSH à internet temporariamente | Marque somente se usar `0.0.0.0/0`. Não há fechamento automático após o evento |
 
 Tenancy OCID é preenchido pela Console. O Terraform cria o compartment,
 rede, VM, dynamic group e policy. Você não precisa copiar compartment OCID,
 gerar chaves SSH ou criar API key de modelo manualmente.
 
 Clique **Next**. Em **Review**, desmarque **Run apply**, revise e clique **Create**.
+
+### SSH opcional no evento: IPs variáveis
+
+Na versão **1.2.0**, é possível liberar SSH temporariamente para qualquer
+**IPv4**, sem precisar conhecer o IP do hotel. Isso expõe TCP/22 à internet:
+qualquer pessoa poderá tentar conectar, mas ainda precisará se autenticar.
+O Terraform exige a chave pública e não habilita autenticação por senha.
+
+No grupo **4. Opcional — diagnóstico por SSH** do formulário:
+
+1. Em **Chave pública SSH opcional**, cole o conteúdo do arquivo `.pub`
+   (começando por `ssh-ed25519` ou `ssh-rsa`). Nunca envie a chave privada à Stack.
+2. Em **Origem IPv4 do SSH**, informe `0.0.0.0/0`.
+3. Marque **Aceito expor a porta SSH à internet temporariamente**.
+4. Salve, execute **Plan**, revise a regra **TCP/22** e depois **Apply**.
+
+O acesso à imagem Oracle Linux usa o usuário `opc` e a chave privada
+correspondente. O token Telegram não é uma credencial SSH. Não compartilhe
+chaves privadas entre participantes e não habilite login por senha.
+
+**Stack já criada:** primeiro baixe o pacote atualizado e substitua a
+configuração por **Edit Stack → Folder**, depois preencha os campos acima.
+Repetir Plan com os arquivos antigos mantém a restrição `/32`.
+Se a VM já foi criada sem chave, editar seus metadados não garante que a chave
+seja instalada no sistema operacional; veja [diagnóstico SSH](TROUBLESHOOTING.md).
+Esse ajuste de rede não reinstala o Hermes nem força a substituição da VM;
+confira sempre o Plan antes de aplicar.
+
+**Após o evento**, use **Edit Stack** para trocar `0.0.0.0/0` pelo seu IPv4
+atual com `/32` e desmarque o aceite. Para fechar SSH completamente, deixe
+chave pública e origem IPv4 vazias e desmarque o aceite. Em ambos os casos,
+execute novo **Plan → revisar → Apply**. A liberação pública não expira sozinha.
 
 ## 5. Execute Plan e Apply — sem sair da Console
 

@@ -1,5 +1,5 @@
 schemaVersion: 1.1.0
-version: '1.1.0'
+version: '1.2.0'
 locale: en
 title: 'Hermes no Telegram — stand Oracle'
 description: 'Trial ORD ou GRU. Instalação e configuração automáticas, sem Cloud Shell ou SSH obrigatório.'
@@ -12,7 +12,7 @@ variableGroups:
   - title: '3. Compute — consome créditos do Trial'
     variables: [instance_shape, availability_domain_index]
   - title: '4. Opcional — diagnóstico por SSH (deixe vazio para não abrir porta)'
-    variables: [ssh_public_key, ssh_allowed_cidr]
+    variables: [ssh_public_key, ssh_allowed_cidr, acknowledge_public_ssh]
   - title: 'Valores preenchidos pela Console'
     visible: false
     variables: [tenancy_ocid, image_ocid]
@@ -63,10 +63,15 @@ variables:
     default: ''
   ssh_allowed_cidr:
     type: string
-    title: 'IPv4 do administrador com /32, opcional'
-    description: 'Preencha junto da chave pública. Nunca use 0.0.0.0/0. Não é necessário para instalar ou conversar.'
+    title: 'Origem IPv4 do SSH: /32 ou 0.0.0.0/0, opcional'
+    description: 'Preencha junto da chave pública. /32 restringe a um IP; 0.0.0.0/0 permite qualquer IPv4 e exige o aceite abaixo. Vazio mantém SSH fechado.'
     required: false
     default: ''
+  acknowledge_public_ssh:
+    type: boolean
+    title: 'Aceito expor a porta SSH à internet temporariamente'
+    description: 'Obrigatório somente para 0.0.0.0/0. Qualquer IPv4 poderá tentar conectar; proteja a chave privada e restrinja ou feche SSH após o evento. Não há fechamento automático.'
+    default: false
   image_ocid:
     type: string
     visible: false

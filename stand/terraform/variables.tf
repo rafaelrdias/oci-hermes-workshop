@@ -56,11 +56,17 @@ variable "ssh_public_key" {
 variable "ssh_allowed_cidr" {
   type        = string
   default     = ""
-  description = "Opcional: IPv4 do administrador /32. Vazio mantém TCP/22 fechado."
+  description = "Opcional: IPv4 /32 recomendado, ou 0.0.0.0/0 com aceite explícito para acesso de qualquer IPv4. Vazio mantém TCP/22 fechado."
   validation {
-    condition     = var.ssh_allowed_cidr == "" || (can(cidrnetmask(var.ssh_allowed_cidr)) && can(regex("/32$", var.ssh_allowed_cidr)))
-    error_message = "SSH deve ficar restrito a um único IPv4 (/32)."
+    condition     = var.ssh_allowed_cidr == "" || var.ssh_allowed_cidr == "0.0.0.0/0" || (can(cidrnetmask(var.ssh_allowed_cidr)) && can(regex("/32$", var.ssh_allowed_cidr)))
+    error_message = "Use um IPv4 /32, ou 0.0.0.0/0 com aceite de exposição pública, ou deixe vazio para desabilitar SSH."
   }
+}
+
+variable "acknowledge_public_ssh" {
+  type        = bool
+  default     = false
+  description = "Aceito expor TCP/22 a qualquer IPv4 com 0.0.0.0/0 temporariamente. A chave pública continua obrigatória; restringirei o acesso após o evento."
 }
 
 variable "instance_shape" {

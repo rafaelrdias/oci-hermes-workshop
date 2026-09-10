@@ -6,6 +6,7 @@
 | Folder excede 11 MB | Selecione somente a pasta da branch `stand-resource-manager`, não o repositório principal ou pasta com `.terraform` |
 | Plan rejeita região | Escolha ORD/GRU subscrita e READY no topo e no formulário. A home region pode ser outra; não há fallback de VM/LLM |
 | Erro antigo “Selecione a HOME REGION do Trial” | Atualize o pacote da mesma Stack por Edit Stack → Folder e execute novo Plan. Veja o guia principal; repetir Plan com arquivos antigos não resolve |
+| Erro antigo “SSH deve ficar restrito a um único IPv4 (/32)” | Atualize a Stack com o pacote 1.2.0 por Edit Stack → Folder. Para qualquer IPv4, preencha chave pública + 0.0.0.0/0 e marque o aceite de exposição pública |
 | Plan pede aceite | Leia o aviso: token persiste em variáveis/state/metadados. Marque apenas se concordar |
 | `NotAuthorizedOrNotFound` criando IAM | Use administrador com permissão para criar IAM. O provider oci.home seleciona automaticamente o endpoint da home region |
 | `Out of host capacity` | Aguarde/reexecute Plan/Apply; ou escolha outra shape/AD explicitamente em Edit Stack. Capacidade não é garantida |
@@ -42,7 +43,12 @@ revele o novo output e faça o pareamento novamente. Isso perde os dados da VM.
 
 Para diagnóstico especializado, SSH pode ser habilitado desde a criação ou
 posteriormente: **Edit Stack → chave pública SSH + IPv4 do administrador `/32`
-→ Plan → revisar → Apply**. Guarde a privada fora da Stack. Se a imagem/serviço
+→ Plan → revisar → Apply**. Para IPs variáveis no evento, a versão 1.2.0 aceita
+**0.0.0.0/0 + aceite de exposição pública**, mantendo a chave obrigatória.
+Isso abre somente TCP/22 para qualquer IPv4; não habilita senha nem libera
+portas da aplicação. Restrinja a `/32` ou feche SSH após o evento por novo
+Plan/Apply — não há expiração automática.
+Guarde a privada fora da Stack. Se a imagem/serviço
 de SSH não atualizar a chave automaticamente, use o procedimento de recuperação
 da Console OCI; não presuma que editar metadados sempre atualiza `authorized_keys`.
 

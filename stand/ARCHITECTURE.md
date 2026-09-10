@@ -94,6 +94,9 @@ inativo normalmente; gateway e ponte continuam ativos e iniciam no boot.
 
 - Sem serviço web público. Por padrão não há entrada TCP; apenas ICMP de MTU.
   Chave pública + CIDR `/32` habilitam SSH administrativo opcional.
+  Para o evento, `0.0.0.0/0` é permitido somente com `acknowledge_public_ssh = true`;
+  expõe apenas TCP/22 a qualquer IPv4 e continua exigindo chave pública.
+  Não há expiração automática: restringir/fechar novamente exige Plan/Apply.
 - Disponibilidade de Compute, acesso a GenAI no Trial, quotas e propagação
   IAM só podem ser comprovados com implantação real na conta.
 - O teste OCI é repetido enquanto IAM não está pronto. Após uma falha, systemd
