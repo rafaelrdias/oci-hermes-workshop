@@ -78,6 +78,9 @@ def main():
 if __name__ == "__main__":
     try:
         sys.exit(main())
+    except ValueError:
+        print("Teste de contrato de ferramenta/streaming falhou; gateway não será ativado.")
+        sys.exit(5)
     except Exception as exc:
         status = getattr(exc, "status_code", "network")
         print("OCI ainda não pronta (status " + str(status) + "). Verifique IAM/limites/modelo.")
