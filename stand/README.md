@@ -115,6 +115,13 @@ Clique **Next**. Em **Review**, desmarque **Run apply**, revise e clique **Creat
 
 ### SSH opcional no evento: IPs variáveis
 
+Ainda não tem uma chave? Para **SSH**, use o
+[guia de geração de chaves no assistente Compute da Console](../docs/OCI_RESOURCE_MANAGER_CONSOLE.md#d-gerar-e-baixar-as-chaves-ssh-pela-console)
+(mantenha a região escolhida para sua instalação; cancele sem criar outra VM).
+Para quem procura **Perfil → Configurações do usuário → API keys**, há um
+[passo a passo separado de chaves de assinatura OCI](../docs/OCI_USER_API_KEYS.md).
+São credenciais diferentes: a chave do perfil não deve ser colada no campo SSH.
+
 Na versão **1.2.0**, é possível liberar SSH temporariamente para qualquer
 **IPv4**, sem precisar conhecer o IP do hotel. Isso expõe TCP/22 à internet:
 qualquer pessoa poderá tentar conectar, mas ainda precisará se autenticar.

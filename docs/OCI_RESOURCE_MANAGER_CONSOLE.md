@@ -93,6 +93,11 @@ O valor começa com `ocid1.compartment`. O Tenancy OCID e o Compartment OCID sã
 
 ### D. Gerar e baixar as chaves SSH pela Console
 
+**Não confunda com Perfil → Configurações do usuário → API keys.** Esse outro
+menu gera chaves de assinatura da API OCI, não as chaves SSH deste passo.
+Se deseja esse procedimento opcional, veja
+[Criar chaves de assinatura pelo perfil do usuário](OCI_USER_API_KEYS.md).
+
 A Console gera o par de chaves dentro do assistente de criação de instância. Use o assistente somente para baixar as chaves; **não crie uma VM manualmente**.
 
 1. confirme **US Midwest (Chicago)** no seletor de região;

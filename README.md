@@ -83,6 +83,7 @@ Para preparar as credenciais em momentos diferentes, use `--oci-only`,
 - [Roteiro completo](docs/WORKSHOP_RUNBOOK.md)
 - [Guia visual — pasta Terraform, OCIDs, chaves SSH e Console OCI](docs/OCI_RESOURCE_MANAGER_CONSOLE.md)
 - [Guia visual — API key OpenAI-compatible, BotFather e primeira conversa](docs/OCI_API_KEY_TELEGRAM.md)
+- [Opcional — criar chaves de assinatura OCI em Configurações do usuário](docs/OCI_USER_API_KEYS.md)
 - [Alternativa para OCI Trial em São Paulo — GRU](docs/GRU_RESOURCE_MANAGER.md)
 - [OCI Enterprise AI e autenticação](docs/ENTERPRISE_AI.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)
