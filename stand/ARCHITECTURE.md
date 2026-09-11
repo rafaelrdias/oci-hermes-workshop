@@ -92,6 +92,12 @@ inativo normalmente; gateway e ponte continuam ativos e iniciam no boot.
 
 ## Limitações e alterações
 
+Desde 1.2.2, `network-preflight.sh` é carregado pelo bootstrap antes de instalar
+pacotes. A instalação via módulo de pacotes do cloud-init foi removida porque
+ela rodava antes de `runcmd`, sem a verificação DNS. Se houver falha de resolução,
+o script reaplica o DNS do NetworkManager sem reiniciar conexões; os retries
+são limitados e não mudam a região, o DHCP ou a política de rede.
+
 Desde 1.2.1, `RefreshingOCISigner` adapta a chamada `do_request_sign` do
 LiteLLM à interface `__call__` do SDK OCI, que verifica a renovação do token.
 Renovação e assinatura são serializadas por lock, sem recriar a identidade

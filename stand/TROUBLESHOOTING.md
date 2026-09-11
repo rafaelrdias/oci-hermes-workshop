@@ -12,6 +12,7 @@
 | `Out of host capacity` | Aguarde/reexecute Plan/Apply; ou escolha outra shape/AD explicitamente em Edit Stack. Capacidade não é garantida |
 | `LimitExceeded` | Confira créditos, Service Limits e recursos existentes. O template não amplia quota nem transforma conta em paga |
 | Apply succeeded, bot silencioso | Bootstrap ainda pode estar em andamento. Revele/copie o comando de pareamento nos Outputs e envie em DM |
+| `Could not resolve host`, pacotes falham e todos os serviços Hermes estão inativos | Instalação parou antes do Telegram. A versão 1.2.2 verifica/reaplica DNS antes dos downloads; veja recuperação abaixo |
 | `/start` sem resposta | Use o comando completo `/start stand_...` da sua Stack; `/start` sozinho não autoriza a conta |
 | “Conta vinculada”, sem “Configuração concluída” | Testes OCI ainda aguardam IAM/acesso/modelo/limites. Alterações de dynamic groups podem levar até uma hora |
 | OCI persiste sem funcionar | Confira GenAI on-demand, policy/dynamic group, limites e crédito. Não autorize `manage all-resources` para contornar |
@@ -22,6 +23,38 @@
 | Pareamento para conta errada | Destrua a instalação, revogue token e crie novo vínculo privado; não compartilhe o comando dos Outputs |
 
 ## Retomar sem criar outra Stack
+
+### Falha de DNS antes da instalação — versão 1.2.2
+
+Em uma VM diagnosticada, o NetworkManager havia recebido `169.254.169.254`
+por DHCP, mas `/etc/resolv.conf` continha `192.168.122.1`. Consultas diretas
+ao resolvedor OCI funcionavam; os downloads pelo resolvedor do sistema falhavam.
+Não presuma que toda falha de DNS tem essa mesma causa.
+
+Para diagnóstico pelo atendente, compare `/etc/resolv.conf` com
+`nmcli -g IP4.DNS device show`. Quando a configuração recebida está correta,
+`sudo nmcli general reload dns-rc` reaplica o DNS gerenciado sem derrubar a
+interface. Faça backup de `/etc/resolv.conf` antes. Valide resolução e acesso
+aos repositórios antes de retomar os pacotes e o bootstrap.
+
+O instalador 1.2.2 faz essa verificação **antes de dnf**, respeita os servidores
+configurados no NetworkManager, preserva um backup e limita as tentativas.
+Não desabilita NetworkManager, não altera DHCP da VCN e não fixa DNS público.
+Se DNS/rotas/firewall continuarem incorretos, encerra com erro em vez de
+anunciar que o Telegram está pronto.
+
+Após recuperação manual, `cloud-init status` pode continuar registrando o
+erro da execução inicial. Não execute `cloud-init clean` nem recrie a VM só
+para apagar esse registro: confira o resultado da recuperação, o marcador
+`/opt/hermes-stand/bootstrap.done` e o estado dos serviços.
+O serviço de ativação fica aguardando o comando privado da **Stack atual**.
+
+Novas instalações devem usar o pacote atualizado. Atualizar os arquivos de
+bootstrap na Stack existente pode propor substituição da VM; revise Plan
+e faça backup antes de aplicar. A recuperação direta não exige novo Apply.
+
+Referências: [NetworkManager — reload dns-rc](https://networkmanager.dev/docs/api/latest/nmcli.html)
+e [OCI — DHCP e DNS](https://docs.oracle.com/en-us/iaas/Content/Network/Tasks/managingDHCP.htm).
 
 ### Correção 1.2.1: renovação da credencial OCI
 

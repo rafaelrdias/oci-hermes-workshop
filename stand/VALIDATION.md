@@ -9,10 +9,12 @@ Validações locais em 10–11/09/2026, sem tokens reais ou criação de recurso
   tamanho do user-data, SSH fechado por padrão, acesso público somente com
   chave e aceite, rejeição de CIDR inválido/IPv6 e
   aceite obrigatório para persistência do token;
-- **23 testes Python aprovados** de pareamento privado, entrada malformada,
+- **28 testes Python aprovados** de pareamento privado, entrada malformada,
   mascaramento de erros, configuração, permissões, streaming, tradução nativa de ferramentas OCI,
   renovação simulada de token/chave com SDK OCI real, assinatura concorrente serializada
-  e marcador SSE `[DONE]` dividido entre leituras sem ocultar payloads inválidos;
+  marcador SSE `[DONE]` dividido entre leituras sem ocultar payloads inválidos,
+  DNS saudável, recuperação DNS antes dos pacotes, falha persistente sem downloads,
+  retries limitados e ordem do cloud-init (testes shell com comandos de SO simulados);
 - `schema.yaml` validado contra o meta-schema oficial Oracle do Resource Manager;
 - contrato da configuração verificado com o código/venv real do Hermes fixado:
   provider, chave local, modo Chat Completions, toolsets e importação do gateway;
@@ -40,6 +42,16 @@ natural e o teste final da conversa pelo participante no Telegram. Não
 generalizar esta verificação para todas as tenancies/regiões ou declarar
 todo o roteiro abaixo aprovado.
 
+## Recuperação de nova VM — 11/09/2026, versão 1.2.2
+
+Uma nova VM chegou com resolução do sistema divergente do DNS recebido por
+DHCP. A atualização do DNS gerenciado pelo NetworkManager restaurou a
+resolução. Pacotes e bootstrap foram retomados sem novo Apply ou recriação.
+O instalador concluiu, reconheceu o pareamento já enviado, validou inferência
+e ferramentas e iniciou o gateway Telegram. Ponte e gateway ficaram ativos.
+O registro de erro do cloud-init original foi preservado para diagnóstico.
+O teste da conversa nessa nova VM ainda deve ser confirmado pelo participante.
+
 ## Repetir testes locais — somente mantenedor
 
 O visitante usa **Plan e Apply na Console**, não estes comandos. Os testes
@@ -51,7 +63,7 @@ cd stand
 python3 -m venv /tmp/hermes-stand-test-venv
 /tmp/hermes-stand-test-venv/bin/pip install -r terraform/files/requirements.lock
 /tmp/hermes-stand-test-venv/bin/python -m unittest discover -s tests -v
-bash -n terraform/files/bootstrap.sh
+bash -n terraform/files/bootstrap.sh terraform/files/network-preflight.sh
 export TF_DATA_DIR="$(mktemp -d)"
 terraform -chdir=terraform init -backend=false
 terraform -chdir=terraform validate
