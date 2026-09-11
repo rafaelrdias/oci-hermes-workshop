@@ -12,6 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 
 import litellm
+from litellm.llms.oci.chat import transformation as oci_chat
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from oci.auth.signers import InstancePrincipalsSecurityTokenSigner
@@ -27,15 +28,48 @@ rate_lock = threading.Lock()
 request_times = []
 
 
+def iter_oci_sse_events(stream, _parse=oci_chat._iter_sse_events):
+    """Compatibility fix for pinned LiteLLM: [DONE] is not an OCI JSON chunk.
+
+    Keep upstream framing (including split HTTP reads), stopping only at the
+    exact SSE terminal marker. Malformed payloads still reach its error path.
+    """
+    for event in _parse(stream):
+        if event.partition(':')[2].strip() == '[DONE]':
+            return
+        yield event
+
+
+# This bridge uses only synchronous completion; async OCI calls are not used.
+# Local to this process, with LiteLLM pinned and regression tests below.
+oci_chat._iter_sse_events = iter_oci_sse_events
+
+
 @lru_cache(maxsize=1)
 def settings():
     return json.loads(Path("/etc/hermes-stand.json").read_text())
 
 
+class RefreshingOCISigner:
+    """Adapt LiteLLM's low-level signing hook to the SDK's refresh-aware API.
+
+    LiteLLM 1.100.1 calls do_request_sign directly, bypassing the OCI SDK
+    __call__ path that renews the federation token and resets signing keys.
+    Serialize refresh + signing so concurrent requests cannot mix key pairs.
+    """
+
+    def __init__(self, sdk_signer):
+        self._sdk_signer = sdk_signer
+        self._lock = threading.Lock()
+
+    def do_request_sign(self, request, enforce_content_headers=True):
+        with self._lock:
+            return self._sdk_signer(request, enforce_content_headers=enforce_content_headers)
+
+
 @lru_cache(maxsize=1)
 def signer():
-    # SDK refreshes its short-lived certificates/token; no user key on disk.
-    return InstancePrincipalsSecurityTokenSigner()
+    return RefreshingOCISigner(InstancePrincipalsSecurityTokenSigner())
 
 
 def authorize(authorization):

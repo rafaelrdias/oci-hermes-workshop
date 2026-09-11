@@ -2,6 +2,11 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.2.1:** corrige a renovação automática da credencial OCI após a
+instalação. Para uma VM já existente, consulte a
+[correção sem recriar o ambiente](TROUBLESHOOTING.md#correção-121-renovação-da-credencial-oci)
+antes de atualizar a Stack e aplicar um Plan que possa substituir a VM.
+
 Esta edição não exige terminal, Cloud Shell, Terraform local, OCI CLI, API key
 OCI ou conexão SSH para instalar. O **OCI Resource Manager executa o Terraform
 pela Console**. A VM instala o Hermes, autentica no modelo com sua identidade

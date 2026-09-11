@@ -1,5 +1,9 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão 1.2.1: renovação da credencial OCI corrigida na ponte LiteLLM. Em VMs
+existentes, atualizar o bootstrap via Apply pode substituir a VM; veja o
+guia de diagnóstico antes de aplicar. Novas instalações já incluem a correção.
+
 [Abra o guia completo, sem comandos](https://github.com/rafaelrdias/oci-hermes-workshop/blob/main/stand/README.md).
 
 Esta pasta é publicada sozinha na branch `stand-resource-manager`, usada pelo

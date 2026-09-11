@@ -92,6 +92,14 @@ inativo normalmente; gateway e ponte continuam ativos e iniciam no boot.
 
 ## Limitações e alterações
 
+Desde 1.2.1, `RefreshingOCISigner` adapta a chamada `do_request_sign` do
+LiteLLM à interface `__call__` do SDK OCI, que verifica a renovação do token.
+Renovação e assinatura são serializadas por lock, sem recriar a identidade
+a cada inferência. O SDK continua responsável pelo cache e validade do token.
+O adaptador SSE síncrono preserva o enquadramento do LiteLLM e encerra no
+marcador `[DONE]`, em vez de tentar interpretá-lo como JSON de resposta OCI.
+Esses ajustes são locais à ponte e testados com a versão fixada do LiteLLM.
+
 - Sem serviço web público. Por padrão não há entrada TCP; apenas ICMP de MTU.
   Chave pública + CIDR `/32` habilitam SSH administrativo opcional.
   Para o evento, `0.0.0.0/0` é permitido somente com `acknowledge_public_ssh = true`;

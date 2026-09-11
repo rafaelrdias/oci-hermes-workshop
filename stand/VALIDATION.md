@@ -2,15 +2,17 @@
 
 ## Escopo dos testes desta entrega
 
-Validações locais em 10/09/2026, sem tokens reais ou criação de recursos na nuvem:
+Validações locais em 10–11/09/2026, sem tokens reais ou criação de recursos na nuvem:
 
 - Terraform `fmt`, `init -backend=false`, `validate`;
 - **14 testes Terraform aprovados** com providers simulados: ORD/GRU, home region diferente (IAD/FRA), rejeição de região não subscrita/não READY, IAM mínimo, VM 1 OCPU/8 GB,
   tamanho do user-data, SSH fechado por padrão, acesso público somente com
   chave e aceite, rejeição de CIDR inválido/IPv6 e
   aceite obrigatório para persistência do token;
-- **18 testes Python aprovados** de pareamento privado, entrada malformada,
-  mascaramento de erros, configuração, permissões, streaming e tradução nativa de ferramentas OCI;
+- **23 testes Python aprovados** de pareamento privado, entrada malformada,
+  mascaramento de erros, configuração, permissões, streaming, tradução nativa de ferramentas OCI,
+  renovação simulada de token/chave com SDK OCI real, assinatura concorrente serializada
+  e marcador SSE `[DONE]` dividido entre leituras sem ocultar payloads inválidos;
 - `schema.yaml` validado contra o meta-schema oficial Oracle do Resource Manager;
 - contrato da configuração verificado com o código/venv real do Hermes fixado:
   provider, chave local, modo Chat Completions, toolsets e importação do gateway;
@@ -20,6 +22,23 @@ Isso **não comprova** disponibilidade Compute, autorização real IAM, acesso
 GenAI na conta Trial, execução de cloud-init/systemd na VM ou conversa final
 do Telegram. A edição precisa de homologação real antes de ser distribuída
 como pronta para visitantes.
+
+## Verificação na VM existente — 11/09/2026, versão 1.2.1
+
+- Antes da correção, a ponte em execução retornou HTTP 401; uma chamada com
+  signer recém-criado respondeu usando a mesma configuração OCI.
+- Após substituir somente `bridge.py` e reiniciar a ponte, `smoke.py` passou:
+  inferência, chamada de ferramenta e retorno da ferramenta.
+- Streaming real com texto em português passou: HTTP 200, texto recebido,
+  marcador `[DONE]` e ausência de erro no stream.
+- O processo do gateway foi preservado; não foi feito novo pareamento,
+  alteração IAM, troca de chaves ou recriação de VM.
+
+A renovação foi coberta por regressão local com SDK real e troca simulada de
+token/chave. Ainda falta observação prolongada em produção após expiração
+natural e o teste final da conversa pelo participante no Telegram. Não
+generalizar esta verificação para todas as tenancies/regiões ou declarar
+todo o roteiro abaixo aprovado.
 
 ## Repetir testes locais — somente mantenedor
 
@@ -42,7 +61,8 @@ terraform fmt -check -recursive terraform
 
 ## Homologação real — uma Trial ORD e outra GRU
 
-Nenhuma das etapas reais abaixo está declarada como aprovada nesta entrega.
+O roteiro abaixo ainda não foi aprovado integralmente; os testes reais
+parciais realizados estão registrados na seção anterior.
 
 1. Usar conta do visitante/admin e um bot novo, sem webhook.
 2. Abrir o botão de deploy; verificar seleção automática do pacote e formulário.

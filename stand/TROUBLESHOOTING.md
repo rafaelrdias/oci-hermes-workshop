@@ -18,9 +18,37 @@
 | Tool calling falhou | Não trate chat simples como aceite. É preciso validar ferramenta e retorno ao modelo antes de liberar ao público |
 | Bot já tem webhook/Telegram 409 | Use um bot novo/exclusivo. O ativador não apaga integrações externas |
 | Bot respondeu ao instalador mas não ao visitante | Envie `/new` e nova tarefa. A mensagem do instalador não prova a resposta do agente |
+| Funcionou inicialmente e depois retornou `Provider authentication failed` / OCI 401 | Versões até 1.2.0 tinham um defeito na renovação do token de Instance Principal na ponte LiteLLM. A versão 1.2.1 corrige esse caminho. Veja abaixo; não crie outra API key nem amplie IAM sem diagnóstico |
 | Pareamento para conta errada | Destrua a instalação, revogue token e crie novo vínculo privado; não compartilhe o comando dos Outputs |
 
 ## Retomar sem criar outra Stack
+
+### Correção 1.2.1: renovação da credencial OCI
+
+A ponte agora chama a interface do SDK que verifica/renova o token antes de
+assinar cada requisição. Um lock mantém renovação e assinatura juntas nas
+chamadas simultâneas. Não é necessário trocar token Telegram, chave SSH ou
+pareamento. Reiniciar a ponte antiga apenas obtém outro token temporário;
+não corrige permanentemente a renovação.
+
+A versão também trata o marcador SSE `[DONE]` antes do parser JSON do
+LiteLLM 1.100.1. Isso evita erro no fim do streaming depois de receber texto.
+Somente esse marcador é tratado; payloads inválidos continuam gerando erro.
+
+Para **novas instalações**, use o pacote atualizado. Para uma **VM existente**,
+o mantenedor pode fazer backup e substituir apenas `/opt/hermes-stand/bridge.py`
+pelo arquivo da versão 1.2.1, preservando root:root e modo 0644, e reiniciar
+somente `hermes-oci-bridge`. Valide `smoke.py` e depois a conversa no Telegram.
+Não exponha `.env`, `bridge.key` ou credenciais nos logs.
+
+**Atenção ao Terraform:** carregar o pacote novo na Stack e executar Apply
+pode propor **substituir a VM**, pois esse arquivo faz parte do bootstrap.
+Para preservar a VM e suas conversas, não aprove essa substituição inadvertidamente.
+Uma correção direta na VM não atualiza a cópia antiga do Terraform armazenada
+na Stack; planeje a atualização/recriação futura com backup e revisão do Plan.
+
+Outros erros 401 ainda exigem diagnóstico: essa correção não substitui
+verificação de IAM, limites, acesso ao modelo e disponibilidade de créditos.
 
 Para falhas de provisionamento, na **mesma Stack**, execute novo **Plan**,
 revise e depois **Apply**. O state do Resource Manager reaproveita os recursos

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -138,6 +138,65 @@ class BridgeTests(unittest.TestCase):
         mapped = adapt_messages_to_generic_oci_standard(messages)
         self.assertEqual(mapped[1].toolCalls[0].name, "stand_echo")
         self.assertEqual(mapped[2].toolCallId, "call_1")
+
+
+class SignerRefreshTests(unittest.TestCase):
+    def test_sse_terminal_marker_split_across_reads(self):
+        chunks = iter(['data: {"finishReason":"STOP"}\n\ndata: [DO', 'NE]\n\n'])
+        self.assertEqual(list(bridge.iter_oci_sse_events(chunks)), ['data: {"finishReason":"STOP"}'])
+
+    def test_sse_malformed_payload_is_not_hidden(self):
+        self.assertEqual(list(bridge.iter_oci_sse_events(iter(['data: not-json\n']))), ['data: not-json'])
+
+    def test_uses_refresh_aware_sdk_entrypoint(self):
+        sdk = Mock(return_value='signed')
+        request = object()
+        self.assertEqual(bridge.RefreshingOCISigner(sdk).do_request_sign(request), 'signed')
+        sdk.assert_called_once_with(request, enforce_content_headers=True)
+        sdk.do_request_sign.assert_not_called()
+
+    def test_real_sdk_and_litellm_observe_renewed_token(self):
+        from cryptography.hazmat.primitives.asymmetric import rsa
+        from oci.auth.signers.security_token_signer import X509FederationClientBasedSecurityTokenSigner
+        from litellm.llms.oci.common_utils import sign_with_oci_signer
+        private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+        federation = Mock()
+        federation.get_security_token.return_value = 'old-test-token'
+        federation.session_key_supplier.get_key_pair.return_value = {'private': private_key}
+        sdk = X509FederationClientBasedSecurityTokenSigner(federation)
+        wrapper = bridge.RefreshingOCISigner(sdk)
+        params = {'oci_signer': wrapper}
+        url = 'https://inference.generativeai.us-chicago-1.oci.oraclecloud.com/20231130/actions/chat'
+        first, _ = sign_with_oci_signer({}, params, {'message': 'olá'}, url)
+        self.assertIn('old-test-token', first['authorization'])
+        # Simulate the federation cache returning a refreshed token/key pair.
+        federation.get_security_token.return_value = 'renewed-test-token'
+        federation.session_key_supplier.get_key_pair.return_value = {
+            'private': rsa.generate_private_key(public_exponent=65537, key_size=2048)}
+        second, _ = sign_with_oci_signer({}, params, {'message': 'olá'}, url)
+        self.assertIn('renewed-test-token', second['authorization'])
+        self.assertNotIn('old-test-token', second['authorization'])
+        self.assertEqual(federation.get_security_token.call_count, 3)
+
+    def test_concurrent_signing_is_serialized(self):
+        import threading
+        import time
+        from concurrent.futures import ThreadPoolExecutor
+        active, peak = 0, 0
+        counter_lock = threading.Lock()
+        def sdk(request, enforce_content_headers=True):
+            nonlocal active, peak
+            with counter_lock:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(0.01)
+            with counter_lock:
+                active -= 1
+            return request
+        wrapper = bridge.RefreshingOCISigner(sdk)
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            self.assertEqual(list(pool.map(wrapper.do_request_sign, range(8))), list(range(8)))
+        self.assertEqual(peak, 1)
 
 
 class FilesTests(unittest.TestCase):
