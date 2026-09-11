@@ -105,6 +105,42 @@ def completion_args(body):
     return result
 
 
+def normalized_stream(result):
+    """Keep each tool call's identity stable across pinned OCI adapter deltas.
+
+    LiteLLM 1.100.1 synthesizes a different id from each argument fragment
+    when OCI omits the id on continuation chunks. Hermes then sees separate,
+    invalid tool calls. Indices are scoped to one choice and one response.
+    Never concatenate/repair arguments here, or hide a real length cutoff.
+    """
+    calls = {}
+    for chunk in result:
+        payload = chunk.model_dump(exclude_none=True)
+        for choice in payload.get("choices", []):
+            choice_index = choice.get("index", 0)
+            delta = choice.get("delta", {})
+            for position, call in enumerate(delta.get("tool_calls") or []):
+                index = call.get("index", position)
+                key = (choice_index, index)
+                call["index"] = index
+                function = call.setdefault("function", {})
+                if key not in calls:
+                    calls[key] = {"id": call.get("id") or "call_" + secrets.token_hex(12), "name": ""}
+                state = calls[key]
+                name = function.get("name") or ""
+                if state["name"] and name and name != state["name"]:
+                    raise ValueError("OCI reused a tool index for a different function")
+                if state["name"] or not name:
+                    # Function name is metadata, not a repeated argument delta.
+                    function.pop("name", None)
+                else:
+                    state["name"] = name
+                call["id"] = state["id"]
+            if choice.get("finish_reason") == "stop" and any(k[0] == choice_index for k in calls):
+                choice["finish_reason"] = "tool_calls"
+        yield payload
+
+
 @app.get("/healthz")
 def health():
     # Process readiness only; smoke.py checks actual inference and tool calling.
@@ -146,8 +182,8 @@ def chat(body: dict, authorization: str = Header(default="")):
 
     def events():
         try:
-            for chunk in result:
-                yield "data: " + chunk.model_dump_json(exclude_none=True) + "\n\n"
+            for payload in normalized_stream(result):
+                yield "data: " + json.dumps(payload, ensure_ascii=False) + "\n\n"
             yield "data: [DONE]\n\n"
         except Exception:
             yield 'data: {"error":{"message":"Streaming OCI interrompido","type":"upstream_error"}}\n\n'

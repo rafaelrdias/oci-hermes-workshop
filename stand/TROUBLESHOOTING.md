@@ -17,12 +17,38 @@
 | “Conta vinculada”, sem “Configuração concluída” | Testes OCI ainda aguardam IAM/acesso/modelo/limites. Alterações de dynamic groups podem levar até uma hora |
 | OCI persiste sem funcionar | Confira GenAI on-demand, policy/dynamic group, limites e crédito. Não autorize `manage all-resources` para contornar |
 | Tool calling falhou | Não trate chat simples como aceite. É preciso validar ferramenta e retorno ao modelo antes de liberar ao público |
+| `Response truncated due to output length limit` até em tarefa curta | Versões até 1.2.2 podiam fragmentar ferramentas no streaming. A versão 1.2.3 corrige os IDs; veja abaixo antes de aumentar tokens |
 | Bot já tem webhook/Telegram 409 | Use um bot novo/exclusivo. O ativador não apaga integrações externas |
 | Bot respondeu ao instalador mas não ao visitante | Envie `/new` e nova tarefa. A mensagem do instalador não prova a resposta do agente |
 | Funcionou inicialmente e depois retornou `Provider authentication failed` / OCI 401 | Versões até 1.2.0 tinham um defeito na renovação do token de Instance Principal na ponte LiteLLM. A versão 1.2.1 corrige esse caminho. Veja abaixo; não crie outra API key nem amplie IAM sem diagnóstico |
 | Pareamento para conta errada | Destrua a instalação, revogue token e crie novo vínculo privado; não compartilhe o comando dos Outputs |
 
 ## Retomar sem criar outra Stack
+
+### Ferramentas truncadas no streaming — versão 1.2.3
+
+No defeito diagnosticado, os logs registravam `Unrepairable tool_call arguments`
+para pedaços de palavras/JSON. A ponte gerava um ID diferente para cada
+fragmento da mesma chamada; o Hermes recusava argumentos incompletos,
+repetia a solicitação e exibia uma mensagem genérica de limite de saída.
+Isso não era falta de créditos nem exigia outro modelo ou limite maior.
+
+- Novas instalações: use o pacote **1.2.3** da branch `stand-resource-manager`.
+  A ativação só libera o gateway após validar também ferramenta e retorno
+  em streaming. O teste final no Telegram continua obrigatório.
+- VM existente com SSH administrativo: o mantenedor pode fazer backup e
+  atualizar somente `/opt/hermes-stand/bridge.py` e `smoke.py` com os arquivos
+  desta versão, reiniciar `hermes-oci-bridge` e executar o teste `smoke.py`
+  com `/opt/hermes-stand/bridge-venv/bin/python`. Não é preciso novo pareamento.
+- Depois da correção, envie **`/new`** ao bot e teste saudação e criação/leitura
+  de arquivo. Isso inicia uma sessão limpa sem apagar o workspace.
+- Pela Console, atualizar arquivos da Stack não altera a VM imediatamente.
+  O próximo Plan/Apply pode **substituir a VM**, pois mudou o bootstrap.
+  Faça backup dos dados e revise o Plan antes de aceitar a substituição.
+
+Uma resposta genuinamente longa ainda pode atingir o teto de saída; a
+correção preserva esse sinal. Se o problema persistir após `/new`, diagnostique
+os logs da nova execução, sem publicar conteúdo de conversas ou credenciais.
 
 ### Falha de DNS antes da instalação — versão 1.2.2
 

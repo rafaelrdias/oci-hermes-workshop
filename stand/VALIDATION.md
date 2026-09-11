@@ -9,12 +9,16 @@ Validações locais em 10–11/09/2026, sem tokens reais ou criação de recurso
   tamanho do user-data, SSH fechado por padrão, acesso público somente com
   chave e aceite, rejeição de CIDR inválido/IPv6 e
   aceite obrigatório para persistência do token;
-- **28 testes Python aprovados** de pareamento privado, entrada malformada,
+- **36 testes Python aprovados** de pareamento privado, entrada malformada,
   mascaramento de erros, configuração, permissões, streaming, tradução nativa de ferramentas OCI,
   renovação simulada de token/chave com SDK OCI real, assinatura concorrente serializada
   marcador SSE `[DONE]` dividido entre leituras sem ocultar payloads inválidos,
   DNS saudável, recuperação DNS antes dos pacotes, falha persistente sem downloads,
   retries limitados e ordem do cloud-init (testes shell com comandos de SO simulados);
+- Regressão do adaptador OCI real fixado: fragmentos com IDs diferentes,
+  índices independentes, estado isolado por resposta, nome tardio/repetido,
+  rejeição de mudança ambígua de função, preservação de truncamento real,
+  aceite de stream completo e rejeição do stream fragmentado/incompleto;
 - `schema.yaml` validado contra o meta-schema oficial Oracle do Resource Manager;
 - contrato da configuração verificado com o código/venv real do Hermes fixado:
   provider, chave local, modo Chat Completions, toolsets e importação do gateway;
@@ -51,6 +55,24 @@ O instalador concluiu, reconheceu o pareamento já enviado, validou inferência
 e ferramentas e iniciou o gateway Telegram. Ponte e gateway ficaram ativos.
 O registro de erro do cloud-init original foi preservado para diagnóstico.
 O teste da conversa nessa nova VM ainda deve ser confirmado pelo participante.
+
+## Ferramentas com streaming — 11/09/2026, versão 1.2.3
+
+- Reprodução real: uma chamada curta de `stand_echo` funcionava sem streaming,
+  mas o stream retornava vários IDs diferentes para fragmentos da mesma função.
+  O Hermes registrava argumentos irrecuperáveis e recusava executar as chamadas.
+- Após atualizar `bridge.py`, o mesmo teste manteve um único ID, argumentos JSON
+  completos e `finish_reason=tool_calls`, sem elevar o teto de tokens.
+- O `smoke.py` ampliado passou em inferência e chamada/retorno de ferramenta
+  com e sem streaming na VM, usando a mesma identidade OCI e modelo.
+- O próprio `AIAgent` do Hermes instalado, com streaming habilitado e toolset
+  de arquivos, respondeu à saudação e executou `write_file` seguido de
+  `read_file`. O arquivo de diagnóstico único foi conferido no workspace.
+- Ponte reiniciada, gateway preservado e pareamento mantido. Não houve
+  novo Apply, alteração IAM ou recriação da VM. Backups dos scripts preservados.
+
+Esse teste exercitou o agente na VM, não uma nova mensagem enviada pelo usuário
+no Telegram. A confirmação final deve ser feita pelo participante após `/new`.
 
 ## Repetir testes locais — somente mantenedor
 

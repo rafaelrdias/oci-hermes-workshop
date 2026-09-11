@@ -106,6 +106,15 @@ O adaptador SSE síncrono preserva o enquadramento do LiteLLM e encerra no
 marcador `[DONE]`, em vez de tentar interpretá-lo como JSON de resposta OCI.
 Esses ajustes são locais à ponte e testados com a versão fixada do LiteLLM.
 
+Desde 1.2.3, a ponte mantém o ID de cada ferramenta por índice de chamada e
+choice durante uma resposta: o adaptador OCI fixado gerava IDs sintéticos
+diferentes para fragmentos de argumentos sem ID. O nome é emitido uma vez,
+os argumentos continuam como deltas, e `stop` com ferramentas vira
+`tool_calls`. Um `length` real nunca é convertido em sucesso. A mudança de
+nome de função no mesmo índice encerra o stream com erro, sem executar JSON
+parcial. O teste de ativação verifica ferramenta e retorno com e sem streaming
+(quatro chamadas curtas de inferência por tentativa, sujeitas a consumo).
+
 - Sem serviço web público. Por padrão não há entrada TCP; apenas ICMP de MTU.
   Chave pública + CIDR `/32` habilitam SSH administrativo opcional.
   Para o evento, `0.0.0.0/0` é permitido somente com `acknowledge_public_ssh = true`;

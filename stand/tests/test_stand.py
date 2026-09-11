@@ -23,6 +23,7 @@ sys.path.insert(0, str(ROOT / "terraform/files"))
 setup = module("stand_activate", ROOT / "terraform/files/activate.py")
 configure = module("stand_configure", ROOT / "terraform/files/configure.py")
 bridge = module("stand_bridge", ROOT / "terraform/files/bridge.py")
+smoke = module("stand_smoke", ROOT / "terraform/files/smoke.py")
 
 
 class PairingTests(unittest.TestCase):
@@ -128,7 +129,7 @@ class BridgeTests(unittest.TestCase):
             response = client.post("/v1/chat/completions", json=self.request(stream=True), headers={"Authorization": "Bearer local-test-key"})
         self.assertIn("text/event-stream", response.headers["content-type"])
         self.assertIn("data: [DONE]", response.text)
-        self.assertIn('"content":"oi"', response.text)
+        self.assertIn('"content": "oi"', response.text)
 
     def test_native_oci_tool_adapter(self):
         from litellm.llms.oci.chat.generic import adapt_messages_to_generic_oci_standard
@@ -138,6 +139,72 @@ class BridgeTests(unittest.TestCase):
         mapped = adapt_messages_to_generic_oci_standard(messages)
         self.assertEqual(mapped[1].toolCalls[0].name, "stand_echo")
         self.assertEqual(mapped[2].toolCallId, "call_1")
+
+
+class StreamToolTests(unittest.TestCase):
+    def chunk(self, index=0, name='', args='', call_id='changing-id', finish=None):
+        from litellm import ModelResponseStream
+        return ModelResponseStream(model='hermes-oci', choices=[{'index': 0, 'delta': {'tool_calls': [
+            {'index': index, 'id': call_id, 'type': 'function', 'function': {'name': name, 'arguments': args}}]},
+            'finish_reason': finish}])
+
+    def test_real_pinned_adapter_fragmented_tool_call(self):
+        # Same progressive shape observed from OCI: only first delta has id/name.
+        chunks = [bridge.oci_chat.handle_generic_stream_chunk({'message': {'role': 'ASSISTANT', 'toolCalls': [tc]}})
+                  for tc in [{'id': 'oci-call', 'name': 'stand_echo', 'arguments': '{"value":'},
+                             {'arguments': '"olá"'}, {'arguments': '}'}]]
+        normalized = list(bridge.normalized_stream(chunks))
+        calls = [c['choices'][0]['delta']['tool_calls'][0] for c in normalized]
+        self.assertEqual({c['id'] for c in calls}, {'oci-call'})
+        self.assertEqual({c['index'] for c in calls}, {0})
+        self.assertEqual(''.join(c['function'].get('name', '') for c in calls), 'stand_echo')
+        self.assertEqual(json.loads(''.join(c['function']['arguments'] for c in calls)), {'value': 'olá'})
+
+    def test_separate_calls_and_no_cross_request_state(self):
+        chunks = [self.chunk(name='first', call_id='a'), self.chunk(index=1, name='second', call_id='b'), self.chunk(args='{}')]
+        output = list(bridge.normalized_stream(chunks))
+        self.assertEqual([c['choices'][0]['delta']['tool_calls'][0]['id'] for c in output], ['a', 'b', 'a'])
+        fresh = list(bridge.normalized_stream([self.chunk(name='fresh', call_id='c')]))
+        self.assertEqual(fresh[0]['choices'][0]['delta']['tool_calls'][0]['id'], 'c')
+
+    def test_finish_reason_preserves_real_truncation(self):
+        for reason, expected in [('stop', 'tool_calls'), ('length', 'length'), ('content_filter', 'content_filter')]:
+            result = list(bridge.normalized_stream([self.chunk(name='echo', finish=reason)]))
+            self.assertEqual(result[0]['choices'][0]['finish_reason'], expected)
+
+    def test_name_can_arrive_later_but_cannot_change(self):
+        result = list(bridge.normalized_stream([self.chunk(), self.chunk(name='echo'), self.chunk(name='echo')]))
+        names = [c['choices'][0]['delta']['tool_calls'][0]['function'].get('name', '') for c in result]
+        self.assertEqual(names, ['', 'echo', ''])
+        with self.assertRaises(ValueError):
+            list(bridge.normalized_stream([self.chunk(name='echo'), self.chunk(name='other')]))
+
+    def test_plain_text_stop_unchanged(self):
+        from litellm import ModelResponseStream
+        chunk = ModelResponseStream(choices=[{'index': 0, 'delta': {'content': 'Olá'}, 'finish_reason': 'stop'}])
+        output = list(bridge.normalized_stream([chunk]))[0]['choices'][0]
+        self.assertEqual(output['finish_reason'], 'stop')
+        self.assertEqual(output['delta']['content'], 'Olá')
+
+    def test_acceptance_rejects_original_fragmentation(self):
+        broken = [self.chunk(name='echo', args='{"value":', call_id='a'),
+                  self.chunk(args='"oi"}', call_id='b', finish='stop')]
+        with self.assertRaises(ValueError):
+            smoke.collect_stream(broken)
+
+    def test_acceptance_reassembles_normalized_stream(self):
+        from openai.types.chat import ChatCompletionChunk
+        source = [self.chunk(name='echo', args='{"value":', call_id='a'),
+                  self.chunk(args='"oi"}', call_id='b', finish='stop')]
+        chunks = [ChatCompletionChunk(**p) for p in bridge.normalized_stream(source)]
+        message = smoke.collect_stream(chunks)
+        self.assertEqual(len(message['tool_calls']), 1)
+        self.assertEqual(json.loads(message['tool_calls'][0]['function']['arguments']), {'value': 'oi'})
+
+    def test_acceptance_rejects_incomplete_stream(self):
+        for finish in (None, 'length'):
+            with self.assertRaises(ValueError):
+                smoke.collect_stream([self.chunk(name='echo', args='{}', finish=finish)])
 
 
 class SignerRefreshTests(unittest.TestCase):

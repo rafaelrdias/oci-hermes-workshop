@@ -2,6 +2,12 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.2.3:** corrige chamadas de ferramentas fragmentadas no streaming
+que apareciam como `Response truncated due to output length limit`.
+A ativação agora testa chamada e retorno de ferramenta também com streaming.
+Não é necessário aumentar o limite de tokens. Em VM já instalada, consulte
+[o diagnóstico e a correção](TROUBLESHOOTING.md#ferramentas-truncadas-no-streaming--versão-123).
+
 **Versão 1.2.2:** verifica DNS antes de instalar pacotes e reaplica a
 configuração DNS do NetworkManager quando necessário. Se os nomes não
 resolverem após tentativas limitadas, interrompe com diagnóstico; não troca

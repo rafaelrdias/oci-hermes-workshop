@@ -1,5 +1,8 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão 1.2.3: identidade estável das ferramentas no streaming e teste de
+ativação com e sem streaming. Inclui as correções anteriores.
+
 Versão 1.2.2: preflight DNS antes dos downloads, recuperação via NetworkManager
 e tentativas limitadas de instalação de pacotes. Inclui as correções 1.2.1.
 
