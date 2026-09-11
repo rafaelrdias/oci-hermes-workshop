@@ -4,7 +4,7 @@ locals {
   tags         = { purpose = "hermes-oracle-stand", managed_by = "terraform" }
   image        = var.image_ocid != "" ? var.image_ocid : data.oci_core_images.ol9[0].images[0].id
   vm_config    = jsonencode({ region = var.region, compartment_id = oci_identity_compartment.stand.id, model = local.model })
-  payloads     = { for name in ["bootstrap.sh", "configure.py", "bridge.py", "smoke.py", "activate.py", "requirements.txt", "requirements.lock", "hermes-gateway.service", "hermes-oci-bridge.service", "hermes-stand-activate.service"] : name => filebase64("${path.module}/files/${name}") }
+  payloads     = { for name in ["bootstrap.sh", "network-preflight.sh", "configure.py", "bridge.py", "smoke.py", "activate.py", "requirements.txt", "requirements.lock", "hermes-gateway.service", "hermes-oci-bridge.service", "hermes-stand-activate.service"] : name => filebase64("${path.module}/files/${name}") }
   pairing_code = "stand_${random_id.pairing.hex}"
   user_data = base64gzip(templatefile("${path.module}/cloud-init.yaml.tftpl", {
     payloads = local.payloads

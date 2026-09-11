@@ -1,5 +1,8 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão 1.2.2: preflight DNS antes dos downloads, recuperação via NetworkManager
+e tentativas limitadas de instalação de pacotes. Inclui as correções 1.2.1.
+
 Versão 1.2.1: renovação da credencial OCI corrigida na ponte LiteLLM. Em VMs
 existentes, atualizar o bootstrap via Apply pode substituir a VM; veja o
 guia de diagnóstico antes de aplicar. Novas instalações já incluem a correção.

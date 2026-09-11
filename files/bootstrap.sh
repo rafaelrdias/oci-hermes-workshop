@@ -4,6 +4,9 @@ umask 022
 root=/opt/hermes-stand
 trap 'printf "Bootstrap interrompido na linha %s. Consulte o log sem compartilhar segredos ou user-data.\n" "$LINENO" >&2' ERR
 
+source "$root/network-preflight.sh"
+stand_install_packages
+
 id hermes >/dev/null 2>&1 || useradd --create-home --home-dir /var/lib/hermes --shell /bin/bash hermes
 install -d -o hermes -g hermes -m 0700 /var/lib/hermes/.hermes /var/lib/hermes/workspace
 install -d -m 0755 "$root/bin" "$root/python"
