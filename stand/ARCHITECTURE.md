@@ -128,7 +128,7 @@ parcial. O teste de ativação verifica ferramenta e retorno com e sem streaming
 - O teste OCI é repetido enquanto IAM não está pronto. Após uma falha, systemd
   retoma em 60 segundos. Não há desligamento financeiro automático: o visitante
   deve usar Destroy se não quiser continuar aguardando/consumindo créditos.
-- Modelo padrão: Grok 4.6 via OCI ORD, hospedado externamente pela xAI.
+- Modelo padrão: Grok 4.3 via OCI ORD, hospedado externamente pela xAI; Grok 4.6 opcional.
   Llama 3.3 70B é alternativa explícita para ORD/GRU. Sem fallback entre regiões, provedores,
   modelos, APIs comerciais ou infraestrutura dedicada.
 - O limite de 120 chamadas/hora é em memória, reinicia com a ponte e não limita
@@ -151,6 +151,7 @@ Consultadas em 10/09/2026:
 - [Instance Principals — Oracle](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm)
 - [Modelos por região — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
 - [Grok 4.6 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-6.htm)
+- [Grok 4.3 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-3.htm)
 - [Whisper local — projeto faster-whisper](https://github.com/SYSTRAN/faster-whisper)
 
 ## Entrada de áudio e saída textual — 1.3.0

@@ -51,7 +51,7 @@ run "gru" {
 run "ord" {
   command = plan
   variables {
-    region = "us-chicago-1"
+    region    = "us-chicago-1"
     llm_model = "xai.grok-4.6"
   }
   override_data {
@@ -70,6 +70,28 @@ run "reject_grok_in_gru" {
   expect_failures = [oci_identity_compartment.stand]
 }
 
+run "ord_grok_43" {
+  command = plan
+  variables {
+    region    = "us-chicago-1"
+    llm_model = "xai.grok-4.3"
+  }
+  override_data {
+    target = data.oci_identity_region_subscriptions.tenancy
+    values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
+  }
+  assert {
+    condition     = output.model == "xai.grok-4.3" && strcontains(oci_identity_policy.hermes.statements[0], "target.model.id = 'xai.grok-4.3'") && !strcontains(oci_identity_policy.hermes.statements[0], "xai.grok-4.6")
+    error_message = "Grok 4.3 deve ser autorizado sem liberar outros modelos."
+  }
+}
+
+run "reject_grok_43_in_gru" {
+  command = plan
+  variables { llm_model = "xai.grok-4.3" }
+  expect_failures = [oci_identity_compartment.stand]
+}
+
 run "reject_unknown_model" {
   command = plan
   variables { llm_model = "unavailable-model" }
@@ -80,7 +102,7 @@ run "disable_stt_explicitly" {
   command = plan
   variables { stt_enabled = false }
   assert {
-    condition = jsondecode(local.vm_config).stt_enabled == false
+    condition     = jsondecode(local.vm_config).stt_enabled == false
     error_message = "A escolha de desabilitar STT deve chegar à VM."
   }
 }

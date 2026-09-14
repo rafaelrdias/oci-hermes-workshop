@@ -114,7 +114,26 @@ homologação do Grok na tenancy ou medição de latência da VM de 1 OCPU.
 
 Isso comprova uma execução real nesta VM/tenancy, não capacidade para vários
 visitantes simultâneos. Falta confirmar a nova mensagem do usuário no Telegram.
-Mais throughput pode exigir solicitação de aumento do service limit à Oracle.
+O 429 não comprova esgotamento do limite publicado de 200 mil TPM. Um teste
+posterior diretamente na API OCI, sem Hermes/LiteLLM, retornou 200 com 7.800
+tokens e depois 429. Throttling dinâmico é uma hipótese documentada pela Oracle,
+não a causa comprovada nesta tenancy. Aumentar quota não é solução garantida.
+
+## Grok 4.3 — 14/09/2026, versão 1.3.2
+
+- Modelo padrão alterado para `xai.grok-4.3` em Chicago; Grok 4.6 continua
+  selecionável. Mantidos limites conservadores de contexto/saída, STT local,
+  respostas textuais, retry limitado e IAM restrito ao modelo escolhido.
+- 50 testes Python e 19 testes Terraform com providers simulados aprovados.
+  Contrato com o Hermes fixado e sintaxe shell aprovados; user-data permanece
+  abaixo de 30.000 caracteres, sem aumentar o limite.
+- Pré-teste direto na VM atual: duas chamadas Grok 4.3 retornaram HTTP 404.
+  A policy gerada para essa instalação restringe acesso a Grok 4.6. A identidade
+  da VM não administra IAM; a credencial local pertence a outra tenancy.
+- **Pendente:** administrador alterar a condição da policy para Grok 4.3;
+  depois atualizar a configuração da VM e repetir inferência e criação/leitura
+  pelo Hermes. O modelo da VM não foi alterado para não interromper Grok 4.6.
+  Não anunciar validação ao vivo de Grok 4.3 antes de concluir esses passos.
 
 ## Repetir testes locais — somente mantenedor
 

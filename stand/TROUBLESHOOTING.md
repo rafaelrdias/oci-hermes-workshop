@@ -17,7 +17,7 @@
 | “Conta vinculada”, sem “Configuração concluída” | Testes OCI ainda aguardam IAM/acesso/modelo/limites. Alterações de dynamic groups podem levar até uma hora |
 | OCI persiste sem funcionar | Confira GenAI on-demand, policy/dynamic group, limites e crédito. Não autorize `manage all-resources` para contornar |
 | Tool calling falhou | Não trate chat simples como aceite. É preciso validar ferramenta e retorno ao modelo antes de liberar ao público |
-| Plan rejeita Grok em GRU | Selecione Chicago para Grok 4.6, ou Llama explicitamente para GRU. Não mude apenas o endpoint na VM |
+| Plan rejeita Grok em GRU | Selecione Chicago para Grok 4.3/4.6, ou Llama explicitamente para GRU. Não mude apenas o endpoint na VM |
 | Áudio não foi entendido | Confira STT habilitado no formulário, use português e áudio curto. Verifique bootstrap/prepare_audio e logs do gateway, sem expor gravações ou transcrições |
 | Bootstrap parou baixando Whisper | Confira DNS/HTTPS para Hugging Face e espaço em disco. Não contrate STT pago como contorno; instalação exige os pesos locais antes da ativação |
 | `/voice on` não produz áudio | Comportamento intencional desta edição: entrada por voz, saída sempre textual |
@@ -37,8 +37,12 @@ inclui contexto e definições das ferramentas; o tamanho da frase digitada
 não representa o total de tokens processados. Títulos auxiliares também usam
 inferência. Um smoke test curto pode passar e a conversa completa atingir quota.
 
-Na ocorrência diagnosticada, a OCI informou que o **service limit do modelo
-foi atingido**. O arquivo foi criado antes do 429 na chamada seguinte. As
+Na ocorrência diagnosticada, a mensagem da OCI mencionou **service limit**,
+mas isso não comprova esgotamento dos 200 mil tokens/minuto. Um teste direto
+na API, sem Hermes/LiteLLM, consumiu 7.800 tokens e a chamada seguinte retornou
+429. A Oracle documenta [throttling dinâmico](https://docs.oracle.com/en-us/iaas/Content/generative-ai/dynamic-throttling.htm);
+essa é uma hipótese, não uma causa confirmada nesta tenancy.
+O arquivo foi criado antes do 429 na chamada seguinte. As
 repetições antigas em 2–5 segundos ainda encontravam a mesma janela limitada.
 Isso é distinto do limite local de 120 chamadas/hora e não indica falha de SSH,
 Telegram, STT ou necessariamente falta de créditos.
@@ -58,12 +62,41 @@ sem reenviar a mensagem repetidamente. Não é necessário novo pareamento.
 Para vários visitantes/mais velocidade, o administrador deve conferir na
 **Console OCI → Governance & Administration → Limits, Quotas and Usage**
 os limites de **Generative AI**, com região **Chicago**, e procurar
-`grok-4-6-tokens-per-minute-count`. Se necessário, solicite aumento pelo fluxo
-de service limits. A aprovação/elegibilidade depende da Oracle e da conta.
+`grok-4-3-tokens-per-minute-count` para Grok 4.3, ou
+`grok-4-6-tokens-per-minute-count` para Grok 4.6. Confira uso e limite efetivo;
+se o 429 ocorrer abaixo do limite, forneça os request IDs ao suporte Oracle.
+Não assuma que aumentar o limite resolve. Quando o esgotamento for confirmado,
+o aumento depende de aprovação/elegibilidade da conta.
 Mais quota não é crédito gratuito: monitore custos e não autorize upgrade
 automático. A VM não possui permissão para alterar quotas.
 
 Fonte: [Grok 4.6 e nome oficial do limite](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-6.htm).
+
+### Trocar o modelo em uma VM existente
+
+A policy restringe `target.model.id` ao modelo selecionado. Alterar só a ponte
+pode retornar 404 (recurso não encontrado ou não autorizado).
+
+1. Na Console da **tenancy da VM**, abra **Identity & Security → Policies**
+   (ou pesquise Policies) e selecione o **compartimento raiz**. Se necessário,
+   selecione a home region para editar IAM; a VM/LLM continuam em Chicago.
+2. Abra **hermes-stand-inference** (ou `<prefix>-inference`, se mudou o nome).
+3. Em **Edit policy**, preserve a regra, os IDs e o verbo `use generative-ai-chat`;
+   altere apenas `target.model.id = 'xai.grok-4.6'` para
+   `target.model.id = 'xai.grok-4.3'`. Salve e aguarde propagação IAM.
+4. O mantenedor deve atualizar o modelo em `/etc/hermes-stand.json`, manter
+   orçamento de saída de 4.096 tokens e usar os scripts da versão 1.3.2.
+   Reiniciar somente a ponte aplica o modelo; não é necessário novo pareamento.
+5. Validar inferência e criação/leitura de arquivo pelo Hermes. HTTP 404 não é
+   HTTP 429: primeiro confirme a autorização e a disponibilidade regional.
+
+Não amplie a policy para todos os modelos nem dê administração IAM à VM.
+A atualização manual gera diferença em relação à Stack: alinhe posteriormente
+a variável `llm_model` e o código da Stack, mas **revise o Plan** — este pacote
+substitui a VM quando modelo/bootstrap mudam. Não aplique uma substituição
+apenas para sincronizar o state sem antes preservar seus dados.
+
+Modelo e limite: [Grok 4.3 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-3.htm).
 
 ### Ferramentas truncadas no streaming — versão 1.2.3
 

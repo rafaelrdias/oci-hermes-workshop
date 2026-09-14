@@ -2,6 +2,11 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.3.2:** Grok 4.3 (`xai.grok-4.3`) é o padrão em Chicago.
+Mantém STT local, respostas em texto e retry limitado. Grok 4.6 permanece
+opcional. A troca não garante eliminar HTTP 429. Em VM existente, veja
+[a permissão e a troca de modelo](TROUBLESHOOTING.md#trocar-o-modelo-em-uma-vm-existente).
+
 **Versão 1.3.1:** trata HTTP 429 da OCI com espera compartilhada e uma
 repetição limitada da chamada recusada. Uma tarefa com várias ferramentas
 pode aguardar cerca de 65 segundos por janela, sem aumentar a quota ou trocar
@@ -55,8 +60,8 @@ OCI, identifica o dono do bot e inicia o Telegram automaticamente.
    VM, rede e inferência ficam nessa região. O Terraform detecta a home region
    e usa seu endpoint apenas para criar compartment, dynamic group e policy
    (IAM global). Não muda a região da VM nem contrata modelo dedicado como fallback.
-   Para **Grok 4.6**, escolha Chicago. No grupo **1. Região da instalação**,
-   mantenha **LLM = xai.grok-4.6** e **Transcrever áudios localmente** marcado.
+   Para **Grok 4.3**, escolha Chicago. No grupo **1. Região da instalação**,
+   mantenha **LLM = xai.grok-4.3** e **Transcrever áudios localmente** marcado.
    Para um Trial somente em GRU, selecione **meta.llama-3.3-70b-instruct**.
 4. Confirme créditos, limites de Compute e acesso a OCI Generative AI on-demand.
 
@@ -271,7 +276,7 @@ Para dispensar STT, desmarque a opção ao criar a Stack; o bot continua textual
 | Infraestrutura | Compartment, VCN, subnet, internet gateway, rotas, regras e VM Oracle Linux 9 |
 | Identidade OCI | Dynamic group de uma única VM e policy apenas para chat no modelo do stand |
 | Instalação | Python 3.11, Hermes oficial, Telegram, ponte local OCI e serviços systemd |
-| Modelo | Grok 4.6 via OCI ORD (padrão); Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
+| Modelo | Grok 4.3 via OCI ORD (padrão); Grok 4.6 opcional; Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
 | Áudio recebido | Whisper base local em CPU, sem cobrança de API STT; pode ser desabilitado no formulário |
 | Resposta | Sempre texto; TTS automático bloqueado no gateway e ferramenta TTS desabilitada |
 | Pareamento | Código privado da Stack, identificação automática do dono e allowlist |
@@ -325,7 +330,7 @@ compartment da demonstração. Fechar a aba, parar o chat ou excluir a Stack
 ## Modelo e documentação
 
 A [matriz regional da Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
-lista `xai.grok-4.6` on-demand em ORD, mas não em GRU (consulta em 14/09/2026).
+lista `xai.grok-4.3` e `xai.grok-4.6` on-demand em ORD, mas não em GRU (consulta em 14/09/2026).
 Llama 3.3 permanece disponível como escolha explícita em ORD/GRU.
 Nesta edição, rede/VM e endpoint OCI permanecem na região selecionada.
 **Grok é hospedado externamente pela xAI**, conforme as notas da mesma matriz;

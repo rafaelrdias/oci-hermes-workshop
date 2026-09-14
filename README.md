@@ -25,7 +25,7 @@ configuram OCI Generative AI e publicam a interação por Telegram.
 formulário no **OCI Resource Manager** executa Terraform, instala o Hermes,
 configura acesso OCI via identidade da VM e vincula o Telegram ao dono.
 Todo o fluxo pela Console, sem Cloud Shell, API key OCI ou SSH obrigatório.
-Versão **1.3.1**: **Grok 4.6 em Chicago**, entrada de voz com **Whisper local**
+Versão **1.3.2**: **Grok 4.3 em Chicago**, entrada de voz com **Whisper local**
 (sem API STT paga) e respostas **sempre em texto**. Para GRU, Llama é uma
 opção explícita; VM/LLM continuam consumindo créditos.
 O token do bot é informado como variável sensível; confira o aviso de segurança.

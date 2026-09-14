@@ -1,5 +1,11 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.3.2**: escolha Chicago e mantenha `xai.grok-4.3` como LLM.
+Grok 4.6 permanece opcional. A policy autoriza somente o modelo escolhido.
+STT local e respostas sempre textuais são mantidos. Trocar modelo não garante
+eliminar HTTP 429. Em uma Stack existente, alterar o modelo/bootstrap pode
+substituir a VM: revise o Plan e não aplique sem backup e aceite da perda de dados.
+
 Versão **1.3.1**: espera e retry limitados para HTTP 429 da OCI. Mantém Grok,
 STT local e respostas textuais; não aumenta quotas nem contrata capacidade.
 
@@ -27,7 +33,7 @@ state, variáveis pessoais, chaves, PDFs ou apresentações no pacote.
 Fluxo: **Create Stack → token sensível + aceite → Plan → revisar → Apply →
 Application information → revelar comando privado → enviar ao bot → aguardar**.
 
-ORD usa Grok 4.6 por padrão. Para GRU selecione Llama 3.3 70B explicitamente;
+ORD usa Grok 4.3 por padrão. Para GRU selecione Llama 3.3 70B explicitamente;
 Grok + GRU é rejeitado. Não há fallback automático de modelo/região.
 A home region pode ser diferente: é detectada automaticamente e usada apenas
 pelo provider `oci.home` para criar IAM global. A região da instalação deve

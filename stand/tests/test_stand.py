@@ -95,6 +95,14 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(args["tools"], tools)
         self.assertTrue(args["stream"])
 
+    def test_grok_43_and_46_keep_reasoning_budget(self):
+        for model in ("xai.grok-4.3", "xai.grok-4.6"):
+            with self.subTest(model=model), patch.object(bridge, "settings", return_value={
+                    "region": "us-chicago-1", "compartment_id": "test", "model": model}):
+                args = bridge.completion_args(self.request(max_tokens=99999))
+                self.assertEqual(args["model"], "oci/" + model)
+                self.assertEqual(args["max_tokens"], 8192)
+
     def test_reject_model_and_images(self):
         with self.assertRaises(bridge.HTTPException):
             bridge.completion_args(self.request(model="gpt-other"))
