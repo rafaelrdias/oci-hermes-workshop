@@ -108,6 +108,28 @@ run "reject_grok_43_in_gru" {
   expect_failures = [oci_identity_compartment.stand]
 }
 
+run "gptoss_in_ord" {
+  command = plan
+  variables {
+    region    = "us-chicago-1"
+    llm_model = "openai.gpt-oss-120b"
+  }
+  override_data {
+    target = data.oci_identity_region_subscriptions.tenancy
+    values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
+  }
+  assert {
+    condition     = output.model == "openai.gpt-oss-120b" && local.chat_policy_condition == "request.region = 'ORD'"
+    error_message = "GPT-OSS deve usar Chicago com a policy regional existente."
+  }
+}
+
+run "reject_gptoss_on_demand_in_gru" {
+  command = plan
+  variables { llm_model = "openai.gpt-oss-120b" }
+  expect_failures = [oci_identity_compartment.stand]
+}
+
 run "reject_unknown_model" {
   command = plan
   variables { llm_model = "unavailable-model" }

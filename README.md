@@ -1,5 +1,10 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.4.1**: modelo padrão `openai.gpt-oss-120b` em Chicago, on-demand.
+Não cria GPU/cluster dedicado nem usa credencial da API OpenAI. Mantidos
+SSH opcional automático, STT local, respostas textuais e IAM regional.
+GRU continua com Llama explícito; Grok é opcional. Não há fallback automático.
+
 Versão **1.4.0**: SSH automático opcional. Em **Configure variables → 4. Opcional —
 acesso SSH e chave automática**, marque `generate_ssh_key` e o aceite
 `acknowledge_ssh_private_key_in_state`; deixe `ssh_public_key` vazio.
@@ -24,11 +29,11 @@ O DG inclui somente a nova VM. Em Chicago, a policy permite todos os modelos
 de chat no compartment do stand com `where request.region = 'ORD'`, sem
 restrição por ID de modelo. Em GRU, mantém Llama e `request.region = 'GRU'`.
 Não concede administração, embeddings ou rerank; não aumenta quotas/créditos.
-O Hermes continua usando Grok 4.3 por padrão, STT local e respostas textuais.
+Desde 1.4.1 o padrão é GPT-OSS 120B; STT local e respostas textuais são mantidos.
 
 Após Destroy, baixe/extraia novamente este pacote e use a pasta atualizada
 em **Create Stack → My configuration → Folder → Plan → Apply**. Não use uma
-cópia antiga. O formulário deve indicar **1.4.0**. Se reutilizar a Stack,
+cópia antiga. O formulário deve indicar **1.4.1**. Se reutilizar a Stack,
 substitua primeiro sua configuração Terraform pela pasta atualizada.
 Depois abra **a Stack recém-executada → Application information** e envie
 o novo `telegram_pairing_command` ao bot. Não há etapa manual de IAM.
@@ -67,8 +72,8 @@ state, variáveis pessoais, chaves, PDFs ou apresentações no pacote.
 Fluxo: **Create Stack → token sensível + aceite → Plan → revisar → Apply →
 Application information → revelar comando privado → enviar ao bot → aguardar**.
 
-ORD usa Grok 4.3 por padrão. Para GRU selecione Llama 3.3 70B explicitamente;
-Grok + GRU é rejeitado. Não há fallback automático de modelo/região.
+ORD usa GPT-OSS 120B por padrão. Para GRU selecione Llama 3.3 70B explicitamente;
+GPT-OSS/Grok + GRU é rejeitado nesta edição on-demand. Não há fallback automático.
 A home region pode ser diferente: é detectada automaticamente e usada apenas
 pelo provider `oci.home` para criar IAM global. A região da instalação deve
 estar subscrita e `READY`. Nenhuma
