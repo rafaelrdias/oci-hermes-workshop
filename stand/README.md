@@ -1,78 +1,9 @@
-# Hermes no Telegram — stand Oracle, pela Console OCI
+# Hermes no Telegram Utilizando Soluções OCI
 
-**Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
-
-**Versão 1.4.1:** padrão **GPT-OSS 120B**, ID OCI `openai.gpt-oss-120b`,
-on-demand em Chicago. Mantidos SSH automático opcional, Whisper local,
-respostas textuais e IAM regional. Grok continua como escolha explícita;
-não há fallback automático nem alteração de quotas. A mudança de modelo
-não garante ausência de throttling para toda tenancy/carga.
-
-**Versão 1.4.0:** opção **Gerar chave SSH automaticamente para esta Stack**.
-O Terraform cria um par RSA 4096, instala a pública na VM e disponibiliza a
-privada em uma saída sensível da própria Stack. Exige aceite de armazenamento
-no state. É opcional e não abre a porta sozinho; veja
-[como gerar, guardar e usar a chave](#ssh-opcional-chave-automática-e-acesso-à-vm).
-
-**Versão 1.3.3:** o Terraform cria o Dynamic Group exclusivo da nova VM e a
-policy que permite **todos os modelos de chat em Chicago**, somente no
-compartimento do stand. **Não é necessário criar/editar DG ou policy manualmente.**
-Naquela versão o modelo era Grok 4.3; desde 1.4.1 é GPT-OSS 120B.
-Whisper local e respostas em texto são mantidos. Para GRU, a permissão continua restrita ao Llama e à região GRU.
-
-**Reinstalação após Destroy:** baixe novamente o
-[pacote leve atualizado](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/stand-resource-manager.zip),
-extraia e selecione a pasta `oci-hermes-workshop-stand-resource-manager` em
-**Create Stack → My configuration → Folder**. Confirme **versão 1.4.1**, escolha
-Chicago e `openai.gpt-oss-120b`, preencha o token/aceites e execute **Plan → Apply**.
-Se reutilizar uma Stack que recebeu Destroy, atualize sua configuração com a
-pasta nova antes de Plan/Apply: outro Plan sozinho não baixa o código do GitHub.
-Depois, abra **a Stack que acabou de executar → Application information**,
-revele `telegram_pairing_command` e envie o **novo comando** ao bot.
-O DG usa o OCID da nova VM; não reaproveite o comando de pareamento anterior.
-
-**Versão 1.3.2:** Grok 4.3 (`xai.grok-4.3`) é o padrão em Chicago.
-Mantém STT local, respostas em texto e retry limitado. Grok 4.6 permanece
-opcional. A troca não garante eliminar HTTP 429. Em VM existente, veja
-[a permissão e a troca de modelo](TROUBLESHOOTING.md#trocar-o-modelo-em-uma-vm-existente).
-
-**Versão 1.3.1:** trata HTTP 429 da OCI com espera compartilhada e uma
-repetição limitada da chamada recusada. Uma tarefa com várias ferramentas
-pode aguardar cerca de 65 segundos por janela, sem aumentar a quota ou trocar
-o modelo. Veja [limites do Grok](TROUBLESHOOTING.md#limite-do-grok-http-429--versão-131).
-
-**Versão 1.3.0:** Grok 4.6 como padrão em **Chicago (ORD)**, transcrição de
-áudios com Whisper local habilitada e respostas **sempre em texto**.
-STT não usa API paga; VM e inferência LLM continuam consumindo créditos.
-Para GRU, escolha Llama explicitamente no formulário; Grok + GRU é bloqueado.
-
-**Versão 1.2.3:** corrige chamadas de ferramentas fragmentadas no streaming
-que apareciam como `Response truncated due to output length limit`.
-A ativação agora testa chamada e retorno de ferramenta também com streaming.
-Não é necessário aumentar o limite de tokens. Em VM já instalada, consulte
-[o diagnóstico e a correção](TROUBLESHOOTING.md#ferramentas-truncadas-no-streaming--versão-123).
-
-**Versão 1.2.2:** verifica DNS antes de instalar pacotes e reaplica a
-configuração DNS do NetworkManager quando necessário. Se os nomes não
-resolverem após tentativas limitadas, interrompe com diagnóstico; não troca
-o resolvedor por um serviço público nem reinicia a rede.
-
-**Versão 1.2.1:** corrige a renovação automática da credencial OCI após a
-instalação. Para uma VM já existente, consulte a
-[correção sem recriar o ambiente](TROUBLESHOOTING.md#correção-121-renovação-da-credencial-oci)
-antes de atualizar a Stack e aplicar um Plan que possa substituir a VM.
-
-Esta edição não exige terminal, Cloud Shell, Terraform local, OCI CLI, API key
+Esta solução não exige terminal, Cloud Shell, Terraform local, OCI CLI, API key
 OCI ou conexão SSH para instalar. O **OCI Resource Manager executa o Terraform
 pela Console**. A VM instala o Hermes, autentica no modelo com sua identidade
 OCI, identifica o dono do bot e inicia o Telegram automaticamente.
-
-> **Segurança:** para permitir o fluxo sem comandos, o token do BotFather é
-> informado em um campo sensível da Stack. Ele é mascarado, mas **persiste nas
-> variáveis, planos/state e metadados cloud-init da VM**. A opção `sensitive`
-> não criptografa o valor dentro do state nem remove essa persistência. Use
-> conta pessoal e bot exclusivo; restrinja acesso à Stack/state/VM. Há aceite
-> obrigatório no formulário. Para produção, adote secret management apropriado.
 
 ## 1. Ative o Trial
 
