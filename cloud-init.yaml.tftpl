@@ -1,0 +1,26 @@
+#cloud-config
+package_update: false
+package_upgrade: false
+# Bootstrap checks DNS before dnf. cloud-init's package module runs before
+# runcmd, so placing packages here would bypass that recovery step.
+write_files:
+  - path: /etc/hermes-stand-secrets.json
+    owner: root:root
+    permissions: '0600'
+    encoding: b64
+    content: ${secrets}
+  - path: /etc/hermes-stand.json
+    owner: root:root
+    permissions: '0644'
+    encoding: b64
+    content: ${config}
+%{ for name, payload in payloads ~}
+  - path: /opt/hermes-stand/${name}
+    owner: root:root
+    permissions: '0644'
+    encoding: gz+b64
+    content: ${payload}
+%{ endfor ~}
+runcmd:
+  - [bash, -lc, 'bash /opt/hermes-stand/bootstrap.sh > /var/log/hermes-stand-bootstrap.log 2>&1']
+final_message: 'Cloud-init encerrou. Confira seu status; apenas bootstrap.done confirma instalação. Depois envie o comando de pareamento da Stack e aguarde o bot.'

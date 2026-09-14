@@ -1,0 +1,5 @@
+# Bridge isolated from the Hermes environment; pinned direct dependencies.
+litellm==1.100.1
+oci==2.185.2
+fastapi==0.141.1
+uvicorn==0.52.4

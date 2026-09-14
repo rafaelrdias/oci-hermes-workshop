@@ -1,0 +1,26 @@
+[Unit]
+Description=Hermes OCI - instance principal bridge (loopback)
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+User=hermes
+Group=hermes
+WorkingDirectory=/opt/hermes-stand
+Environment=HOME=/var/lib/hermes
+Environment=HERMES_HOME=/var/lib/hermes/.hermes
+Environment=LITELLM_LOCAL_MODEL_COST_MAP=True
+Environment=LITELLM_TELEMETRY=False
+ExecStart=/usr/bin/bash -c 'exec /opt/hermes-stand/bridge-venv/bin/uvicorn bridge:app --host 127.0.0.1 --port 4000 --no-access-log'
+Restart=on-failure
+RestartSec=10
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/hermes
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
