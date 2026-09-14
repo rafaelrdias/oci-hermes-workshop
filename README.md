@@ -1,5 +1,24 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.4.0**: SSH automático opcional. Em **Configure variables → 4. Opcional —
+acesso SSH e chave automática**, marque `generate_ssh_key` e o aceite
+`acknowledge_ssh_private_key_in_state`; deixe `ssh_public_key` vazio.
+Terraform gera RSA 4096 e instala somente a pública. A privada fica no state
+e na saída sensível `ssh_private_key_pem`. Não é recomendação para produção.
+
+Depois do Apply, abra **a Stack recém-executada → Application information →
+SSH opcional**, revele/copie `ssh_private_key_pem` e salve como `hermes.key` em
+texto puro no seu computador/gerenciador seguro, preservando cabeçalho,
+rodapé e quebras de linha. Não há download automático nem envio ao Telegram.
+Restrinja acesso à Stack/state; nunca publique a chave ou o state.
+
+`ssh_allowed_cidr` vazio mantém a porta fechada mesmo com a chave instalada.
+Para conectar, informe IPv4 `/32`; `0.0.0.0/0` exige também o aceite separado
+`acknowledge_public_ssh`. Consulte `ssh_connection_command` depois do Apply.
+Para fechar/reabrir SSH, altere o CIDR sem desmarcar a geração: preserva a chave.
+Sem geração, é possível continuar fornecendo a própria chave pública.
+Por padrão, geração e abertura SSH permanecem desabilitadas.
+
 Versão **1.3.3**: DG e policy são criados automaticamente pelo Terraform.
 O DG inclui somente a nova VM. Em Chicago, a policy permite todos os modelos
 de chat no compartment do stand com `where request.region = 'ORD'`, sem
@@ -9,7 +28,7 @@ O Hermes continua usando Grok 4.3 por padrão, STT local e respostas textuais.
 
 Após Destroy, baixe/extraia novamente este pacote e use a pasta atualizada
 em **Create Stack → My configuration → Folder → Plan → Apply**. Não use uma
-cópia antiga. O formulário deve indicar **1.3.3**. Se reutilizar a Stack,
+cópia antiga. O formulário deve indicar **1.4.0**. Se reutilizar a Stack,
 substitua primeiro sua configuração Terraform pela pasta atualizada.
 Depois abra **a Stack recém-executada → Application information** e envie
 o novo `telegram_pairing_command` ao bot. Não há etapa manual de IAM.
@@ -59,12 +78,16 @@ variáveis e metadados da VM; o formulário exige aceite e uso de bot exclusivo.
 SSH é opcional e fechado por padrão. Para remover, use **Destroy na Console**
 antes de excluir a Stack. O disco/arquivos/histórico da VM serão apagados.
 
-Na versão 1.2.0, para diagnóstico com IPs variáveis: informe chave pública,
+Para diagnóstico com IPs variáveis: gere a chave com aceite ou informe sua pública,
 `ssh_allowed_cidr = 0.0.0.0/0` e marque `acknowledge_public_ssh` no formulário.
 Isso expõe somente TCP/22 a qualquer IPv4; não habilita login por senha.
-Após o evento, restrinja a `/32` ou deixe chave/CIDR vazios, desmarque o aceite
-e aplique novo Plan/Apply. Não há expiração automática. Em uma VM existente
+Após o evento, restrinja a `/32` ou deixe somente CIDR vazio, desmarque o aceite
+de SSH público e aplique novo Plan/Apply. Não desmarque geração para fechar a porta.
+Não há expiração automática. Em uma VM existente
 sem chave, a atualização dos metadados pode não instalar a chave no SO.
+Alterar/remover metadados tampouco garante revogação no SO. Um novo state gera
+outra chave; Apply normal mantém a mesma. Guarde sua cópia antes de Destroy;
+jobs/state históricos podem reter segredos e o Terraform não apaga cópias baixadas.
 
 Já criou uma Stack com o pacote antigo? Baixe novamente este pacote e use
 **Edit Stack → configuração Terraform → Folder** para substituir os arquivos.

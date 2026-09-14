@@ -1,6 +1,8 @@
 locals {
-  home_region = one([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.is_home_region])
-  model       = var.llm_model
+  home_region              = one([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.is_home_region])
+  model                    = var.llm_model
+  ssh_key_configured       = var.generate_ssh_key || trimspace(var.ssh_public_key) != ""
+  effective_ssh_public_key = var.generate_ssh_key ? trimspace(tls_private_key.ssh[0].public_key_openssh) : trimspace(var.ssh_public_key)
   # Chicago: all chat models; GRU retains its explicitly selected model.
   chat_policy_condition = var.region == "us-chicago-1" ? "request.region = 'ORD'" : "ALL {request.region = 'GRU', target.model.id = '${local.model}'}"
   tags                  = { purpose = "hermes-oracle-stand", managed_by = "terraform" }
@@ -17,6 +19,23 @@ locals {
 
 data "oci_identity_region_subscriptions" "tenancy" {
   tenancy_id = var.tenancy_ocid
+}
+
+# Opt-in only. Never put the private key in user-data, VM metadata or Telegram.
+resource "tls_private_key" "ssh" {
+  count     = var.generate_ssh_key ? 1 : 0
+  algorithm = "RSA"
+  rsa_bits  = 4096
+  lifecycle {
+    precondition {
+      condition     = var.acknowledge_ssh_private_key_in_state
+      error_message = "Para gerar SSH, aceite explicitamente que a chave privada ficará no state/saídas da Stack."
+    }
+    precondition {
+      condition     = trimspace(var.ssh_public_key) == ""
+      error_message = "Escolha gerar a chave OU fornecer uma chave pública existente, nunca ambos."
+    }
+  }
 }
 
 resource "random_id" "pairing" {
@@ -101,7 +120,7 @@ resource "oci_core_security_list" "stand" {
     protocol    = "all"
   }
   dynamic "ingress_security_rules" {
-    for_each = var.ssh_allowed_cidr != "" && var.ssh_public_key != "" ? [var.ssh_allowed_cidr] : []
+    for_each = var.ssh_allowed_cidr != "" && local.ssh_key_configured ? [var.ssh_allowed_cidr] : []
     content {
       source   = ingress_security_rules.value
       protocol = "6"
@@ -153,14 +172,14 @@ resource "oci_core_instance" "hermes" {
   }
   metadata = merge(
     { user_data = local.user_data },
-    var.ssh_public_key != "" ? { ssh_authorized_keys = trimspace(var.ssh_public_key) } : {}
+    local.ssh_key_configured ? { ssh_authorized_keys = local.effective_ssh_public_key } : {}
   )
   lifecycle {
     ignore_changes       = [source_details[0].source_id]
     replace_triggered_by = [terraform_data.bootstrap_revision]
     precondition {
-      condition     = (var.ssh_allowed_cidr == "") == (var.ssh_public_key == "")
-      error_message = "Para habilitar SSH, preencha chave pública E CIDR (/32 ou 0.0.0.0/0 com aceite), ou deixe ambos vazios."
+      condition     = var.ssh_allowed_cidr == "" || local.ssh_key_configured
+      error_message = "Para abrir SSH, gere uma chave com aceite ou forneça a chave pública existente. CIDR vazio mantém SSH fechado, mesmo com chave instalada."
     }
     precondition {
       condition     = length(local.user_data) < 30000
