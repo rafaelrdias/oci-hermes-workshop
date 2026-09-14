@@ -1,5 +1,8 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.3.1**: espera e retry limitados para HTTP 429 da OCI. Mantém Grok,
+STT local e respostas textuais; não aumenta quotas nem contrata capacidade.
+
 Versão **1.3.0**: escolha Chicago e mantenha `xai.grok-4.6` como LLM.
 STT local Whisper vem habilitado; respostas sempre em texto. Sem API paga de
 transcrição, mas VM e LLM consomem créditos. Grok é hospedado pela xAI via OCI.
