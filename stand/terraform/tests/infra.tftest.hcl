@@ -10,6 +10,14 @@ mock_provider "oci" {
   }
 }
 mock_provider "random" {}
+mock_provider "tls" {
+  mock_resource "tls_private_key" {
+    defaults = {
+      public_key_openssh = "ssh-rsa TEST-ONLY-GENERATED-PUBLIC-KEY\n"
+      private_key_pem    = "TEST-ONLY-PRIVATE-KEY-NOT-A-REAL-SECRET"
+    }
+  }
+}
 mock_provider "oci" {
   alias = "home"
 }
@@ -177,6 +185,109 @@ run "no_ssh_by_default" {
   assert {
     condition     = alltrue([for rule in oci_core_security_list.stand.ingress_security_rules : rule.protocol != "6"])
     error_message = "Sem chave/CIDR não deve haver entrada TCP."
+  }
+  assert {
+    condition     = length(tls_private_key.ssh) == 0 && output.ssh_private_key_pem == "" && !contains(keys(oci_core_instance.hermes.metadata), "ssh_authorized_keys")
+    error_message = "Por padrão, nenhuma chave deve ser gerada, exposta ou instalada."
+  }
+}
+
+run "generate_ssh_with_closed_port" {
+  command = apply
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = true
+    ssh_public_key                       = ""
+    ssh_allowed_cidr                     = ""
+  }
+  assert {
+    condition     = length(tls_private_key.ssh) == 1 && tls_private_key.ssh[0].algorithm == "RSA" && tls_private_key.ssh[0].rsa_bits == 4096
+    error_message = "Deve gerar exatamente um par RSA 4096 exclusivo da Stack."
+  }
+  assert {
+    condition     = oci_core_instance.hermes.metadata.ssh_authorized_keys == trimspace(tls_private_key.ssh[0].public_key_openssh) && output.ssh_public_key == oci_core_instance.hermes.metadata.ssh_authorized_keys
+    error_message = "Somente a chave pública gerada deve ser instalada na VM."
+  }
+  assert {
+    condition     = output.ssh_private_key_pem == tls_private_key.ssh[0].private_key_pem && !strcontains(jsonencode(oci_core_instance.hermes.metadata), tls_private_key.ssh[0].private_key_pem) && !strcontains(local.vm_config, tls_private_key.ssh[0].private_key_pem)
+    error_message = "Privada deve ir somente para saída/state, nunca para metadata/config da VM."
+  }
+  assert {
+    condition     = alltrue([for rule in oci_core_security_list.stand.ingress_security_rules : rule.protocol != "6"]) && startswith(output.ssh_connection_command, "SSH fechado")
+    error_message = "Gerar uma chave não pode abrir SSH automaticamente."
+  }
+}
+
+run "generated_ssh_key_stable_when_opening_cidr" {
+  command = apply
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = true
+    ssh_public_key                       = ""
+    ssh_allowed_cidr                     = "203.0.113.8/32"
+  }
+  assert {
+    condition     = output.ssh_private_key_pem == run.generate_ssh_with_closed_port.ssh_private_key_pem && output.instance_id == run.generate_ssh_with_closed_port.instance_id && startswith(output.ssh_connection_command, "ssh -i hermes.key opc@")
+    error_message = "Abrir CIDR deve preservar a chave/VM existentes e fornecer comando SSH."
+  }
+  assert {
+    condition     = length([for rule in oci_core_security_list.stand.ingress_security_rules : rule if rule.protocol == "6" && rule.source == "203.0.113.8/32" && alltrue([for ports in rule.tcp_options : ports.min == 22 && ports.max == 22])]) == 1
+    error_message = "A chave gerada com /32 deve liberar somente TCP/22 nesse IP."
+  }
+}
+
+run "reject_generated_key_without_state_consent" {
+  command = plan
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = false
+    ssh_public_key                       = ""
+    ssh_allowed_cidr                     = ""
+  }
+  expect_failures = [tls_private_key.ssh]
+}
+
+run "reject_generated_and_supplied_key" {
+  command = plan
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = true
+  }
+  expect_failures = [tls_private_key.ssh]
+}
+
+run "generated_key_public_ssh_requires_separate_consent" {
+  command = plan
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = true
+    ssh_public_key                       = ""
+    ssh_allowed_cidr                     = "0.0.0.0/0"
+  }
+  expect_failures = [oci_core_security_list.stand]
+}
+
+run "generated_key_public_ssh_with_both_consents" {
+  command = plan
+  variables {
+    generate_ssh_key                     = true
+    acknowledge_ssh_private_key_in_state = true
+    ssh_public_key                       = ""
+    ssh_allowed_cidr                     = "0.0.0.0/0"
+    acknowledge_public_ssh               = true
+  }
+  assert {
+    condition     = length([for rule in oci_core_security_list.stand.ingress_security_rules : rule if rule.protocol == "6" && rule.source == "0.0.0.0/0" && alltrue([for ports in rule.tcp_options : ports.min == 22 && ports.max == 22])]) == 1
+    error_message = "Com ambos os aceites, somente TCP/22 pode abrir para todos os IPv4."
+  }
+}
+
+run "supplied_key_with_closed_port" {
+  command = plan
+  variables { ssh_allowed_cidr = "" }
+  assert {
+    condition     = length(tls_private_key.ssh) == 0 && output.ssh_private_key_pem == "" && oci_core_instance.hermes.metadata.ssh_authorized_keys == trimspace(var.ssh_public_key) && alltrue([for rule in oci_core_security_list.stand.ingress_security_rules : rule.protocol != "6"])
+    error_message = "Chave própria pode ser instalada sem gerar outra chave nem abrir a porta."
   }
 }
 

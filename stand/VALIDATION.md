@@ -2,6 +2,24 @@
 
 ## Escopo dos testes desta entrega
 
+### Versão 1.4.0 — par SSH automático opcional, 14/09/2026
+
+- Provider TLS 4.3.0 fixado, instalado e hashes registrados no lockfile.
+  Geração RSA 4096 opt-in com aceite independente de persistência da privada.
+- Chave própria e geração automática são mutuamente exclusivas; a privada
+  aparece somente no state/saída sensível, não no cloud-init/VM/Telegram.
+- 26 testes Terraform com providers simulados aprovados: sem SSH por padrão,
+  geração com porta fechada, chave pública correta na metadata, privada ausente
+  da metadata/config, /32, /0 com aceite separado, falta de chave, conflito de
+  modos, falta de aceite e manutenção de chave/VM quando só o CIDR muda.
+- 51 testes Python aprovados, incluindo defaults seguros no schema, output
+  privado sensível e ausência de entrada de chave privada fornecida pelo usuário.
+- `init -backend=false`, `validate`, `fmt -check` e `git diff --check` aprovados.
+- **Pendente:** nova Stack real, recuperação/cópia da chave pela Console e
+  conexão SSH com OpenSSH. Testes simulados não comprovam UI, criptografia
+  do par real nem conectividade; nenhum recurso OCI foi criado nesta validação.
+- Mantidos Grok 4.3, STT local, respostas textuais, DG de uma VM e IAM ORD.
+
 ### Versão 1.3.3 — IAM regional automático, 14/09/2026
 
 - DG mantido como recurso Terraform, com regra exata para o OCID da única

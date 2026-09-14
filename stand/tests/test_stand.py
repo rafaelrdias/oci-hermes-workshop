@@ -384,8 +384,21 @@ class FilesTests(unittest.TestCase):
         self.assertIn('variable "telegram_bot_token"', source)
         self.assertRegex(source, r'sensitive\s*=\s*true')
         self.assertIn('variable "acknowledge_secret_in_state"', source)
-        for forbidden in ("oci_api_key", "private_key", "tls_private_key"):
+        for forbidden in ('variable "oci_api_key"', 'variable "private_key"', 'variable "ssh_private_key"'):
             self.assertNotIn(forbidden, source)
+
+    def test_generated_ssh_key_is_opt_in_and_sensitive(self):
+        schema = configure.yaml.safe_load((ROOT / "terraform/schema.yaml").read_text())
+        for name in ('generate_ssh_key', 'acknowledge_ssh_private_key_in_state', 'acknowledge_public_ssh'):
+            self.assertIs(schema['variables'][name]['default'], False)
+        self.assertTrue(schema['outputs']['ssh_private_key_pem']['sensitive'])
+        outputs = (ROOT / "terraform/outputs.tf").read_text()
+        self.assertRegex(outputs, r'output "ssh_private_key_pem" \{[^}]*sensitive\s*=\s*true')
+        template = (ROOT / "terraform/cloud-init.yaml.tftpl").read_text()
+        self.assertNotIn('private_key', template)
+        for path in (ROOT / "terraform/files").iterdir():
+            if path.suffix in ('.py', '.sh', '.service'):
+                self.assertNotIn('tls_private_key', path.read_text())
 
     def test_service_security_and_no_public_bridge(self):
         gateway = (ROOT / "terraform/files/hermes-gateway.service").read_text()

@@ -60,6 +60,18 @@ variable "prefix" {
   }
 }
 
+variable "generate_ssh_key" {
+  type        = bool
+  default     = false
+  description = "Gerar par RSA 4096 exclusivo desta Stack. A chave privada persiste no state e fica em uma saída sensível. Não abre SSH sem CIDR."
+}
+
+variable "acknowledge_ssh_private_key_in_state" {
+  type        = bool
+  default     = false
+  description = "Aceito que a chave SSH privada gerada fique no state e nas saídas da Stack; restrinjo acesso e guardarei uma cópia pessoal segura."
+}
+
 variable "ssh_public_key" {
   type    = string
   default = ""
@@ -82,7 +94,7 @@ variable "ssh_allowed_cidr" {
 variable "acknowledge_public_ssh" {
   type        = bool
   default     = false
-  description = "Aceito expor TCP/22 a qualquer IPv4 com 0.0.0.0/0 temporariamente. A chave pública continua obrigatória; restringirei o acesso após o evento."
+  description = "Aceito expor TCP/22 a qualquer IPv4 com 0.0.0.0/0 temporariamente. Uma chave gerada ou fornecida continua obrigatória; restringirei o acesso após o evento."
 }
 
 variable "instance_shape" {

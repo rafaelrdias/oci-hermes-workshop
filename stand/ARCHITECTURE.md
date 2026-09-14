@@ -31,7 +31,7 @@ a home region pode ser diferente de ORD/GRU. Nenhuma credencial extra é solicit
 | Componente | Responsabilidade |
 |---|---|
 | `schema.yaml` | Formulário Console, campo de senha, aceite de risco e Outputs copiáveis |
-| Terraform OCI + random | Compartment, rede, VM, IAM, código privado de vínculo e cloud-init |
+| Terraform OCI + random + TLS | Compartment, rede, VM, IAM, código privado de vínculo, cloud-init e par SSH opcional |
 | `bootstrap.sh` | Instalar Hermes core e Telegram, dependências da ponte e serviços |
 | `activate.py` | Validar bot, aguardar código em DM, identificar dono, testar OCI e ativar |
 | `configure.py` | Configuração Hermes, chave local da ponte, `.env`, allowlist e gateway |
@@ -57,6 +57,17 @@ do Terraform. **Está no state, planos/variáveis e cloud-init da instância.**
 O schema pede confirmação explícita dessa escolha. Não é uma solução de
 secret management para produção. Limite acesso a Stack, jobs/state e VM;
 base64/gzip é codificação/compressão, não criptografia.
+
+Desde 1.4.0, `generate_ssh_key` opt-in cria `tls_private_key.ssh[0]` com RSA 4096
+(provider TLS 4.3.0 fixado). Exige `acknowledge_ssh_private_key_in_state` e
+rejeita chave própria simultânea. A privada fica no state/saída sensível PEM;
+somente `public_key_openssh` é inserida em `metadata.ssh_authorized_keys`.
+Não usa `remote-exec`, não grava a privada no cloud-init/VM e não envia ao bot.
+Não há arquivo privado no pacote GitHub. Cada state gera sua chave e a mantém
+entre Applies; CIDR não é gatilho de rotação. Para fechar rede, preserve a chave
+e esvazie somente CIDR. Mudar metadados não garante rotação/revogação no SO.
+Históricos de state/jobs podem reter segredos após Destroy; a cópia local do
+participante deve ser protegida e não é apagada pelo Terraform.
 
 O comando de pareamento é output sensível e deve ser revelado somente ao dono.
 O código é aleatório e uma mensagem privada precisa reproduzi-lo exatamente;
@@ -126,7 +137,8 @@ parcial. O teste de ativação verifica ferramenta e retorno com e sem streaming
 (quatro chamadas curtas de inferência por tentativa, sujeitas a consumo).
 
 - Sem serviço web público. Por padrão não há entrada TCP; apenas ICMP de MTU.
-  Chave pública + CIDR `/32` habilitam SSH administrativo opcional.
+  Chave pública gerada ou fornecida + CIDR `/32` habilitam SSH administrativo opcional.
+  A chave pode ser instalada com CIDR vazio, mantendo SSH fechado.
   Para o evento, `0.0.0.0/0` é permitido somente com `acknowledge_public_ssh = true`;
   expõe apenas TCP/22 a qualquer IPv4 e continua exigindo chave pública.
   Não há expiração automática: restringir/fechar novamente exige Plan/Apply.

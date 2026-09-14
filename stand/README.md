@@ -2,6 +2,12 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.4.0:** opção **Gerar chave SSH automaticamente para esta Stack**.
+O Terraform cria um par RSA 4096, instala a pública na VM e disponibiliza a
+privada em uma saída sensível da própria Stack. Exige aceite de armazenamento
+no state. É opcional e não abre a porta sozinho; veja
+[como gerar, guardar e usar a chave](#ssh-opcional-chave-automática-e-acesso-à-vm).
+
 **Versão 1.3.3:** o Terraform cria o Dynamic Group exclusivo da nova VM e a
 policy que permite **todos os modelos de chat em Chicago**, somente no
 compartimento do stand. **Não é necessário criar/editar DG ou policy manualmente.**
@@ -11,7 +17,7 @@ são mantidos. Para GRU, a permissão continua restrita ao Llama e à região GR
 **Reinstalação após Destroy:** baixe novamente o
 [pacote leve atualizado](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/stand-resource-manager.zip),
 extraia e selecione a pasta `oci-hermes-workshop-stand-resource-manager` em
-**Create Stack → My configuration → Folder**. Confirme **versão 1.3.3**, escolha
+**Create Stack → My configuration → Folder**. Confirme **versão 1.4.0**, escolha
 Chicago e `xai.grok-4.3`, preencha o token/aceites e execute **Plan → Apply**.
 Se reutilizar uma Stack que recebeu Destroy, atualize sua configuração com a
 pasta nova antes de Plan/Apply: outro Plan sozinho não baixa o código do GitHub.
@@ -150,7 +156,10 @@ Na tela **Configure variables**:
 | Aceite de persistência | Leia e marque somente se concordar com o token em state/metadados |
 | Shape | Padrão E5.Flex: 1 OCPU, 8 GB RAM, 50 GB de boot; usa créditos |
 | Availability domain | Mantenha `0` (primeiro AD) |
-| Chave pública SSH / origem IPv4 | Por padrão, **deixe ambos vazios**. Para diagnóstico, informe a chave `.pub` e um IPv4 `/32`, ou `0.0.0.0/0` com o aceite abaixo |
+| Gerar chave SSH automaticamente | Marque se quiser uma chave exclusiva para acessar a VM depois; deixe a chave pública manual vazia |
+| Aceito armazenar a chave SSH privada no state | Obrigatório somente ao gerar a chave. Quem acessa o state pode obter a privada; guarde uma cópia segura |
+| Chave pública SSH opcional | Alternativa à geração: cole sua `.pub`. Não preencha se marcou gerar automaticamente |
+| Origem IPv4 do SSH | Vazio mantém a porta fechada, mesmo com chave instalada. Para conectar: seu IPv4 `/32`, ou `0.0.0.0/0` com aceite abaixo |
 | Aceito expor a porta SSH à internet temporariamente | Marque somente se usar `0.0.0.0/0`. Não há fechamento automático após o evento |
 
 Tenancy OCID é preenchido pela Console. O Terraform cria o compartment,
@@ -159,44 +168,79 @@ gerar chaves SSH ou criar API key de modelo manualmente.
 
 Clique **Next**. Em **Review**, desmarque **Run apply**, revise e clique **Create**.
 
-### SSH opcional no evento: IPs variáveis
+### SSH opcional: chave automática e acesso à VM
 
-Ainda não tem uma chave? Para **SSH**, use o
-[guia de geração de chaves no assistente Compute da Console](../docs/OCI_RESOURCE_MANAGER_CONSOLE.md#d-gerar-e-baixar-as-chaves-ssh-pela-console)
-(mantenha a região escolhida para sua instalação; cancele sem criar outra VM).
-Para quem procura **Perfil → Configurações do usuário → API keys**, há um
-[passo a passo separado de chaves de assinatura OCI](../docs/OCI_USER_API_KEYS.md).
-São credenciais diferentes: a chave do perfil não deve ser colada no campo SSH.
+SSH é opcional: instalar e usar o Hermes pelo Telegram não exige terminal.
+Esta opção serve para quem quiser administrar a própria VM posteriormente.
 
-Na versão **1.2.0**, é possível liberar SSH temporariamente para qualquer
-**IPv4**, sem precisar conhecer o IP do hotel. Isso expõe TCP/22 à internet:
-qualquer pessoa poderá tentar conectar, mas ainda precisará se autenticar.
-O Terraform exige a chave pública e não habilita autenticação por senha.
+**Durante Create Stack → Configure variables**, no grupo
+**4. Opcional — acesso SSH e chave automática**:
 
-No grupo **4. Opcional — diagnóstico por SSH** do formulário:
+1. Marque **Gerar chave SSH automaticamente para esta Stack**.
+2. Leia e marque **Aceito armazenar a chave SSH privada no state da Stack**.
+   A chave fica legível dentro do state; `sensitive` mascara sua exibição,
+   não impede que leitores do state a obtenham. Use apenas no laboratório.
+3. Deixe **Chave pública SSH opcional** vazia. Não é preciso ir a Compute
+   nem a Configurações do usuário para gerar outra chave.
+4. Para guardar a chave e acessar depois, deixe **Origem IPv4 do SSH** vazia.
+   Para acessar já, informe seu IPv4 público com `/32`. No evento, se precisar
+   de qualquer IPv4, informe `0.0.0.0/0` e marque também **Aceito expor a porta
+   SSH à internet temporariamente**. Esse aceite é separado do aceite da chave.
+5. Execute **Plan → revisar → Apply**. O plano deve incluir um
+   `tls_private_key.ssh[0]`; somente sua chave pública vai para a VM.
 
-1. Em **Chave pública SSH opcional**, cole o conteúdo do arquivo `.pub`
-   (começando por `ssh-ed25519` ou `ssh-rsa`). Nunca envie a chave privada à Stack.
-2. Em **Origem IPv4 do SSH**, informe `0.0.0.0/0`.
-3. Marque **Aceito expor a porta SSH à internet temporariamente**.
-4. Salve, execute **Plan**, revise a regra **TCP/22** e depois **Apply**.
+**Depois do Apply — na Stack que acabou de executar**:
 
-O acesso à imagem Oracle Linux usa o usuário `opc` e a chave privada
-correspondente. O token Telegram não é uma credencial SSH. Não compartilhe
-chaves privadas entre participantes e não habilite login por senha.
+1. Abra **Resource Manager → Stacks → sua Stack → Application information**.
+2. Localize o grupo **SSH opcional — guarde sua chave privada em segurança**.
+3. Revele e copie **`ssh_private_key_pem`**. Se a geração não foi selecionada,
+   essa saída estará vazia. **Não copie `ssh_public_key` para acessar por SSH.**
+4. Salve todo o conteúdo em um arquivo de **texto puro** chamado `hermes.key`
+   (ou `hermes.pem`), incluindo as linhas `-----BEGIN RSA PRIVATE KEY-----`
+   e `-----END RSA PRIVATE KEY-----`, mantendo as quebras de linha.
+   Não inclua aspas, crases ou formatação Markdown. Evite extensão `.txt` oculta.
+5. Guarde no computador pessoal ou gerenciador de senhas seguro. Não envie ao
+   facilitador, Telegram, GitHub, e-mail ou computador compartilhado.
+   A cópia não é baixada automaticamente para seu computador.
 
-**Stack já criada:** primeiro baixe o pacote atualizado e substitua a
-configuração por **Edit Stack → Folder**, depois preencha os campos acima.
-Repetir Plan com os arquivos antigos mantém a restrição `/32`.
-Se a VM já foi criada sem chave, editar seus metadados não garante que a chave
-seja instalada no sistema operacional; veja [diagnóstico SSH](TROUBLESHOOTING.md).
-Esse ajuste de rede não reinstala o Hermes nem força a substituição da VM;
-confira sempre o Plan antes de aplicar.
+No macOS/Linux, abra um terminal **na pasta onde salvou o arquivo**:
 
-**Após o evento**, use **Edit Stack** para trocar `0.0.0.0/0` pelo seu IPv4
-atual com `/32` e desmarque o aceite. Para fechar SSH completamente, deixe
-chave pública e origem IPv4 vazias e desmarque o aceite. Em ambos os casos,
-execute novo **Plan → revisar → Apply**. A liberação pública não expira sozinha.
+```bash
+chmod 600 hermes.key
+ssh -i hermes.key opc@IP_DA_VM
+```
+
+Substitua `IP_DA_VM` pela saída `public_ip`, ou copie `ssh_connection_command`.
+No Windows, use OpenSSH do PowerShell, proteja o arquivo para acesso exclusivo
+do seu usuário e use o mesmo comando `ssh -i`; `chmod` é para macOS/Linux.
+A primeira conexão pede confirmação da identidade do servidor: confira o
+fingerprint por um canal confiável; não desabilite essa verificação.
+Esses comandos são para acesso opcional depois do laboratório, **não para
+executar o Terraform**, que continua sendo feito pela Console.
+
+**Liberar/restringir a rede depois:** em **Edit Stack**, mantenha a geração e
+o aceite da chave como estavam; altere somente `ssh_allowed_cidr` e, quando
+necessário, `acknowledge_public_ssh`. Execute Plan/Apply e revise: mudar apenas
+o CIDR não deve recriar a VM nem a chave. CIDR vazio fecha SSH; não desmarque
+a geração apenas para fechar a porta. A liberação pública não expira sozinha.
+
+**Já tem sua chave?** Não marque geração automática; cole a chave pública
+`.pub` existente (`ssh-rsa` ou `ssh-ed25519`). Guarde a privada original no
+seu computador. Também pode usar o
+[assistente Compute para gerar um par manual](../docs/OCI_RESOURCE_MANAGER_CONSOLE.md#d-gerar-e-baixar-as-chaves-ssh-pela-console).
+As [API keys do perfil OCI](../docs/OCI_USER_API_KEYS.md) são outras credenciais;
+não são necessárias para esta etapa.
+
+**Cuidados com ciclo de vida:** uma nova Stack/novo state gera outra chave;
+repetir Apply preserva a existente. Faça backup antes de Destroy. Não trate o
+state como guarda permanente: históricos de jobs/state e cópias podem manter
+segredos mesmo após Destroy. Uma cópia privada baixada não é apagada pelo Terraform.
+Em uma VM já instalada, mudar/remover a chave dos metadados **não garante**
+atualizar/revogar `authorized_keys` no SO. Use esta opção na instalação nova;
+para rotação em VM existente, mantenha acesso de recuperação e atualize o SO.
+Nunca compartilhe a mesma chave entre participantes nem habilite senha SSH.
+
+Referência: [tls_private_key e risco de persistência no state](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key).
 
 ## 5. Execute Plan e Apply — sem sair da Console
 

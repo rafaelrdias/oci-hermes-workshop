@@ -8,6 +8,11 @@
 | Erro antigo “Selecione a HOME REGION do Trial” | Atualize o pacote da mesma Stack por Edit Stack → Folder e execute novo Plan. Veja o guia principal; repetir Plan com arquivos antigos não resolve |
 | Erro antigo “SSH deve ficar restrito a um único IPv4 (/32)” | Atualize a Stack com o pacote 1.2.0 por Edit Stack → Folder. Para qualquer IPv4, preencha chave pública + 0.0.0.0/0 e marque o aceite de exposição pública |
 | Plan pede aceite | Leia o aviso: token persiste em variáveis/state/metadados. Marque apenas se concordar |
+| Gerar SSH exige aceite | Marque `acknowledge_ssh_private_key_in_state` somente se aceitar a privada no state; esse aceite é separado do token e da exposição pública |
+| Gerar SSH conflita com chave pública | Escolha geração automática OU chave pública própria; deixe o outro caminho desabilitado/vazio |
+| Saída `ssh_private_key_pem` vazia | Normal se `generate_ssh_key` não foi selecionado. Com geração, aguarde Apply e abra a própria Stack → Application information → SSH opcional |
+| Chave gerada, mas SSH não conecta | Gerar não abre a porta. Confira CIDR e aceite de `0.0.0.0/0`, IP da VM, rede do cliente, rota e firewall. Veja o guia de SSH |
+| SSH informa `invalid format` | Salve a saída privada inteira em texto puro com cabeçalho/rodapé e quebras de linha, sem aspas/crases; não use a saída pública |
 | `NotAuthorizedOrNotFound` criando IAM | Use administrador com permissão para criar IAM. O provider oci.home seleciona automaticamente o endpoint da home region |
 | `Out of host capacity` | Aguarde/reexecute Plan/Apply; ou escolha outra shape/AD explicitamente em Edit Stack. Capacidade não é garantida |
 | `LimitExceeded` | Confira créditos, Service Limits e recursos existentes. O template não amplia quota nem transforma conta em paga |
