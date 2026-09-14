@@ -40,8 +40,15 @@ a home region pode ser diferente de ORD/GRU. Nenhuma credencial extra é solicit
 
 ## Identidade e segredos
 
-A VM é a única integrante de seu dynamic group. A policy permite apenas
-`use generative-ai-chat` no modelo/compartment configurados. Não há chave de
+A VM é a única integrante de seu dynamic group. Terraform cria o DG e a policy
+na raiz da tenancy pelo provider da home region. A policy permite apenas
+`use generative-ai-chat` no compartment do stand. Desde 1.3.3, em Chicago
+autoriza todos os modelos de chat com `request.region = 'ORD'`; em GRU, exige
+`ALL {request.region = 'GRU', target.model.id = 'meta.llama-3.3-70b-instruct'}`.
+Essa ampliação em ORD foi solicitada para trocar modelos sem reeditar IAM:
+a identidade pode consumir outros modelos de chat, inclusive de custo maior,
+mas o Hermes continua usando apenas o modelo configurado, sem fallback.
+Não concede embeddings, rerank, administração ou aumento de quota. Não há chave de
 usuário OCI, API key OpenAI-compatible, Project, cluster dedicado ou acesso
 administrativo OCI concedido ao agente. O SDK renova sua identidade temporária.
 
@@ -149,6 +156,8 @@ Consultadas em 10/09/2026:
 - [Schema, campos e outputs sensíveis — Oracle](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/terraformconfigresourcemanager_topic-schema.htm)
 - [Segurança Resource Manager — Oracle](https://docs.oracle.com/en-us/iaas/Content/Security/Reference/resourcemanager_security.htm)
 - [Instance Principals — Oracle](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm)
+- [Condição request.region — Oracle](https://docs.oracle.com/en-us/iaas/Content/Identity/policyreference/policyreference_topic-General_Variables_for_All_Requests.htm)
+- [Permissões de Chat — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/chat-permissions.htm)
 - [Modelos por região — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
 - [Grok 4.6 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-6.htm)
 - [Grok 4.3 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-3.htm)

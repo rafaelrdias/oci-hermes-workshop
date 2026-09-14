@@ -74,23 +74,32 @@ Fonte: [Grok 4.6 e nome oficial do limite](https://docs.oracle.com/en-us/iaas/Co
 
 ### Trocar o modelo em uma VM existente
 
-A policy restringe `target.model.id` ao modelo selecionado. Alterar só a ponte
-pode retornar 404 (recurso não encontrado ou não autorizado).
+**Nova instalação 1.3.3 em Chicago:** DG e policy já são criados pelo Terraform,
+com acesso a todos os modelos de chat em ORD no compartment do stand.
+Não execute a edição manual abaixo ao reinstalar com o pacote atual.
+Isso não altera automaticamente o modelo configurado no Hermes nem garante
+disponibilidade/cota de cada modelo. Em GRU, o pacote continua restrito ao Llama.
+
+**VM antiga, instalada até 1.3.2:** a policy restringe `target.model.id` ao
+modelo selecionado. Alterar só a ponte pode retornar 404 (recurso não encontrado
+ou não autorizado). Para migrar Chicago ao escopo solicitado na versão 1.3.3:
 
 1. Na Console da **tenancy da VM**, abra **Identity & Security → Policies**
    (ou pesquise Policies) e selecione o **compartimento raiz**. Se necessário,
    selecione a home region para editar IAM; a VM/LLM continuam em Chicago.
 2. Abra **hermes-stand-inference** (ou `<prefix>-inference`, se mudou o nome).
 3. Em **Edit policy**, preserve a regra, os IDs e o verbo `use generative-ai-chat`;
-   altere apenas `target.model.id = 'xai.grok-4.6'` para
-   `target.model.id = 'xai.grok-4.3'`. Salve e aguarde propagação IAM.
+   substitua a condição `target.model.id = 'xai.grok-4.6'` (ou o modelo atual)
+   por `request.region = 'ORD'`. Salve e aguarde propagação IAM.
 4. O mantenedor deve atualizar o modelo em `/etc/hermes-stand.json`, manter
-   orçamento de saída de 4.096 tokens e usar os scripts da versão 1.3.2.
+   orçamento de saída de 4.096 tokens para Grok e usar os scripts da versão 1.3.3.
    Reiniciar somente a ponte aplica o modelo; não é necessário novo pareamento.
 5. Validar inferência e criação/leitura de arquivo pelo Hermes. HTTP 404 não é
    HTTP 429: primeiro confirme a autorização e a disponibilidade regional.
 
-Não amplie a policy para todos os modelos nem dê administração IAM à VM.
+Mantenha o escopo no compartment do stand e na região ORD; não dê administração
+IAM à VM. O acesso a todos os modelos de chat em ORD pode permitir consumo de
+modelos mais caros, mas não aumenta quota/crédito nem cria fallback no agente.
 A atualização manual gera diferença em relação à Stack: alinhe posteriormente
 a variável `llm_model` e o código da Stack, mas **revise o Plan** — este pacote
 substitui a VM quando modelo/bootstrap mudam. Não aplique uma substituição

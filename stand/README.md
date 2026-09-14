@@ -2,6 +2,23 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.3.3:** o Terraform cria o Dynamic Group exclusivo da nova VM e a
+policy que permite **todos os modelos de chat em Chicago**, somente no
+compartimento do stand. **Não é necessário criar/editar DG ou policy manualmente.**
+Grok 4.3 continua sendo o modelo utilizado; Whisper local e respostas em texto
+são mantidos. Para GRU, a permissão continua restrita ao Llama e à região GRU.
+
+**Reinstalação após Destroy:** baixe novamente o
+[pacote leve atualizado](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/stand-resource-manager.zip),
+extraia e selecione a pasta `oci-hermes-workshop-stand-resource-manager` em
+**Create Stack → My configuration → Folder**. Confirme **versão 1.3.3**, escolha
+Chicago e `xai.grok-4.3`, preencha o token/aceites e execute **Plan → Apply**.
+Se reutilizar uma Stack que recebeu Destroy, atualize sua configuração com a
+pasta nova antes de Plan/Apply: outro Plan sozinho não baixa o código do GitHub.
+Depois, abra **a Stack que acabou de executar → Application information**,
+revele `telegram_pairing_command` e envie o **novo comando** ao bot.
+O DG usa o OCID da nova VM; não reaproveite o comando de pareamento anterior.
+
 **Versão 1.3.2:** Grok 4.3 (`xai.grok-4.3`) é o padrão em Chicago.
 Mantém STT local, respostas em texto e retry limitado. Grok 4.6 permanece
 opcional. A troca não garante eliminar HTTP 429. Em VM existente, veja
@@ -274,7 +291,7 @@ Para dispensar STT, desmarque a opção ao criar a Stack; o bot continua textual
 | Camada | Configuração |
 |---|---|
 | Infraestrutura | Compartment, VCN, subnet, internet gateway, rotas, regras e VM Oracle Linux 9 |
-| Identidade OCI | Dynamic group de uma única VM e policy apenas para chat no modelo do stand |
+| Identidade OCI | Terraform cria DG de uma única VM e policy apenas para chat no compartment do stand: todos os modelos em ORD; Llama em GRU; condição de região em ambos |
 | Instalação | Python 3.11, Hermes oficial, Telegram, ponte local OCI e serviços systemd |
 | Modelo | Grok 4.3 via OCI ORD (padrão); Grok 4.6 opcional; Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
 | Áudio recebido | Whisper base local em CPU, sem cobrança de API STT; pode ser desabilitado no formulário |

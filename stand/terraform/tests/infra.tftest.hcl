@@ -35,12 +35,16 @@ run "gru" {
     error_message = "User data comprimido excede o orçamento de metadados OCI."
   }
   assert {
-    condition     = strcontains(oci_identity_dynamic_group.hermes.matching_rule, oci_core_instance.hermes.id)
+    condition     = oci_identity_dynamic_group.hermes.matching_rule == "ALL {instance.id = '${oci_core_instance.hermes.id}'}" && oci_identity_dynamic_group.hermes.compartment_id == var.tenancy_ocid
     error_message = "Dynamic group deve autorizar apenas esta VM."
   }
   assert {
     condition     = strcontains(oci_identity_policy.hermes.statements[0], "use generative-ai-chat") && !strcontains(oci_identity_policy.hermes.statements[0], "manage")
     error_message = "A VM não pode administrar a tenancy."
+  }
+  assert {
+    condition     = oci_identity_policy.hermes.statements == tolist(["Allow dynamic-group id ${oci_identity_dynamic_group.hermes.id} to use generative-ai-chat in compartment id ${oci_identity_compartment.stand.id} where ALL {request.region = 'GRU', target.model.id = 'meta.llama-3.3-70b-instruct'}"])
+    error_message = "GRU deve manter chat restrito ao Llama, à região GRU e ao compartment do stand."
   }
   assert {
     condition     = oci_core_instance.hermes.shape_config[0].ocpus == 1 && oci_core_instance.hermes.shape_config[0].memory_in_gbs == 8
@@ -59,7 +63,7 @@ run "ord" {
     values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
   }
   assert {
-    condition     = output.region == "us-chicago-1" && output.model == "xai.grok-4.6" && strcontains(oci_identity_policy.hermes.statements[0], "xai.grok-4.6")
+    condition     = output.region == "us-chicago-1" && output.model == "xai.grok-4.6" && local.chat_policy_condition == "request.region = 'ORD'"
     error_message = "ORD deve permanecer em Chicago."
   }
 }
@@ -71,7 +75,7 @@ run "reject_grok_in_gru" {
 }
 
 run "ord_grok_43" {
-  command = plan
+  command = apply
   variables {
     region    = "us-chicago-1"
     llm_model = "xai.grok-4.3"
@@ -81,8 +85,12 @@ run "ord_grok_43" {
     values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
   }
   assert {
-    condition     = output.model == "xai.grok-4.3" && strcontains(oci_identity_policy.hermes.statements[0], "target.model.id = 'xai.grok-4.3'") && !strcontains(oci_identity_policy.hermes.statements[0], "xai.grok-4.6")
-    error_message = "Grok 4.3 deve ser autorizado sem liberar outros modelos."
+    condition     = output.model == "xai.grok-4.3" && oci_identity_policy.hermes.statements == tolist(["Allow dynamic-group id ${oci_identity_dynamic_group.hermes.id} to use generative-ai-chat in compartment id ${oci_identity_compartment.stand.id} where request.region = 'ORD'"])
+    error_message = "ORD deve autorizar todos os modelos de chat somente em Chicago e no compartment do stand."
+  }
+  assert {
+    condition     = oci_identity_dynamic_group.hermes.matching_rule == "ALL {instance.id = '${oci_core_instance.hermes.id}'}" && oci_identity_dynamic_group.hermes.compartment_id == var.tenancy_ocid && oci_identity_policy.hermes.compartment_id == var.tenancy_ocid
+    error_message = "DG/policy devem ser criados na raiz da tenancy, com DG exclusivo para a VM desta Stack."
   }
 }
 

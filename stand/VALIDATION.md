@@ -2,6 +2,24 @@
 
 ## Escopo dos testes desta entrega
 
+### Versão 1.3.3 — IAM regional automático, 14/09/2026
+
+- DG mantido como recurso Terraform, com regra exata para o OCID da única
+  VM criada na Stack; DG e policy criados na raiz pelo provider da home region.
+- ORD: policy autoriza `use generative-ai-chat` somente no compartment do stand
+  com `where request.region = 'ORD'`, sem restrição por modelo.
+- GRU: preserva restrição ao Llama e adiciona condição de região GRU.
+- 19 testes Terraform com providers simulados aprovados, incluindo comparação
+  exata das regras em ORD/GRU e do vínculo do DG à VM; 50 testes Python aprovados.
+  `terraform validate`, `fmt -check` e `git diff --check` aprovados.
+- Grok 4.3, STT local e respostas textuais permanecem configurados. Nenhuma
+  alteração de credencial, quota, crédito ou permissão administrativa da VM.
+- A Stack anterior foi destruída pelo usuário. **Pendente: nova implantação
+  real pela Console e teste no Telegram.** Os testes locais não comprovam
+  propagação IAM, disponibilidade do modelo nem inferência ao vivo.
+
+### Histórico inicial
+
 Validações locais em 10–11/09/2026, sem tokens reais ou criação de recursos na nuvem:
 
 - Terraform `fmt`, `init -backend=false`, `validate`;
@@ -130,10 +148,12 @@ não a causa comprovada nesta tenancy. Aumentar quota não é solução garantid
 - Pré-teste direto na VM atual: duas chamadas Grok 4.3 retornaram HTTP 404.
   A policy gerada para essa instalação restringe acesso a Grok 4.6. A identidade
   da VM não administra IAM; a credencial local pertence a outra tenancy.
-- **Pendente:** administrador alterar a condição da policy para Grok 4.3;
+- **Pendente à época da 1.3.2:** administrador alterar a condição da policy para Grok 4.3;
   depois atualizar a configuração da VM e repetir inferência e criação/leitura
   pelo Hermes. O modelo da VM não foi alterado para não interromper Grok 4.6.
   Não anunciar validação ao vivo de Grok 4.3 antes de concluir esses passos.
+  A Stack foi posteriormente destruída; para a reinstalação, a versão 1.3.3
+  automatiza o novo escopo IAM de Chicago e dispensa essa edição manual.
 
 ## Repetir testes locais — somente mantenedor
 
