@@ -1,7 +1,22 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.3.3**: DG e policy são criados automaticamente pelo Terraform.
+O DG inclui somente a nova VM. Em Chicago, a policy permite todos os modelos
+de chat no compartment do stand com `where request.region = 'ORD'`, sem
+restrição por ID de modelo. Em GRU, mantém Llama e `request.region = 'GRU'`.
+Não concede administração, embeddings ou rerank; não aumenta quotas/créditos.
+O Hermes continua usando Grok 4.3 por padrão, STT local e respostas textuais.
+
+Após Destroy, baixe/extraia novamente este pacote e use a pasta atualizada
+em **Create Stack → My configuration → Folder → Plan → Apply**. Não use uma
+cópia antiga. O formulário deve indicar **1.3.3**. Se reutilizar a Stack,
+substitua primeiro sua configuração Terraform pela pasta atualizada.
+Depois abra **a Stack recém-executada → Application information** e envie
+o novo `telegram_pairing_command` ao bot. Não há etapa manual de IAM.
+
 Versão **1.3.2**: escolha Chicago e mantenha `xai.grok-4.3` como LLM.
-Grok 4.6 permanece opcional. A policy autoriza somente o modelo escolhido.
+Grok 4.6 permanece opcional. Na versão 1.3.2, a policy autorizava somente o modelo escolhido;
+a versão 1.3.3 substitui essa restrição em Chicago conforme descrito acima.
 STT local e respostas sempre textuais são mantidos. Trocar modelo não garante
 eliminar HTTP 429. Em uma Stack existente, alterar o modelo/bootstrap pode
 substituir a VM: revise o Plan e não aplique sem backup e aceite da perda de dados.
