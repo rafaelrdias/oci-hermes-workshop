@@ -38,6 +38,9 @@ def collect_stream(chunks):
 
 
 def main():
+    # Reasoning models need room beyond the 128-token Llama-only smoke budget.
+    config = json.loads(Path('/etc/hermes-stand.json').read_text())
+    budget = 4096 if config['model'] == 'xai.grok-4.6' else 128
     client = OpenAI(api_key=Path("/var/lib/hermes/.hermes/bridge.key").read_text().strip(),
                     base_url="http://127.0.0.1:4000/v1", timeout=140, max_retries=0)
     nonce = "stand-" + secrets.token_hex(4)
@@ -45,7 +48,7 @@ def main():
     tool = {"type": "function", "function": {"name": "stand_echo", "description": "Echo a test value",
             "parameters": {"type": "object", "properties": {"value": {"type": "string"}}, "required": ["value"]}}}
     first = client.chat.completions.create(model="hermes-oci", messages=messages, tools=[tool],
-            tool_choice={"type": "function", "function": {"name": "stand_echo"}}, max_tokens=128)
+            tool_choice={"type": "function", "function": {"name": "stand_echo"}}, max_tokens=budget)
     message = first.choices[0].message
     calls = message.tool_calls or []
     if len(calls) != 1 or calls[0].function.name != "stand_echo" or json.loads(calls[0].function.arguments).get("value") != nonce:
@@ -54,21 +57,21 @@ def main():
     messages += [message.model_dump(exclude_none=True), {"role": "tool", "tool_call_id": calls[0].id, "content": nonce},
                  {"role": "user", "content": "Repeat exactly the value returned by the tool."}]
     second = client.chat.completions.create(model="hermes-oci", messages=messages, tools=[tool],
-                                           tool_choice="none", max_tokens=128)
+                                           tool_choice="none", max_tokens=budget)
     if nonce not in (second.choices[0].message.content or ""):
         print("Teste de retorno da ferramenta falhou.")
         return 5
     # The original check was non-streaming only and missed broken SSE tool ids.
     streamed = collect_stream(client.chat.completions.create(model='hermes-oci', messages=messages[:1],
         tools=[tool], tool_choice={'type': 'function', 'function': {'name': 'stand_echo'}},
-        max_tokens=128, stream=True))
+        max_tokens=budget, stream=True))
     calls = streamed.get('tool_calls', [])
     if len(calls) != 1 or calls[0]['function']['name'] != 'stand_echo' or json.loads(calls[0]['function']['arguments']).get('value') != nonce:
         raise ValueError('Streaming tool call failed')
     followup = messages[:1] + [streamed, {'role': 'tool', 'tool_call_id': calls[0]['id'], 'content': nonce},
                               {'role': 'user', 'content': 'Repeat exactly the value returned by the tool.'}]
     answer = collect_stream(client.chat.completions.create(model='hermes-oci', messages=followup,
-        tools=[tool], tool_choice='none', max_tokens=128, stream=True))
+        tools=[tool], tool_choice='none', max_tokens=budget, stream=True))
     if nonce not in answer['content']:
         raise ValueError('Streaming tool result failed')
     print("OCI OK: inferência + chamada/retorno de ferramenta, com e sem streaming.")

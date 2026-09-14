@@ -27,13 +27,15 @@ fi
 }
 (
   cd "$root/agent"
-  uv sync --frozen --no-dev --python 3.11
+  # The pinned voice extra includes faster-whisper and its locked CPU wheels.
+  uv sync --frozen --no-dev --extra voice --python 3.11
   uv pip install --python .venv/bin/python 'python-telegram-bot[webhooks]==22.6'
 )
 uv venv --python 3.11 "$root/bridge-venv"
 uv pip sync --python "$root/bridge-venv/bin/python" "$root/requirements.lock"
 
 "$root/agent/.venv/bin/python" "$root/configure.py" --initialize
+runuser -u hermes -- "$root/agent/.venv/bin/python" "$root/prepare_audio.py"
 install -m 0644 "$root/hermes-oci-bridge.service" /etc/systemd/system/hermes-oci-bridge.service
 install -m 0644 "$root/hermes-gateway.service" /etc/systemd/system/hermes-gateway.service
 install -m 0644 "$root/hermes-stand-activate.service" /etc/systemd/system/hermes-stand-activate.service

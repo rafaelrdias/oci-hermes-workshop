@@ -1,12 +1,12 @@
 schemaVersion: 1.1.0
-version: '1.2.3'
+version: '1.3.0'
 locale: en
 title: 'Hermes no Telegram — stand Oracle'
 description: 'Trial ORD ou GRU. Instalação e configuração automáticas, sem Cloud Shell ou SSH obrigatório.'
 informationalText: 'Apply cria a VM; depois copie o comando privado de pareamento abaixo e envie ao bot. Aguarde a mensagem de pronto no Telegram. Não compartilhe token, comando, state ou metadados.'
 variableGroups:
   - title: '1. Região da instalação'
-    variables: [region, prefix]
+    variables: [region, llm_model, stt_enabled, prefix]
   - title: '2. Bot pessoal e segurança'
     variables: [telegram_bot_token, acknowledge_secret_in_state]
   - title: '3. Compute — consome créditos do Trial'
@@ -31,6 +31,18 @@ variables:
     title: 'Nome do ambiente'
     default: hermes-stand
     required: true
+  llm_model:
+    type: enum
+    title: 'LLM: Grok 4.6 em Chicago; Llama para GRU'
+    enum: [xai.grok-4.6, meta.llama-3.3-70b-instruct]
+    default: xai.grok-4.6
+    description: 'Grok é cobrado via OCI e hospedado externamente pela xAI. Sem mudança automática de região/modelo.'
+    required: true
+  stt_enabled:
+    type: boolean
+    title: 'Transcrever áudios localmente (sem API paga de STT)'
+    description: 'Whisper base na CPU, português. Download inicial ~150 MB na VM. Respostas sempre em texto; LLM e VM consomem créditos.'
+    default: true
   telegram_bot_token:
     type: password
     title: 'Token do BotFather (bot novo e exclusivo)'
