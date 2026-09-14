@@ -2,6 +2,27 @@
 
 ## Escopo dos testes desta entrega
 
+### Versão 1.4.1 — GPT-OSS 120B, 14/09/2026
+
+- Troca solicitada para `openai.gpt-oss-120b`, on-demand em ORD; mantidos
+  contexto configurado de 128.000, orçamento de saída 4.096 e teto da ponte
+  8.192. Sem alteração de endpoint, identidade, quota, tentativas ou ferramentas.
+- Pré-teste nativo real: duas chamadas consecutivas HTTP 200, em 0,23 s e
+  0,21 s (prompts curtos). Não é benchmark de conversa completa.
+- VM atualizada com backup de configuração/scripts, reiniciando somente a
+  ponte. Preservados gateway Telegram, dono, histórico, SSH, STT e saída textual.
+- Teste real do AIAgent/Hermes, com streaming e ferramentas do stand:
+  `write_file` → `read_file` → resposta completa em **2,9 s**, sem erro.
+  Arquivo sintético exclusivo verificado. Não foi uma mensagem enviada pela
+  conta Telegram do participante; falta confirmação dele no aplicativo.
+- Smoke do instalador aprovado na VM: chamada/retorno de ferramenta com e
+  sem streaming. Ambos os serviços ativos; nenhum novo 429 no período do teste.
+- 28 testes Terraform simulados e 51 testes Python aprovados, incluindo
+  GPT-OSS em ORD, bloqueio em GRU on-demand e orçamento de modelo de raciocínio.
+- Os tempos observados não garantem latência/ausência de 429 em outras
+  tenancies, horários ou cargas. A Stack existente mantém a variável antiga;
+  não reaplique apenas para alinhar modelo sem revisar Plan: pode substituir a VM.
+
 ### Versão 1.4.0 — par SSH automático opcional, 14/09/2026
 
 - Provider TLS 4.3.0 fixado, instalado e hashes registrados no lockfile.

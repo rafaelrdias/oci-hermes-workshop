@@ -45,7 +45,7 @@ def initialize():
     settings_file = Path('/etc/hermes-stand.json')
     vm_settings = json.loads(settings_file.read_text()) if settings_file.exists() else {}
     audio_enabled = vm_settings.get('stt_enabled', True)
-    output_budget = 4096 if vm_settings.get('model', 'xai.grok-4.3') in ('xai.grok-4.3', 'xai.grok-4.6') else 2048
+    output_budget = 4096 if vm_settings.get('model', 'openai.gpt-oss-120b') in ('openai.gpt-oss-120b', 'xai.grok-4.3', 'xai.grok-4.6') else 2048
     key_file = STATE / "bridge.key"
     if not key_file.exists():
         write_private(key_file, secrets.token_urlsafe(48) + "\n")

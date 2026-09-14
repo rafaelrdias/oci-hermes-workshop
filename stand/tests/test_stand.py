@@ -96,7 +96,7 @@ class BridgeTests(unittest.TestCase):
         self.assertTrue(args["stream"])
 
     def test_grok_43_and_46_keep_reasoning_budget(self):
-        for model in ("xai.grok-4.3", "xai.grok-4.6"):
+        for model in ("openai.gpt-oss-120b", "xai.grok-4.3", "xai.grok-4.6"):
             with self.subTest(model=model), patch.object(bridge, "settings", return_value={
                     "region": "us-chicago-1", "compartment_id": "test", "model": model}):
                 args = bridge.completion_args(self.request(max_tokens=99999))

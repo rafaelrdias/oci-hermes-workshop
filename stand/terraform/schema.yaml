@@ -1,5 +1,5 @@
 schemaVersion: 1.1.0
-version: '1.4.0'
+version: '1.4.1'
 locale: en
 title: 'Hermes no Telegram — stand Oracle'
 description: 'Trial ORD ou GRU. Instalação e configuração automáticas, sem Cloud Shell ou SSH obrigatório.'
@@ -33,9 +33,9 @@ variables:
     required: true
   llm_model:
     type: enum
-    title: 'LLM: Grok 4.3 em Chicago (padrão); Llama para GRU'
-    enum: [xai.grok-4.3, xai.grok-4.6, meta.llama-3.3-70b-instruct]
-    default: xai.grok-4.3
+    title: 'LLM: GPT-OSS 120B em Chicago (padrão); Llama para GRU'
+    enum: [openai.gpt-oss-120b, xai.grok-4.3, xai.grok-4.6, meta.llama-3.3-70b-instruct]
+    default: openai.gpt-oss-120b
     description: 'Modelo usado pelo Hermes. IAM permite todos os modelos de chat em Chicago; em GRU, somente Llama. Grok é cobrado via OCI e hospedado pela xAI. Sem fallback automático.'
     required: true
   stt_enabled:

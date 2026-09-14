@@ -17,11 +17,11 @@ variable "region" {
 
 variable "llm_model" {
   type        = string
-  default     = "xai.grok-4.3"
-  description = "Grok 4.3 em ORD (padrão). Grok 4.6 é opcional; Llama é alternativa explícita para GRU; sem fallback automático."
+  default     = "openai.gpt-oss-120b"
+  description = "GPT-OSS 120B em ORD (padrão). Grok é opcional; Llama é alternativa explícita para GRU; sem fallback automático."
   validation {
-    condition     = contains(["xai.grok-4.3", "xai.grok-4.6", "meta.llama-3.3-70b-instruct"], var.llm_model)
-    error_message = "Selecione Grok 4.3, Grok 4.6 ou Llama 3.3 70B."
+    condition     = contains(["openai.gpt-oss-120b", "xai.grok-4.3", "xai.grok-4.6", "meta.llama-3.3-70b-instruct"], var.llm_model)
+    error_message = "Selecione GPT-OSS 120B, Grok 4.3, Grok 4.6 ou Llama 3.3 70B."
   }
 }
 

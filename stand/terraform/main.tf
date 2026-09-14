@@ -56,8 +56,8 @@ resource "oci_identity_compartment" "stand" {
   freeform_tags  = local.tags
   lifecycle {
     precondition {
-      condition     = !contains(["xai.grok-4.3", "xai.grok-4.6"], var.llm_model) || var.region == "us-chicago-1"
-      error_message = "Grok 4.3 e 4.6 exigem Chicago (us-chicago-1) neste pacote. Para GRU, selecione Llama explicitamente; não há fallback regional."
+      condition     = var.llm_model == "meta.llama-3.3-70b-instruct" || var.region == "us-chicago-1"
+      error_message = "GPT-OSS 120B e Grok exigem Chicago (us-chicago-1) neste pacote on-demand. Para GRU, selecione Llama explicitamente; não há fallback regional."
     }
     precondition {
       condition     = contains([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.state == "READY"], var.region)

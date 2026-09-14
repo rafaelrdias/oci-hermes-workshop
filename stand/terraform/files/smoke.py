@@ -40,7 +40,7 @@ def collect_stream(chunks):
 def main():
     # Reasoning models need room beyond the 128-token Llama-only smoke budget.
     config = json.loads(Path('/etc/hermes-stand.json').read_text())
-    budget = 4096 if config['model'] in ('xai.grok-4.3', 'xai.grok-4.6') else 128
+    budget = 4096 if config['model'] in ('openai.gpt-oss-120b', 'xai.grok-4.3', 'xai.grok-4.6') else 128
     client = OpenAI(api_key=Path("/var/lib/hermes/.hermes/bridge.key").read_text().strip(),
                     base_url="http://127.0.0.1:4000/v1", timeout=140, max_retries=0)
     nonce = "stand-" + secrets.token_hex(4)

@@ -2,6 +2,12 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.4.1:** padrão **GPT-OSS 120B**, ID OCI `openai.gpt-oss-120b`,
+on-demand em Chicago. Mantidos SSH automático opcional, Whisper local,
+respostas textuais e IAM regional. Grok continua como escolha explícita;
+não há fallback automático nem alteração de quotas. A mudança de modelo
+não garante ausência de throttling para toda tenancy/carga.
+
 **Versão 1.4.0:** opção **Gerar chave SSH automaticamente para esta Stack**.
 O Terraform cria um par RSA 4096, instala a pública na VM e disponibiliza a
 privada em uma saída sensível da própria Stack. Exige aceite de armazenamento
@@ -11,14 +17,14 @@ no state. É opcional e não abre a porta sozinho; veja
 **Versão 1.3.3:** o Terraform cria o Dynamic Group exclusivo da nova VM e a
 policy que permite **todos os modelos de chat em Chicago**, somente no
 compartimento do stand. **Não é necessário criar/editar DG ou policy manualmente.**
-Grok 4.3 continua sendo o modelo utilizado; Whisper local e respostas em texto
-são mantidos. Para GRU, a permissão continua restrita ao Llama e à região GRU.
+Naquela versão o modelo era Grok 4.3; desde 1.4.1 é GPT-OSS 120B.
+Whisper local e respostas em texto são mantidos. Para GRU, a permissão continua restrita ao Llama e à região GRU.
 
 **Reinstalação após Destroy:** baixe novamente o
 [pacote leve atualizado](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/stand-resource-manager.zip),
 extraia e selecione a pasta `oci-hermes-workshop-stand-resource-manager` em
-**Create Stack → My configuration → Folder**. Confirme **versão 1.4.0**, escolha
-Chicago e `xai.grok-4.3`, preencha o token/aceites e execute **Plan → Apply**.
+**Create Stack → My configuration → Folder**. Confirme **versão 1.4.1**, escolha
+Chicago e `openai.gpt-oss-120b`, preencha o token/aceites e execute **Plan → Apply**.
 Se reutilizar uma Stack que recebeu Destroy, atualize sua configuração com a
 pasta nova antes de Plan/Apply: outro Plan sozinho não baixa o código do GitHub.
 Depois, abra **a Stack que acabou de executar → Application information**,
@@ -83,8 +89,8 @@ OCI, identifica o dono do bot e inicia o Telegram automaticamente.
    VM, rede e inferência ficam nessa região. O Terraform detecta a home region
    e usa seu endpoint apenas para criar compartment, dynamic group e policy
    (IAM global). Não muda a região da VM nem contrata modelo dedicado como fallback.
-   Para **Grok 4.3**, escolha Chicago. No grupo **1. Região da instalação**,
-   mantenha **LLM = xai.grok-4.3** e **Transcrever áudios localmente** marcado.
+   Para **GPT-OSS 120B**, escolha Chicago. No grupo **1. Região da instalação**,
+   mantenha **LLM = openai.gpt-oss-120b** e **Transcrever áudios localmente** marcado.
    Para um Trial somente em GRU, selecione **meta.llama-3.3-70b-instruct**.
 4. Confirme créditos, limites de Compute e acesso a OCI Generative AI on-demand.
 
@@ -337,7 +343,7 @@ Para dispensar STT, desmarque a opção ao criar a Stack; o bot continua textual
 | Infraestrutura | Compartment, VCN, subnet, internet gateway, rotas, regras e VM Oracle Linux 9 |
 | Identidade OCI | Terraform cria DG de uma única VM e policy apenas para chat no compartment do stand: todos os modelos em ORD; Llama em GRU; condição de região em ambos |
 | Instalação | Python 3.11, Hermes oficial, Telegram, ponte local OCI e serviços systemd |
-| Modelo | Grok 4.3 via OCI ORD (padrão); Grok 4.6 opcional; Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
+| Modelo | GPT-OSS 120B via OCI ORD (padrão); Grok opcional; Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
 | Áudio recebido | Whisper base local em CPU, sem cobrança de API STT; pode ser desabilitado no formulário |
 | Resposta | Sempre texto; TTS automático bloqueado no gateway e ferramenta TTS desabilitada |
 | Pareamento | Código privado da Stack, identificação automática do dono e allowlist |
@@ -391,7 +397,9 @@ compartment da demonstração. Fechar a aba, parar o chat ou excluir a Stack
 ## Modelo e documentação
 
 A [matriz regional da Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
-lista `xai.grok-4.3` e `xai.grok-4.6` on-demand em ORD, mas não em GRU (consulta em 14/09/2026).
+lista GPT-OSS 120B e Grok on-demand em ORD. O pacote não oferece GPT-OSS
+on-demand em GRU nem cria cluster dedicado para contornar isso (consulta em 14/09/2026).
+Identificador: [openai.gpt-oss-120b na OCI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/openai-gpt-oss-120b.htm).
 Llama 3.3 permanece disponível como escolha explícita em ORD/GRU.
 Nesta edição, rede/VM e endpoint OCI permanecem na região selecionada.
 **Grok é hospedado externamente pela xAI**, conforme as notas da mesma matriz;
