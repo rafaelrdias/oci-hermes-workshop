@@ -17,6 +17,7 @@ mock_provider "oci" {
 variables {
   tenancy_ocid                = "ocid1.tenancy.oc1..test"
   region                      = "sa-saopaulo-1"
+  llm_model                   = "meta.llama-3.3-70b-instruct"
   ssh_public_key              = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAITestOnlyNotARealKey stand-test"
   ssh_allowed_cidr            = "203.0.113.7/32"
   telegram_bot_token          = "123456:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
@@ -49,14 +50,38 @@ run "gru" {
 
 run "ord" {
   command = plan
-  variables { region = "us-chicago-1" }
+  variables {
+    region = "us-chicago-1"
+    llm_model = "xai.grok-4.6"
+  }
   override_data {
     target = data.oci_identity_region_subscriptions.tenancy
     values = { region_subscriptions = [{ is_home_region = true, region_name = "us-chicago-1", region_key = "ORD", state = "READY" }] }
   }
   assert {
-    condition     = output.region == "us-chicago-1"
+    condition     = output.region == "us-chicago-1" && output.model == "xai.grok-4.6" && strcontains(oci_identity_policy.hermes.statements[0], "xai.grok-4.6")
     error_message = "ORD deve permanecer em Chicago."
+  }
+}
+
+run "reject_grok_in_gru" {
+  command = plan
+  variables { llm_model = "xai.grok-4.6" }
+  expect_failures = [oci_identity_compartment.stand]
+}
+
+run "reject_unknown_model" {
+  command = plan
+  variables { llm_model = "unavailable-model" }
+  expect_failures = [var.llm_model]
+}
+
+run "disable_stt_explicitly" {
+  command = plan
+  variables { stt_enabled = false }
+  assert {
+    condition = jsondecode(local.vm_config).stt_enabled == false
+    error_message = "A escolha de desabilitar STT deve chegar à VM."
   }
 }
 

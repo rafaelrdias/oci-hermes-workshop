@@ -26,4 +26,16 @@ with tempfile.TemporaryDirectory() as temp:
         active_tools = _get_platform_tools(cfg, "telegram", include_default_mcp_servers=False)
         assert active_tools == {"terminal", "file", "memory", "skills"}, active_tools
         import gateway.run  # Validate minimal installation imports gateway runtime.
+        import sys
+        sys.path.insert(0, str(source.parent))
+        import gateway_text_only
+        gateway_text_only.apply_policy()
+        from gateway.platforms.base import BasePlatformAdapter
+        from gateway.run import GatewayRunner
+        from tools import transcription_tools
+        assert not BasePlatformAdapter._should_auto_tts_for_chat(None, '123')
+        assert not GatewayRunner._should_send_voice_reply(None, None, 'response', [])
+        assert transcription_tools._get_provider({'enabled': True, 'provider': 'local'}) == 'local'
+        assert cfg['stt']['local']['language'] == 'pt'
+        assert not cfg['voice']['auto_tts']
     print("Pinned Hermes: provider, credentials, Telegram toolsets and gateway imports OK (no live inference).")

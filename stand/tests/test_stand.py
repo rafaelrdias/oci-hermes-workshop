@@ -69,7 +69,7 @@ class PairingTests(unittest.TestCase):
 class BridgeTests(unittest.TestCase):
     def setUp(self):
         self.config_patch = patch.object(bridge, "settings", return_value={"region": "sa-saopaulo-1",
-              "compartment_id": "ocid1.compartment.oc1..test", "model": "meta.llama-3.3-70b-instruct"})
+              "compartment_id": "ocid1.compartment.oc1..test", "model": "xai.grok-4.6"})
         self.config_patch.start()
         self.addCleanup(self.config_patch.stop)
         bridge.request_times.clear()
@@ -85,11 +85,12 @@ class BridgeTests(unittest.TestCase):
         self.assertNotIn("api_key", args)
         self.assertEqual(args["oci_region"], "sa-saopaulo-1")
         self.assertEqual(args["oci_serving_mode"], "ON_DEMAND")
+        self.assertEqual(args["model"], "oci/xai.grok-4.6")
 
     def test_limit_and_tool_passthrough(self):
         tools = [{"type": "function", "function": {"name": "test"}}]
         args = bridge.completion_args(self.request(tools=tools, tool_choice="auto", max_tokens=99999, stream=True))
-        self.assertEqual(args["max_tokens"], 4000)
+        self.assertEqual(args["max_tokens"], 8192)
         self.assertEqual(args["tools"], tools)
         self.assertTrue(args["stream"])
 
@@ -287,6 +288,11 @@ class FilesTests(unittest.TestCase):
                 config = configure.yaml.safe_load((state / "config.yaml").read_text())
                 self.assertEqual(config["platform_toolsets"]["telegram"], ["terminal", "file", "memory", "skills"])
                 self.assertEqual(config["model"]["provider"], "custom:oci-stand")
+                self.assertEqual(config['stt']['provider'], 'local')
+                self.assertTrue(config['stt']['enabled'])
+                self.assertEqual(config['stt']['local']['language'], 'pt')
+                self.assertFalse(config['voice']['auto_tts'])
+                self.assertIn('tts', config['agent']['disabled_toolsets'])
                 self.assertNotIn("TELEGRAM_BOT_TOKEN", (state / ".env").read_text())
                 self.assertFalse((state / "telegram.ready").exists())
 

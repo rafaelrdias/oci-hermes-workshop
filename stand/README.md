@@ -2,6 +2,11 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.3.0:** Grok 4.6 como padrão em **Chicago (ORD)**, transcrição de
+áudios com Whisper local habilitada e respostas **sempre em texto**.
+STT não usa API paga; VM e inferência LLM continuam consumindo créditos.
+Para GRU, escolha Llama explicitamente no formulário; Grok + GRU é bloqueado.
+
 **Versão 1.2.3:** corrige chamadas de ferramentas fragmentadas no streaming
 que apareciam como `Response truncated due to output length limit`.
 A ativação agora testa chamada e retorno de ferramenta também com streaming.
@@ -45,6 +50,9 @@ OCI, identifica o dono do bot e inicia o Telegram automaticamente.
    VM, rede e inferência ficam nessa região. O Terraform detecta a home region
    e usa seu endpoint apenas para criar compartment, dynamic group e policy
    (IAM global). Não muda a região da VM nem contrata modelo dedicado como fallback.
+   Para **Grok 4.6**, escolha Chicago. No grupo **1. Região da instalação**,
+   mantenha **LLM = xai.grok-4.6** e **Transcrever áudios localmente** marcado.
+   Para um Trial somente em GRU, selecione **meta.llama-3.3-70b-instruct**.
 4. Confirme créditos, limites de Compute e acesso a OCI Generative AI on-demand.
 
 Cadastro, validação cadastral, liberação da conta, capacidade e eventuais
@@ -230,7 +238,26 @@ A mensagem enviada pelo instalador não substitui a resposta real do Hermes.
 Também experimente pedir um roteiro de estudo de OCI salvo em Markdown ou
 guardar sua preferência por respostas curtas. Esta edição habilita texto,
 terminal, arquivos, memória e skills; navegador, pesquisa web, imagens,
-áudio, outros canais e GPUs estão fora do fluxo rápido.
+outros canais e GPUs estão fora do fluxo rápido. Áudios recebidos são
+transcritos localmente quando STT está habilitado; respostas continuam em texto.
+
+### Testar mensagens de voz
+
+1. Após **Configuração concluída**, envie `/new` ao seu bot.
+2. Grave pelo microfone do Telegram um áudio curto (10–30 segundos), em português:
+   “Crie o arquivo lembrete.txt com o texto Bem-vindo ao stand Oracle e leia o arquivo.”
+3. Aguarde a transcrição e a resposta escrita. Confirme que ele entendeu o pedido
+   e executou as ferramentas. O bot não deve enviar voz, mesmo após `/voice on`.
+4. Em local barulhento, fale perto do microfone. Se houver erro, repita ou envie texto.
+
+Whisper **base multilíngue**, CPU/int8, sem GPU ou chave STT. Os pesos (~150 MB)
+são baixados durante o bootstrap, não fazem parte da pasta enviada à Console.
+O áudio é processado na VM; a transcrição segue para o LLM como texto.
+Grok é acessado e cobrado via OCI, mas **hospedado externamente pela xAI**;
+não há garantia de que o processamento do LLM permaneça em Chicago.
+Não envie dados sensíveis no teste. A transcrição usa CPU/RAM; áudios longos
+podem ser lentos em 1 OCPU. Não há garantia de latência nem de acerto em ruído.
+Para dispensar STT, desmarque a opção ao criar a Stack; o bot continua textual.
 
 ## O que está automatizado
 
@@ -239,7 +266,9 @@ terminal, arquivos, memória e skills; navegador, pesquisa web, imagens,
 | Infraestrutura | Compartment, VCN, subnet, internet gateway, rotas, regras e VM Oracle Linux 9 |
 | Identidade OCI | Dynamic group de uma única VM e policy apenas para chat no modelo do stand |
 | Instalação | Python 3.11, Hermes oficial, Telegram, ponte local OCI e serviços systemd |
-| Modelo | Llama 3.3 70B on-demand na mesma região da VM, sem API key OCI/Project/cluster dedicado |
+| Modelo | Grok 4.6 via OCI ORD (padrão); Llama 3.3 como opção explícita ORD/GRU. Instance Principal, sem API key/cluster dedicado |
+| Áudio recebido | Whisper base local em CPU, sem cobrança de API STT; pode ser desabilitado no formulário |
+| Resposta | Sempre texto; TTS automático bloqueado no gateway e ferramenta TTS desabilitada |
 | Pareamento | Código privado da Stack, identificação automática do dono e allowlist |
 | Aceitação | Teste real de inferência, chamada de ferramenta e retorno ao modelo |
 | Operação | Reinício dos serviços no boot e novas tentativas quando IAM ainda propaga |
@@ -269,8 +298,12 @@ compartment da demonstração. Fechar a aba, parar o chat ou excluir a Stack
   Always Free. A1 é uma opção explícita no formulário, sujeita a quota,
   capacidade e elegibilidade da conta. Não há troca automática de shape/região.
 - Configure acompanhamento de custos na Console. Limites locais de 8
-  iterações/tarefa, até 4.000 tokens de saída/chamada e 120 chamadas/hora na
+  iterações/tarefa, até 8.192 tokens de saída/chamada para Grok (4.000 para Llama)
+  e 120 chamadas/hora na
   ponte **não são teto de gastos** e não cobrem outros usos da tenancy.
+  Grok usa orçamento inicial de 4.096 tokens e cada chamada do smoke test
+  também permite até 4.096, para não limitar raciocínio ao antigo teste de
+  128 tokens do Llama. O limite não implica consumo integral, mas não é gratuito.
 - Telegram usa polling de saída. Não é necessário domínio, TLS, webhook,
   porta de aplicação pública ou SSH. A ponte escuta apenas em `127.0.0.1:4000`.
 - Hermes roda como usuário dedicado, sem sudo e com restrições de escrita.
@@ -287,9 +320,11 @@ compartment da demonstração. Fechar a aba, parar o chat ou excluir a Stack
 ## Modelo e documentação
 
 A [matriz regional da Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
-lista `meta.llama-3.3-70b-instruct` on-demand em ORD e GRU; GPT-OSS em GRU está
-listado somente como dedicado. Criar um Project não muda essa modalidade.
-Nesta edição, rede/VM/inferência permanecem na região selecionada (ORD ou GRU).
+lista `xai.grok-4.6` on-demand em ORD, mas não em GRU (consulta em 14/09/2026).
+Llama 3.3 permanece disponível como escolha explícita em ORD/GRU.
+Nesta edição, rede/VM e endpoint OCI permanecem na região selecionada.
+**Grok é hospedado externamente pela xAI**, conforme as notas da mesma matriz;
+usar endpoint OCI não significa residência do processamento LLM na VM/região.
 A home region pode ser outra: IAM é global e é criado pelo endpoint da home
 region detectada automaticamente. Veja a saída `iam_home_region` na Stack.
 Outras regiões de VM/LLM ainda não estão habilitadas neste pacote: o modelo

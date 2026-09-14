@@ -1,10 +1,10 @@
 locals {
   home_region  = one([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.is_home_region])
-  model        = "meta.llama-3.3-70b-instruct"
+  model        = var.llm_model
   tags         = { purpose = "hermes-oracle-stand", managed_by = "terraform" }
   image        = var.image_ocid != "" ? var.image_ocid : data.oci_core_images.ol9[0].images[0].id
-  vm_config    = jsonencode({ region = var.region, compartment_id = oci_identity_compartment.stand.id, model = local.model })
-  payloads     = { for name in ["bootstrap.sh", "network-preflight.sh", "configure.py", "bridge.py", "smoke.py", "activate.py", "requirements.txt", "requirements.lock", "hermes-gateway.service", "hermes-oci-bridge.service", "hermes-stand-activate.service"] : name => filebase64("${path.module}/files/${name}") }
+  vm_config    = jsonencode({ region = var.region, compartment_id = oci_identity_compartment.stand.id, model = local.model, stt_enabled = var.stt_enabled })
+  payloads     = { for name in ["bootstrap.sh", "network-preflight.sh", "configure.py", "bridge.py", "smoke.py", "activate.py", "prepare_audio.py", "gateway_text_only.py", "requirements.txt", "requirements.lock", "hermes-gateway.service", "hermes-oci-bridge.service", "hermes-stand-activate.service"] : name => filebase64("${path.module}/files/${name}") }
   pairing_code = "stand_${random_id.pairing.hex}"
   user_data = base64gzip(templatefile("${path.module}/cloud-init.yaml.tftpl", {
     payloads = local.payloads
@@ -34,6 +34,10 @@ resource "oci_identity_compartment" "stand" {
   enable_delete  = true
   freeform_tags  = local.tags
   lifecycle {
+    precondition {
+      condition     = var.llm_model != "xai.grok-4.6" || var.region == "us-chicago-1"
+      error_message = "Grok 4.6 exige Chicago (us-chicago-1) neste pacote. Para GRU, selecione Llama explicitamente; não há fallback regional."
+    }
     precondition {
       condition     = contains([for r in data.oci_identity_region_subscriptions.tenancy.region_subscriptions : r.region_name if r.state == "READY"], var.region)
       error_message = "A região da instalação deve estar subscrita e READY nesta tenancy. Confira Manage Regions na Console. Ela não precisa ser a home region."

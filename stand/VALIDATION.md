@@ -74,6 +74,28 @@ O teste da conversa nessa nova VM ainda deve ser confirmado pelo participante.
 Esse teste exercitou o agente na VM, não uma nova mensagem enviada pelo usuário
 no Telegram. A confirmação final deve ser feita pelo participante após `/new`.
 
+## Grok e áudio local — 14/09/2026, versão 1.3.0
+
+- 17 testes Terraform com providers simulados: inclui Grok em ORD, rejeição
+  de Grok em GRU e modelo desconhecido, opção STT desligada e policy do modelo.
+- 42 testes Python: inclui configuração local explícita, STT desligado sem
+  download, carregamento CPU/local-only, TTS bloqueado e pesos fora do Terraform.
+- Contrato executado contra o Hermes fixado, com o extra `voice` instalado:
+  provider/STT local e guardas dos dois caminhos de TTS automático confirmados.
+- Transcrição real em CPU/int8 pelo módulo do Hermes, com amostra sintética
+  em português em WAV e OGG/Opus: sucesso e texto reconhecido. Houve pequena
+  imprecisão na fala sintetizada; isso não mede precisão em ambiente de evento.
+  Teste local no Mac, não na nova VM OCI; não foram usados áudios do usuário
+  nem API paga. A amostra/pesos não foram incluídos no pacote Terraform.
+- Consulta da disponibilidade oficial OCI em 14/09/2026: Grok 4.6 em ORD,
+  hospedagem externa xAI; sem disponibilidade listada em GRU.
+
+O usuário removeu a instalação anterior. **Não foi criada VM nem executada
+inferência real Grok nesta entrega.** A nova Stack deverá validar IAM,
+acesso/créditos, chamada/retorno de ferramentas (com e sem streaming) e a
+conversa final por voz no Telegram. Não interpretar testes locais como
+homologação do Grok na tenancy ou medição de latência da VM de 1 OCPU.
+
 ## Repetir testes locais — somente mantenedor
 
 O visitante usa **Plan e Apply na Console**, não estes comandos. Os testes

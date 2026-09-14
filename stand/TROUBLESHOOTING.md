@@ -17,6 +17,10 @@
 | “Conta vinculada”, sem “Configuração concluída” | Testes OCI ainda aguardam IAM/acesso/modelo/limites. Alterações de dynamic groups podem levar até uma hora |
 | OCI persiste sem funcionar | Confira GenAI on-demand, policy/dynamic group, limites e crédito. Não autorize `manage all-resources` para contornar |
 | Tool calling falhou | Não trate chat simples como aceite. É preciso validar ferramenta e retorno ao modelo antes de liberar ao público |
+| Plan rejeita Grok em GRU | Selecione Chicago para Grok 4.6, ou Llama explicitamente para GRU. Não mude apenas o endpoint na VM |
+| Áudio não foi entendido | Confira STT habilitado no formulário, use português e áudio curto. Verifique bootstrap/prepare_audio e logs do gateway, sem expor gravações ou transcrições |
+| Bootstrap parou baixando Whisper | Confira DNS/HTTPS para Hugging Face e espaço em disco. Não contrate STT pago como contorno; instalação exige os pesos locais antes da ativação |
+| `/voice on` não produz áudio | Comportamento intencional desta edição: entrada por voz, saída sempre textual |
 | `Response truncated due to output length limit` até em tarefa curta | Versões até 1.2.2 podiam fragmentar ferramentas no streaming. A versão 1.2.3 corrige os IDs; veja abaixo antes de aumentar tokens |
 | Bot já tem webhook/Telegram 409 | Use um bot novo/exclusivo. O ativador não apaga integrações externas |
 | Bot respondeu ao instalador mas não ao visitante | Envie `/new` e nova tarefa. A mensagem do instalador não prova a resposta do agente |

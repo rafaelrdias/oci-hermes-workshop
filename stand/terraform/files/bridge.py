@@ -99,7 +99,8 @@ def completion_args(body):
         requested = int(body.get("max_completion_tokens") or body.get("max_tokens") or 2048)
     except (ValueError, TypeError):
         raise HTTPException(400, "max_tokens inválido") from None
-    result.update(model="oci/" + config["model"], max_tokens=max(1, min(requested, 4000)),
+    ceiling = 8192 if config['model'] == 'xai.grok-4.6' else 4000
+    result.update(model="oci/" + config["model"], max_tokens=max(1, min(requested, ceiling)),
                   oci_region=config["region"], oci_compartment_id=config["compartment_id"],
                   oci_serving_mode="ON_DEMAND", timeout=120, num_retries=0, drop_params=True)
     return result

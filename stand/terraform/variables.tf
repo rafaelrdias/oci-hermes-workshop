@@ -15,6 +15,22 @@ variable "region" {
   }
 }
 
+variable "llm_model" {
+  type        = string
+  default     = "xai.grok-4.6"
+  description = "Grok 4.6 em ORD (padrão). Llama é alternativa explícita para GRU; sem fallback automático."
+  validation {
+    condition     = contains(["xai.grok-4.6", "meta.llama-3.3-70b-instruct"], var.llm_model)
+    error_message = "Selecione Grok 4.6 ou Llama 3.3 70B."
+  }
+}
+
+variable "stt_enabled" {
+  type        = bool
+  default     = true
+  description = "Transcrição local gratuita de API, Whisper base em CPU. Consome CPU/RAM da VM; respostas somente texto."
+}
+
 variable "telegram_bot_token" {
   type        = string
   sensitive   = true

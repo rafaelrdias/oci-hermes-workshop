@@ -1,5 +1,9 @@
 # Terraform do stand Oracle — execução pela Console OCI
 
+Versão **1.3.0**: escolha Chicago e mantenha `xai.grok-4.6` como LLM.
+STT local Whisper vem habilitado; respostas sempre em texto. Sem API paga de
+transcrição, mas VM e LLM consomem créditos. Grok é hospedado pela xAI via OCI.
+
 Versão 1.2.3: identidade estável das ferramentas no streaming e teste de
 ativação com e sem streaming. Inclui as correções anteriores.
 
@@ -20,7 +24,8 @@ state, variáveis pessoais, chaves, PDFs ou apresentações no pacote.
 Fluxo: **Create Stack → token sensível + aceite → Plan → revisar → Apply →
 Application information → revelar comando privado → enviar ao bot → aguardar**.
 
-ORD e GRU são suportadas, com Llama 3.3 70B on-demand na região selecionada.
+ORD usa Grok 4.6 por padrão. Para GRU selecione Llama 3.3 70B explicitamente;
+Grok + GRU é rejeitado. Não há fallback automático de modelo/região.
 A home region pode ser diferente: é detectada automaticamente e usada apenas
 pelo provider `oci.home` para criar IAM global. A região da instalação deve
 estar subscrita e `READY`. Nenhuma

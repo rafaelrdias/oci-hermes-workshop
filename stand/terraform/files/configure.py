@@ -14,6 +14,7 @@ import yaml
 
 STATE = Path("/var/lib/hermes/.hermes")
 BASE_URL = "http://127.0.0.1:4000/v1"
+STT_MODEL = "/var/lib/hermes/models/whisper-base"
 TOKEN_PATTERN = r"[0-9]{5,15}:[A-Za-z0-9_-]{30,100}"
 
 
@@ -41,6 +42,10 @@ def validate_binding(data):
 
 
 def initialize():
+    settings_file = Path('/etc/hermes-stand.json')
+    vm_settings = json.loads(settings_file.read_text()) if settings_file.exists() else {}
+    audio_enabled = vm_settings.get('stt_enabled', True)
+    output_budget = 4096 if vm_settings.get('model', 'xai.grok-4.6') == 'xai.grok-4.6' else 2048
     key_file = STATE / "bridge.key"
     if not key_file.exists():
         write_private(key_file, secrets.token_urlsafe(48) + "\n")
@@ -50,11 +55,14 @@ def initialize():
             "_config_version": 33,
             "model": {"provider": "custom:oci-stand", "default": "hermes-oci",
                       "base_url": BASE_URL, "api_mode": "chat_completions",
-                      "context_length": 128000, "max_tokens": 2048},
+                      "context_length": 128000, "max_tokens": output_budget},
             "custom_providers": [{"name": "oci-stand", "base_url": BASE_URL,
                                   "api_mode": "chat_completions", "key_env": "OPENAI_API_KEY",
                                   "model": "hermes-oci", "context_length": 128000}],
-            "agent": {"max_turns": 8, "gateway_timeout": 300, "disabled_toolsets": ["kanban"]},
+            "agent": {"max_turns": 8, "gateway_timeout": 300, "disabled_toolsets": ["kanban", "tts"]},
+            "stt": {"enabled": audio_enabled, "provider": "local",
+                    "local": {"model": STT_MODEL, "language": "pt"}},
+            "voice": {"auto_tts": False},
             "terminal": {"backend": "local", "cwd": "/var/lib/hermes/workspace", "timeout": 30},
             "auxiliary": {name: {"provider": "custom", "model": "hermes-oci", "base_url": BASE_URL}
                           for name in ("compression", "title_generation", "approval")},
@@ -67,7 +75,11 @@ def initialize():
     if not (STATE / "SOUL.md").exists():
         write_private(STATE / "SOUL.md", """# Hermes no stand Oracle
 Você é o assistente pessoal deste visitante, executando em OCI. Responda em português.
-Este ambiente é uma demonstração de texto. Não prometa analisar imagens ou áudio.
+Responda SEMPRE por texto, nunca gere nem envie áudio. Não use text_to_speech.
+Áudios recebidos são transcritos localmente pelo gateway; interprete a transcrição
+como a mensagem do usuário, sem fingir ter ouvido características não transcritas.
+Se a transcrição falhar ou não houver fala, peça que o usuário repita ou escreva.
+Não prometa analisar imagens. Não tente instalar nem contratar serviços de áudio.
 Use ferramentas quando necessário, confira os resultados e não invente execuções.
 Trabalhe em /var/lib/hermes/workspace. Não leia nem exponha chaves ou tokens,
 inclusive .env, bridge.key, metadados de identidade da VM e credenciais OCI.

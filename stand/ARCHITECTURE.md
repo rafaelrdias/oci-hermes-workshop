@@ -11,6 +11,9 @@ flowchart LR
   U <-->|polling| H
   H --> B[Ponte local LiteLLM + OCI SDK]
   B -->|Instance Principal| G[OCI Generative AI on-demand]
+  G -->|Grok: hospedagem externa| X[xAI]
+  U -->|áudio recebido| S[Whisper local: CPU]
+  S -->|transcrição textual| H
 ```
 
 O visitante não executa Terraform no notebook ou Cloud Shell. A Stack recebe
@@ -56,7 +59,7 @@ o ID do remetente é salvo na allowlist. Webhooks existentes não são apagados.
 
 - Hermes oficial `v2026.7.7.2`, commit verificado
   `9de9c25f620ff7f1ce0fd5457d596052d5159596`; não é um fork.
-- `uv 0.12.12`, Python 3.11, core com `uv sync --frozen --no-dev`, Telegram
+- `uv 0.12.12`, Python 3.11, core com `uv sync --frozen --no-dev --extra voice`, Telegram
   `python-telegram-bot[webhooks]==22.6`, sem navegador ou canais extras.
 - Ponte em virtualenv separada: LiteLLM `1.100.1`, OCI SDK `2.185.2`, FastAPI
   `0.141.1`, Uvicorn `0.52.4`. Transitivas em `requirements.lock` (versões
@@ -125,7 +128,8 @@ parcial. O teste de ativação verifica ferramenta e retorno com e sem streaming
 - O teste OCI é repetido enquanto IAM não está pronto. Após uma falha, systemd
   retoma em 60 segundos. Não há desligamento financeiro automático: o visitante
   deve usar Destroy se não quiser continuar aguardando/consumindo créditos.
-- Modelo fixo: Llama 3.3 70B on-demand. Sem fallback entre regiões, provedores,
+- Modelo padrão: Grok 4.6 via OCI ORD, hospedado externamente pela xAI.
+  Llama 3.3 70B é alternativa explícita para ORD/GRU. Sem fallback entre regiões, provedores,
   modelos, APIs comerciais ou infraestrutura dedicada.
 - O limite de 120 chamadas/hora é em memória, reinicia com a ponte e não limita
   uso direto da identidade OCI; não é orçamento nem hard cap financeiro.
@@ -146,6 +150,21 @@ Consultadas em 10/09/2026:
 - [Segurança Resource Manager — Oracle](https://docs.oracle.com/en-us/iaas/Content/Security/Reference/resourcemanager_security.htm)
 - [Instance Principals — Oracle](https://docs.oracle.com/en-us/iaas/Content/Identity/Tasks/callingservicesfrominstances.htm)
 - [Modelos por região — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
-- [Llama 3.3 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/meta-llama-3-3-70b.htm)
+- [Grok 4.6 — Oracle](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-6.htm)
+- [Whisper local — projeto faster-whisper](https://github.com/SYSTRAN/faster-whisper)
+
+## Entrada de áudio e saída textual — 1.3.0
+
+`prepare_audio.py` baixa uma revisão fixa do Whisper base e verifica carregamento
+CPU/int8 antes da ativação. Pesos ficam na VM, fora do pacote Terraform.
+`stt.provider=local` é explícito: no Hermes fixado, indisponibilidade local não
+aciona fallback pago. Português é configurado; a opção STT pode ser desligada.
+`gateway_text_only.py` inicia o Hermes com duas guardas de TTS automático e
+carregamento STT local-only/CPU. Preferências antigas e `/voice on` não geram
+respostas faladas. A ferramenta `tts` também está desabilitada. Essas guardas
+são específicas do release Hermes fixado e têm teste de contrato upstream.
+Não há API STT paga ou GPU provisionada. CPU/RAM/armazenamento da VM e LLM
+continuam sujeitos a consumo. O arquivo de áudio pode ficar no cache do Hermes;
+histórico/transcrições requerem os mesmos cuidados de privacidade do chat.
 - [OCI Signer e tool calling — LiteLLM](https://docs.litellm.ai/docs/providers/oci)
 - [Telegram Bot API](https://core.telegram.org/bots/api#getupdates)
