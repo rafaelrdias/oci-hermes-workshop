@@ -73,6 +73,7 @@ class BridgeTests(unittest.TestCase):
         self.config_patch.start()
         self.addCleanup(self.config_patch.stop)
         bridge.request_times.clear()
+        bridge.cooldown_until = 0
 
     def request(self, **kwargs):
         body = {"model": "hermes-oci", "messages": [{"role": "user", "content": "oi"}]}
@@ -140,6 +141,80 @@ class BridgeTests(unittest.TestCase):
         mapped = adapt_messages_to_generic_oci_standard(messages)
         self.assertEqual(mapped[1].toolCalls[0].name, "stand_echo")
         self.assertEqual(mapped[2].toolCallId, "call_1")
+
+
+class RateBackoffTests(unittest.TestCase):
+    def setUp(self):
+        self.now = 1000.0
+        bridge.cooldown_until = 0
+        bridge.request_times.clear()
+        self.patches = [patch.object(bridge.time, 'monotonic', side_effect=lambda: self.now),
+                        patch.object(bridge.time, 'sleep', side_effect=self.sleep),
+                        patch.object(bridge, 'signer', return_value=object())]
+        for p in self.patches:
+            p.start()
+            self.addCleanup(p.stop)
+        self.addCleanup(setattr, bridge, 'cooldown_until', 0)
+
+    def sleep(self, seconds):
+        self.now += seconds
+
+    def error(self, status=429, headers=None):
+        error = RuntimeError('secret-provider-payload')
+        error.status_code = status
+        error.response = SimpleNamespace(headers=headers or {})
+        return error
+
+    def test_rate_limit_waits_then_recovers(self):
+        with patch.object(bridge.litellm, 'completion', side_effect=[self.error(), 'ok']) as call:
+            self.assertEqual(bridge.completion_with_backoff({'timeout': 120}), 'ok')
+        self.assertEqual(self.now, 1065)
+        self.assertEqual(call.call_count, 2)
+        self.assertEqual(len(bridge.request_times), 1)  # extra attempt is counted
+        self.assertEqual(call.call_args.kwargs['timeout'], 35)
+
+    def test_non_rate_error_never_retried(self):
+        with patch.object(bridge.litellm, 'completion', side_effect=self.error(401)) as call:
+            with self.assertRaises(RuntimeError):
+                bridge.completion_with_backoff({'timeout': 120})
+        self.assertEqual(call.call_count, 1)
+        self.assertEqual(self.now, 1000)
+
+    def test_retry_after_and_exhaustion_are_redacted(self):
+        with patch.object(bridge.litellm, 'completion', side_effect=self.error(headers={'retry-after': '20'})) as call:
+            with self.assertRaises(bridge.HTTPException) as caught:
+                bridge.completion_with_backoff({'timeout': 120})
+        self.assertEqual(call.call_count, 2)
+        self.assertEqual(caught.exception.headers['Retry-After'], '20')
+        self.assertNotIn('secret', caught.exception.detail)
+
+    def test_long_retry_after_is_not_shortened_or_slept(self):
+        with patch.object(bridge.litellm, 'completion', side_effect=self.error(headers={'retry-after': '180'})) as call:
+            with self.assertRaises(bridge.HTTPException) as caught:
+                bridge.completion_with_backoff({'timeout': 120})
+        self.assertEqual(call.call_count, 1)
+        self.assertEqual(caught.exception.headers['Retry-After'], '180')
+        self.assertEqual(self.now, 1000)
+
+    def test_shared_cooldown_delays_next_caller(self):
+        bridge.cooldown_until = 1040
+        with patch.object(bridge.litellm, 'completion', return_value='ok'):
+            bridge.completion_with_backoff({'timeout': 120})
+        self.assertEqual(self.now, 1040)
+
+    def test_retry_does_not_bypass_hourly_limit(self):
+        bridge.request_times[:] = [1000] * 120
+        with patch.object(bridge.litellm, 'completion', side_effect=self.error()) as call:
+            with self.assertRaises(bridge.HTTPException) as caught:
+                bridge.completion_with_backoff({'timeout': 120})
+        self.assertEqual(call.call_count, 1)
+        self.assertEqual(caught.exception.headers['X-Hermes-Limit-Source'], 'local')
+
+    def test_retry_after_http_date_and_invalid(self):
+        from email.utils import formatdate
+        with patch.object(bridge.time, 'time', return_value=1000):
+            self.assertEqual(bridge.retry_delay(self.error(headers={'retry-after': formatdate(1030, usegmt=True)})), 30)
+        self.assertEqual(bridge.retry_delay(self.error(headers={'retry-after': 'invalid'})), 65)
 
 
 class StreamToolTests(unittest.TestCase):

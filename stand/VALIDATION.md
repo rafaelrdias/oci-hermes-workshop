@@ -96,6 +96,26 @@ acesso/créditos, chamada/retorno de ferramentas (com e sem streaming) e a
 conversa final por voz no Telegram. Não interpretar testes locais como
 homologação do Grok na tenancy ou medição de latência da VM de 1 OCPU.
 
+## HTTP 429 na nova VM — 14/09/2026, versão 1.3.1
+
+- A OCI retornou erro de service limit do modelo Grok. Chamadas com contexto
+  maior reproduziram sucesso seguido de 429, independentemente do limite local.
+- O agente havia executado `write_file` antes do erro; o problema estava na
+  inferência seguinte, não em Telegram, SSH ou ferramentas de arquivo.
+- Ponte corrigida na VM com backup, sem alterar IAM/quota/modelo/pareamento.
+- Teste real do Hermes com Grok, streaming e os toolsets do stand concluiu
+  `write_file` → `read_file` → resposta textual; arquivo conferido no workspace.
+  Tempo observado: **144,6 s**, incluindo espera pela janela do serviço.
+- 49 testes Python aprovados: inclui retry limitado, erros não-429 sem retry,
+  Retry-After numérico/data, cooldown compartilhado, teto de espera e quota local.
+- 17 testes Terraform aprovados. Scripts passam a usar gzip+base64 individual
+  no cloud-init para manter o user-data abaixo do limite seguro de 30.000
+  caracteres. O limite não foi aumentado. A compactação não é criptografia.
+
+Isso comprova uma execução real nesta VM/tenancy, não capacidade para vários
+visitantes simultâneos. Falta confirmar a nova mensagem do usuário no Telegram.
+Mais throughput pode exigir solicitação de aumento do service limit à Oracle.
+
 ## Repetir testes locais — somente mantenedor
 
 O visitante usa **Plan e Apply na Console**, não estes comandos. Os testes

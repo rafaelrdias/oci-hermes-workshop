@@ -18,7 +18,7 @@ write_files:
   - path: /opt/hermes-stand/${name}
     owner: root:root
     permissions: '0644'
-    encoding: b64
+    encoding: gz+b64
     content: ${payload}
 %{ endfor ~}
 runcmd:

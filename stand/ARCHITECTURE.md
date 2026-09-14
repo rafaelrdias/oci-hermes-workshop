@@ -166,5 +166,15 @@ são específicas do release Hermes fixado e têm teste de contrato upstream.
 Não há API STT paga ou GPU provisionada. CPU/RAM/armazenamento da VM e LLM
 continuam sujeitos a consumo. O arquivo de áudio pode ficar no cache do Hermes;
 histórico/transcrições requerem os mesmos cuidados de privacidade do chat.
+
+## Controle de HTTP 429 — 1.3.1
+
+A ponte serializa a abertura de chamadas OCI e compartilha cooldown. Apenas
+429 antes da entrega do stream permite um retry, respeitando Retry-After ou
+65 s por padrão, com orçamento de abertura/fila de 100 s. Os retries contam
+nas 120 chamadas/h; os limites OCI são independentes. Nenhum aumento de quota,
+troca de modelo, tier prioritário ou mudança IAM é feito automaticamente.
+Os arquivos de instalação usam `encoding: gz+b64` nativo do cloud-init,
+mantendo o teto de 30.000 caracteres de user-data sem remover validações.
 - [OCI Signer e tool calling — LiteLLM](https://docs.litellm.ai/docs/providers/oci)
 - [Telegram Bot API](https://core.telegram.org/bots/api#getupdates)

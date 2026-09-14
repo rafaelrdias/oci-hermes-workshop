@@ -8,6 +8,8 @@ import logging
 import secrets
 import threading
 import time
+import math
+from email.utils import parsedate_to_datetime
 from functools import lru_cache
 from pathlib import Path
 
@@ -26,6 +28,74 @@ app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 slots = threading.BoundedSemaphore(2)
 rate_lock = threading.Lock()
 request_times = []
+upstream_lock = threading.Lock()
+cooldown_until = 0.0
+RATE_RETRY_SECONDS = 65
+REQUEST_BUDGET_SECONDS = 100
+
+
+def retry_delay(exc):
+    """Respect Retry-After, including HTTP dates. Never expose provider headers."""
+    response = getattr(exc, 'response', None)
+    headers = getattr(response, 'headers', {}) or {}
+    value = headers.get('retry-after')
+    try:
+        delay = float(value)
+    except (ValueError, TypeError):
+        try:
+            delay = parsedate_to_datetime(value).timestamp() - time.time()
+        except (ValueError, TypeError, AttributeError, OverflowError):
+            delay = RATE_RETRY_SECONDS
+    return max(1, delay) if math.isfinite(delay) else RATE_RETRY_SECONDS
+
+
+def rate_error(delay):
+    return HTTPException(429, 'Limite temporário OCI/Grok. Aguarde a janela de uso; não é erro de autenticação.',
+                         headers={'Retry-After': str(max(1, math.ceil(delay))),
+                                  'X-Hermes-Limit-Source': 'oci'})
+
+
+def completion_with_backoff(args):
+    """One bounded retry of rejected inference, never replay a delivered stream.
+
+    Share cooldown across foreground and auxiliary requests. Serialize opening
+    upstream calls, but do not hold the lock for the entire SSE response.
+    This does not change OCI quotas, models, accounts or the hourly ceiling.
+    """
+    global cooldown_until
+    deadline = time.monotonic() + REQUEST_BUDGET_SECONDS
+    if not upstream_lock.acquire(timeout=REQUEST_BUDGET_SECONDS):
+        raise HTTPException(429, 'Fila local ocupada; aguarde a tarefa anterior.',
+                            headers={'Retry-After': '10', 'X-Hermes-Limit-Source': 'local'})
+    try:
+        for attempt in range(2):
+            delay = max(0, cooldown_until - time.monotonic())
+            if delay >= deadline - time.monotonic():
+                raise rate_error(delay)
+            if delay:
+                time.sleep(delay)
+            if attempt:
+                with rate_lock:
+                    now = time.monotonic()
+                    request_times[:] = [t for t in request_times if now - t < 3600]
+                    if len(request_times) >= 120:
+                        raise HTTPException(429, 'Limite local: 120 chamadas/hora.',
+                                            headers={'X-Hermes-Limit-Source': 'local'})
+                    request_times.append(now)
+            try:
+                remaining = max(1, deadline - time.monotonic())
+                return litellm.completion(**dict(args, timeout=min(args['timeout'], remaining)), oci_signer=signer())
+            except Exception as exc:
+                if getattr(exc, 'status_code', None) != 429:
+                    raise
+                delay = retry_delay(exc)
+                cooldown_until = max(cooldown_until, time.monotonic() + delay)
+                logging.getLogger('hermes.bridge').warning('OCI HTTP 429; cooldown %.0fs; attempt %s/2', delay, attempt + 1)
+                if attempt or delay >= deadline - time.monotonic():
+                    raise rate_error(delay) from None
+        raise RuntimeError('Unreachable retry state')
+    finally:
+        upstream_lock.release()
 
 
 def iter_oci_sse_events(stream, _parse=oci_chat._iter_sse_events):
@@ -168,7 +238,10 @@ def chat(body: dict, authorization: str = Header(default="")):
             raise HTTPException(429, "Limite local: 120 chamadas/hora; não é um teto financeiro")
         request_times.append(now)
     try:
-        result = litellm.completion(**args, oci_signer=signer())
+        result = completion_with_backoff(args)
+    except HTTPException:
+        slots.release()
+        raise
     except Exception as exc:
         slots.release()
         status = getattr(exc, "status_code", 502)

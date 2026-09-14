@@ -2,6 +2,11 @@
 
 **Trial pessoal → BotFather → Create Stack → Plan → Apply → Telegram.**
 
+**Versão 1.3.1:** trata HTTP 429 da OCI com espera compartilhada e uma
+repetição limitada da chamada recusada. Uma tarefa com várias ferramentas
+pode aguardar cerca de 65 segundos por janela, sem aumentar a quota ou trocar
+o modelo. Veja [limites do Grok](TROUBLESHOOTING.md#limite-do-grok-http-429--versão-131).
+
 **Versão 1.3.0:** Grok 4.6 como padrão em **Chicago (ORD)**, transcrição de
 áudios com Whisper local habilitada e respostas **sempre em texto**.
 STT não usa API paga; VM e inferência LLM continuam consumindo créditos.

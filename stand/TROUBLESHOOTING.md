@@ -29,6 +29,42 @@
 
 ## Retomar sem criar outra Stack
 
+### Limite do Grok (HTTP 429) — versão 1.3.1
+
+Uma mensagem pode exigir várias inferências: decidir escrever → executar
+`write_file` → decidir ler → executar `read_file` → responder. Cada chamada
+inclui contexto e definições das ferramentas; o tamanho da frase digitada
+não representa o total de tokens processados. Títulos auxiliares também usam
+inferência. Um smoke test curto pode passar e a conversa completa atingir quota.
+
+Na ocorrência diagnosticada, a OCI informou que o **service limit do modelo
+foi atingido**. O arquivo foi criado antes do 429 na chamada seguinte. As
+repetições antigas em 2–5 segundos ainda encontravam a mesma janela limitada.
+Isso é distinto do limite local de 120 chamadas/hora e não indica falha de SSH,
+Telegram, STT ou necessariamente falta de créditos.
+
+A ponte 1.3.1 respeita `Retry-After` quando informado; sem ele, aguarda 65 s.
+Compartilha a espera entre requisições, serializa a abertura de chamadas OCI e
+faz **no máximo uma repetição adicional** antes de devolver o erro. O orçamento
+da abertura da chamada é 100 s, incluindo fila/espera; não repete streams já
+entregues nem ferramentas locais. O retry conta no limite local de 120/h.
+Os logs registram apenas status, espera e tentativa, sem prompts/credenciais.
+O Hermes ainda tem seu próprio limite de tentativas e timeout da tarefa:
+a espera não garante conclusão se a quota continuar insuficiente.
+
+Para testar após a correção, envie `/new`, peça criação/leitura e aguarde
+sem reenviar a mensagem repetidamente. Não é necessário novo pareamento.
+
+Para vários visitantes/mais velocidade, o administrador deve conferir na
+**Console OCI → Governance & Administration → Limits, Quotas and Usage**
+os limites de **Generative AI**, com região **Chicago**, e procurar
+`grok-4-6-tokens-per-minute-count`. Se necessário, solicite aumento pelo fluxo
+de service limits. A aprovação/elegibilidade depende da Oracle e da conta.
+Mais quota não é crédito gratuito: monitore custos e não autorize upgrade
+automático. A VM não possui permissão para alterar quotas.
+
+Fonte: [Grok 4.6 e nome oficial do limite](https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-6.htm).
+
 ### Ferramentas truncadas no streaming — versão 1.2.3
 
 No defeito diagnosticado, os logs registravam `Unrepairable tool_call arguments`
