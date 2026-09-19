@@ -1,8 +1,7 @@
 # Hermes Agent na OCI, pelo Telegram
 
 Seu agente pessoal em uma VM OCI: converse por texto, envie áudios e execute
-tarefas com ferramentas. Um laboratório para **workshops, conferências,
-meetups, treinamentos e experiências práticas em eventos**.
+tarefas com ferramentas.
 
 **Console OCI → Terraform → Hermes → Telegram.** Não precisa instalar
 Terraform no computador, abrir Cloud Shell ou usar SSH para concluir a instalação.
