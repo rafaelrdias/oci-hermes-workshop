@@ -6,7 +6,6 @@ import unittest
 import zipfile
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = [ROOT / "README.md", ROOT / "terraform/README.md", *sorted((ROOT / "docs").glob("*.md"))]
@@ -30,21 +29,33 @@ class DocumentationTests(unittest.TestCase):
                     if anchor and target.suffix == ".md":
                         self.assertIn(unquote(anchor), anchors(target.read_text()))
 
-    def test_only_telegram_remains_illustrated(self):
-        images = sorted((ROOT / "docs/images").glob("*.svg"))
-        self.assertEqual({p.name for p in images}, {
-            "01-telegram-botfather.svg", "08-telegram-pareamento.svg",
-            "09-telegram-conversa.svg",
-        })
-        guide = "\n".join(path.read_text() for path in DOCS)
-        for path in images:
-            with self.subTest(image=path.name):
-                tree = ET.fromstring(path.read_text())
-                self.assertEqual(tree.attrib["viewBox"], "0 0 1200 790")
-                self.assertIn("Tela ilustrativa", "".join(tree.itertext()))
-                self.assertIn(path.name, guide)
-                self.assertNotIn("<script", path.read_text().lower())
-                self.assertNotIn("https://api.telegram.org/bot", path.read_text())
+    def test_legacy_ui_mockups_are_not_published(self):
+        self.assertFalse(list((ROOT / "docs/images").glob("*.svg")))
+
+    def test_telegram_uses_real_redacted_crops(self):
+        guide = (ROOT / "README.md").read_text()
+        provenance = (ROOT / "docs/TELAS.md").read_text()
+        images = ROOT / "docs/images/telegram"
+        expected = {
+            "01-botfather-nome-username.png": (615, 266),
+            "02-botfather-token-link.png": (422, 248),
+            "03-telegram-vinculo.png": (605, 264),
+            "04-telegram-teste-arquivo.png": (412, 92),
+        }
+        self.assertEqual({p.name for p in images.iterdir()}, set(expected))
+        for name, dimensions in expected.items():
+            with self.subTest(image=name):
+                data = (images / name).read_bytes()
+                self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n")
+                self.assertEqual(struct.unpack(">II", data[16:24]), dimensions)
+                self.assertIn(name, guide)
+                self.assertIn(name, provenance)
+        for phrase in ["nome de exibição", "username", "HTTP API", "tarja",
+                       "não invalida o token original", "Conta vinculada!",
+                       "Configuração concluída!", "não é o token do BotFather",
+                       "Esse teste de áudio é adicional"]:
+            self.assertIn(phrase, guide)
+        self.assertNotIn("01-telegram-botfather.svg", guide)
 
     def test_console_captures_are_documented_pngs_outside_terraform(self):
         images = sorted((ROOT / "docs/images/console").glob("*.png"))
@@ -110,7 +121,7 @@ class DocumentationTests(unittest.TestCase):
         guide = (ROOT / "README.md").read_text()
         for phrase in ["Application information", "telegram_pairing_command",
                        "a Stack que acabou de executar", "três aceites distintos",
-                       "telas ilustrativas", "Whisper", "Sempre por texto"]:
+                       "capturas reais", "Whisper", "Sempre por texto"]:
             self.assertIn(phrase, guide)
 
     def test_terraform_package_is_small_and_has_no_artifacts(self):

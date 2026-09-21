@@ -53,8 +53,10 @@ créditos/cobrança: transcrição local não significa laboratório inteiro gra
 > **Sobre as telas:** as imagens da **Console OCI são capturas reais**, feitas em
 > 21/09/2026, em inglês e no tema escuro, com recortes para preservar os dados da
 > conta. Os nomes dos controles foram mantidos como aparecem na Console.
-> As três imagens do **Telegram continuam sendo telas ilustrativas**, identificadas
-> como tal. Use seus próprios valores. [Origem e cobertura das capturas](docs/TELAS.md).
+> No **Telegram**, criação do bot, pareamento e resposta do teste de arquivo
+> também usam capturas reais fornecidas pelo mantenedor, com tokens e código
+> privado ocultados. Use seus próprios valores; as tarjas não fazem parte das interfaces.
+> [Origem e cobertura das capturas](docs/TELAS.md).
 
 ## 1. Prepare a conta e selecione Chicago
 
@@ -88,12 +90,38 @@ no cabeçalho. A próxima etapa acontece no Telegram, sem fechar este guia.
 
 1. Abra o [@BotFather oficial](https://t.me/BotFather) e toque **Start / Iniciar**.
 2. Envie **`/newbot`**.
-3. Informe um nome, por exemplo **Meu Hermes OCI**.
-4. Escolha um username único terminado em **`bot`**. Se estiver ocupado, escolha outro.
-5. Guarde o **token** retornado e o link **`https://t.me/SEU_USERNAME_BOT`**.
-   O token vai somente no campo sensível `telegram_bot_token` da sua Stack.
+3. Quando o BotFather perguntar **“How are we going to call it?”**, informe o
+   **nome de exibição**, por exemplo **Meu Hermes OCI**. Na captura fornecida,
+   o nome escolhido foi `teste_bot_hermes`. Esse ainda não é o username.
+4. Na pergunta **“Let's choose a username for your bot”**, envie um
+   **username único terminado em `bot`**, por exemplo `meu_hermes_evento_bot`.
+   Na captura, a primeira tentativa sem esse final foi recusada; acrescentar
+   `_bot` permitiu continuar. Se o nome já estiver ocupado, escolha outra
+   combinação que continue terminando em `bot`.
 
-![Telegram: criar o bot no BotFather](docs/images/01-telegram-botfather.svg)
+   ![Telegram real: criação com newbot, nome de exibição e correção do username para terminar em bot](docs/images/telegram/01-botfather-nome-username.png)
+
+   *Recorte real: o BotFather pede primeiro o nome e depois o username. A mensagem
+   **Sorry, the username must end in bot** indica que basta corrigir o username
+   e enviá-lo no mesmo chat; não é preciso começar outro `/newbot`.*
+
+5. A mensagem **“Done! Congratulations on your new bot”** confirma a criação.
+   Nessa mesma mensagem, guarde **duas informações diferentes**:
+
+   | Informação recebida | Onde aparece | Como será usada |
+   |---|---|---|
+   | Link do seu bot | Depois de **You will find it at**, no formato `t.me/SEU_USERNAME_BOT` | Abrir a conversa com o seu Hermes na etapa 7 |
+   | Token privado | Abaixo de **Use this token to access the HTTP API** | Preencher **Token do BotFather** e sua confirmação na Stack, etapa 4 |
+
+   ![Telegram real: confirmação do BotFather com link do bot e token coberto por tarja opaca](docs/images/telegram/02-botfather-token-link.png)
+
+   *Recorte real: o link aparece no início da confirmação e o token fica abaixo
+   da indicação **HTTP API**. A tarja foi acrescentada para ocultar a credencial;
+   ela não faz parte do Telegram. Use o link e o token da **sua** conversa, não
+   o bot mostrado no exemplo.*
+
+O token é uma credencial, não o nome nem o link do bot. No formulário OCI,
+ele corresponde à variável `telegram_bot_token`.
 
 Não envie o token ao facilitador, ao próprio bot ou ao GitHub. Use um bot exclusivo.
 **Não precisa descobrir chat ID nem criar API key OCI:** o vínculo identifica
@@ -102,6 +130,12 @@ seu usuário, e a VM acessa o modelo com Instance Principals.
 **Antes de continuar:** guarde tanto o token quanto o link do **seu** bot.
 O BotFather cria o bot; a conversa com o Hermes acontecerá no outro chat,
 depois do pareamento na [etapa 7](#7-vincule-sua-conta-ao-bot).
+
+**Se um token aparecer em um print compartilhado ou no GitHub**, recomendamos
+substituí-lo pelo BotFather antes de usar o bot. Ocultar uma cópia da imagem
+não invalida o token original. A [documentação do Telegram](https://core.telegram.org/bots/features#generating-an-authentication-token)
+orienta gerar um novo token quando houver exposição. Se já houver uma instalação,
+revise o impacto de atualizar a configuração antes de aplicar mudanças na Stack.
 
 ## 3. Abra Create Stack na Console OCI
 
@@ -372,7 +406,26 @@ sem projetar o valor na tela. Não copie tokens ou comandos de imagens de exempl
    Se enviou antes de o instalador estar ouvindo e não houve confirmação,
    aguarde o bootstrap e reenvie o comando, sem repetir continuamente.
 
-![Telegram: vínculo privado e confirmação](docs/images/08-telegram-pareamento.svg)
+![Telegram real: comando start com código ocultado, Conta vinculada, Configuração concluída e new](docs/images/telegram/03-telegram-vinculo.png)
+
+*Recorte real no chat do **bot criado**, não no BotFather. O texto privado após
+`/start` está coberto por uma tarja. Os horários registram essa execução e não
+representam um prazo garantido para todas as instalações.*
+
+Veja como ler a sequência da imagem:
+
+- **`/start` com o código da Stack:** solicita o vínculo. Copie a saída completa
+  da OCI; o código de pareamento **não é o token do BotFather**. A quebra de
+  linha da bolha é apenas a forma como o Telegram apresenta a mensagem.
+- **Conta vinculada!**: o instalador identificou sua conta e ainda está
+  validando o acesso OCI e as ferramentas. Essa mensagem não significa que
+  já terminou.
+- **Configuração concluída!**: os testes iniciais terminaram e o bot orienta
+  o próximo passo. Agora você pode enviar **`/new`** para iniciar a sessão.
+- Depois da confirmação da nova sessão, faça o teste de arquivo da etapa 8.
+
+Se só aparecer a primeira confirmação, aguarde a próxima mensagem; não é
+necessário criar outro bot nem repetir o Apply para refazer o vínculo.
 
 O primeiro usuário que enviar o código válido em DM será o dono autorizado.
 Não projete nem compartilhe esse código. Não precisa chat ID ou aprovação SSH.
@@ -387,10 +440,16 @@ Crie boas-vindas.txt no seu workspace com uma saudação e leia o arquivo mostra
 ```
 
 O agente deve criar, ler e mostrar o conteúdo, não apenas prometer executar.
+
+![Telegram real: Hermes responde ao teste de criação e leitura de boas-vindas.txt](docs/images/telegram/04-telegram-teste-arquivo.png)
+
+*Resposta exibida na captura fornecida: o Hermes informa a criação e leitura de
+`boas-vindas.txt` e apresenta a saudação. O texto da resposta pode variar; o
+objetivo é conferir a execução da tarefa e a exibição do conteúdo.*
+
 Depois envie um áudio curto em português pedindo três ideias para aplicar IA
 no seu trabalho. A transcrição acontece na VM; a resposta vem **por texto**.
-
-![Telegram: ferramentas e áudio com resposta por texto](docs/images/09-telegram-conversa.svg)
+Esse teste de áudio é adicional: ele não aparece na captura acima.
 
 O nome exibido na sessão pode ser **`hermes-oci`**, alias local do modelo.
 O modelo OCI selecionado aparece na saída **`model`** da Stack. Não use dados

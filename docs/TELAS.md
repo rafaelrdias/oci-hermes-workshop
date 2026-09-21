@@ -1,4 +1,4 @@
-# Capturas da Console OCI
+# Capturas da Console OCI e do Telegram
 
 [Voltar ao guia](../README.md)
 
@@ -49,12 +49,56 @@ Essas etapas continuam descritas no guia e nas instruções de SSH; não foram
 substituídas por telas desenhadas. As orientações de Plan e Apply foram
 conferidas com a documentação oficial da Oracle.
 
-As três imagens do Telegram são ilustrações didáticas já identificadas com
-**Tela ilustrativa**, não capturas da Console nem evidências de execução.
+As quatro imagens do Telegram também são recortes reais, fornecidos pelo
+mantenedor e documentados abaixo. Elas registram as conversas das capturas;
+não representam uma nova implantação realizada durante esta revisão do guia.
 
 A interface OCI pode variar conforme idioma, tema e atualizações. Use os nomes
 dos controles, o contexto da página e os pontos de conferência do roteiro;
 a posição exata de um botão não deve ser o único critério.
+
+## Telegram e BotFather
+
+O mantenedor forneceu uma captura do BotFather em **21/09/2026**, mostrando
+a sequência `/newbot`, nome de exibição, tentativa de username sem o sufixo
+`bot`, correção e confirmação da criação. A data da conversa exibida no original
+é diferente da data de recebimento da captura.
+
+Foram autorizados **somente recortes e tarjas opacas**, sem geração de imagem
+por IA. A conversa e os rótulos foram preservados. A mensagem de uma criação
+anterior, visível na parte superior do original, não foi incluída nos recortes.
+O token da confirmação foi substituído por pixels pretos opacos antes de
+exportar o PNG. O original não foi alterado nem adicionado ao repositório.
+
+| Recorte real | Onde ajuda |
+|---|---|
+| [BotFather — nome e username](images/telegram/01-botfather-nome-username.png) | Distinguir nome de exibição de username e reconhecer o erro do sufixo |
+| [BotFather — link e token ocultado](images/telegram/02-botfather-token-link.png) | Localizar as duas informações necessárias para continuar na OCI e no Telegram |
+
+A tarja é uma edição de segurança, **não um elemento da interface Telegram**.
+Ela não revoga credenciais. Se os tokens do original ainda estiverem ativos,
+o proprietário deve substituí-los pelo BotFather. Não foi feito acesso à API
+do Telegram nem alteração de bots para produzir estas imagens.
+
+## Telegram e pareamento com o Hermes
+
+Uma segunda captura, também recebida em **21/09/2026**, mostra a conversa com
+o bot criado: comando de vínculo, confirmações do instalador, `/new` e resposta
+do teste de arquivo.
+
+| Recorte real | Onde ajuda |
+|---|---|
+| [Telegram — vínculo com o Hermes](images/telegram/03-telegram-vinculo.png) | Diferenciar Conta vinculada de Configuração concluída e identificar quando enviar `/new` |
+| [Telegram — resposta do teste de arquivo](images/telegram/04-telegram-teste-arquivo.png) | Reconhecer o resultado esperado após pedir criação e leitura do arquivo |
+
+O código privado enviado após `/start` foi coberto por uma tarja opaca antes
+de exportar. O recorte do resultado inclui somente a resposta do bot, sem
+os nomes de participantes e as mensagens citadas da conversa. Os textos da
+interface não foram reescritos e os horários não foram alterados.
+
+A imagem original não foi adicionada ao repositório. Nenhum código de vínculo
+foi utilizado e nenhum bot foi acionado para produzir os recortes. A captura
+do teste é de uma tarefa de texto/arquivo; não demonstra a transcrição de áudio.
 
 ## Atualizar as capturas
 
@@ -67,8 +111,8 @@ a posição exata de um botão não deve ser o único critério.
    existente. A necessidade de um screenshot não autoriza provisionar ou destruir.
 6. Confira cada PNG em tamanho legível, a legenda e os links. Atualize este
    catálogo com a data e as condições observadas.
-7. Mantenha imagens somente em `docs/images/console/`, nunca em `terraform/`
-   ou no pacote da branch `resource-manager`.
+7. Mantenha imagens em `docs/images/console/` ou `docs/images/telegram/`, nunca
+   em `terraform/` ou no pacote da branch `resource-manager`.
 
 ## Referências oficiais
 
@@ -76,3 +120,4 @@ a posição exata de um botão não deve ser o único critério.
 - [Criar um job Plan](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm)
 - [Criar um job Apply](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm)
 - [Schema e Application information](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Concepts/terraformconfigresourcemanager_topic-schema.htm)
+- [BotFather e criação de bots](https://core.telegram.org/bots/features#botfather)
