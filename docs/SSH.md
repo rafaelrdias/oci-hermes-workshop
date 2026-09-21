@@ -26,9 +26,13 @@ O aceite do token Telegram continua obrigatório e é independente deste.
 Abra **Resource Manager → Stacks → a Stack que acabou de executar →
 Application information → SSH opcional**.
 
-![Console OCI: recuperar chave privada da própria Stack](images/10-oci-chave-ssh.svg)
+Esse caminho parte dos detalhes **da Stack**, não da instância Compute nem
+do job Apply. O grupo tem o título **SSH opcional — guarde sua chave privada em segurança**.
+O valor privado deve continuar oculto até você estar pronto para salvá-lo.
 
-1. Revele **`ssh_private_key_pem`**. Vazio significa que não houve geração automática.
+1. Localize **Chave PRIVADA gerada: revelar, copiar e salvar como hermes.key
+   (vazio se não gerada)**, título da saída **`ssh_private_key_pem`**, e revele
+   o valor. Vazio significa que não houve geração automática.
 2. Copie **todo o conteúdo**, desde `-----BEGIN RSA PRIVATE KEY-----` até
    `-----END RSA PRIVATE KEY-----`, preservando as quebras de linha.
 3. Em um editor de texto puro, salve como **`hermes.key`**, não `hermes.key.txt`.

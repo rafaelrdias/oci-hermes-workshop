@@ -6,11 +6,27 @@ tarefas com ferramentas.
 **Console OCI → Terraform → Hermes → Telegram.** Não precisa instalar
 Terraform no computador, abrir Cloud Shell ou usar SSH para concluir a instalação.
 
-[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https%3A%2F%2Fgithub.com%2Frafaelrdias%2Foci-hermes-workshop%2Farchive%2Frefs%2Fheads%2Fresource-manager.zip)
+## Comece por aqui
 
-[Começar pela Console](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https%3A%2F%2Fgithub.com%2Frafaelrdias%2Foci-hermes-workshop%2Farchive%2Frefs%2Fheads%2Fresource-manager.zip)
-· [Baixar pasta Terraform](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager.zip)
-· [Acesso SSH](docs/SSH.md) · [Resolver problemas](docs/OPERACAO.md)
+**Mantenha este guia aberto até a primeira conversa com o Hermes.** A Console
+executa a instalação, mas não leva este passo a passo junto. A sugestão é trabalhar
+com duas abas: **GitHub = instruções** e **Console OCI = execução**; o Telegram
+será usado para criar o bot e conversar com ele.
+
+| Momento | Onde continuar neste guia | O que você terá ao terminar |
+|---|---|---|
+| Preparação | [1. Conta e região](#1-prepare-a-conta-e-selecione-chicago) → [2. BotFather](#2-crie-seu-bot-no-telegram) | Conta acessível e token do seu bot guardado |
+| Configuração | [3. Abrir Create stack](#3-abra-create-stack-na-console-oci) → [4. Variáveis](#4-preencha-as-variáveis-e-os-aceites) → [5. SSH opcional](#5-escolha-se-quer-ssh--opcional) | Formulário conferido, ainda sem instalar a VM |
+| Implantação | [6. Plan e Apply](#6-execute-plan-e-apply) | Recursos criados; instalação do Hermes em andamento |
+| Primeiro uso | [7. Vincular o bot](#7-vincule-sua-conta-ao-bot) → [8. Testar](#8-converse-e-teste-ferramentas-e-áudio) | Conversa, ferramentas e áudio testados |
+| Encerramento | [9. Guardar ou remover](#9-ao-terminar-guardar-ou-remover) | Decisão sobre custos e dados do ambiente |
+
+**Primeira vez?** Comece pela preparação. O botão **Deploy to Oracle Cloud** está
+somente na [etapa 3](#3-abra-create-stack-na-console-oci), depois dos pré-requisitos.
+**Já criou a Stack?** Continue da etapa correspondente; não clique no botão de
+implantação outra vez para consultar uma instalação existente.
+
+[Acesso SSH](docs/SSH.md) · [Resolver problemas](docs/OPERACAO.md)
 
 ## O que será instalado
 
@@ -34,10 +50,11 @@ créditos/cobrança: transcrição local não significa laboratório inteiro gra
 > segredo. Restrinja acesso à Stack, jobs e VM; não compartilhe tokens, comandos
 > de pareamento ou chaves. O formulário exige os aceites correspondentes.
 
-> **Sobre as telas:** as imagens deste guia são **telas ilustrativas**, com
-> dados fictícios e foco nos campos usados. Não são capturas de uma conta real.
-> Posição/idioma dos controles podem variar. Use seu token e as saídas da sua Stack,
-> nunca os valores fictícios das imagens.
+> **Sobre as telas:** as imagens da **Console OCI são capturas reais**, feitas em
+> 21/09/2026, em inglês e no tema escuro, com recortes para preservar os dados da
+> conta. Os nomes dos controles foram mantidos como aparecem na Console.
+> As três imagens do **Telegram continuam sendo telas ilustrativas**, identificadas
+> como tal. Use seus próprios valores. [Origem e cobertura das capturas](docs/TELAS.md).
 
 ## 1. Prepare a conta e selecione Chicago
 
@@ -49,7 +66,10 @@ créditos/cobrança: transcrição local não significa laboratório inteiro gra
 3. Confirme créditos, capacidade de Compute e acesso a Generative AI on-demand.
    O Terraform não aprova cadastro, amplia quotas ou converte a conta em paga.
 
-![Console OCI: selecionar Chicago](docs/images/02-oci-regiao.svg)
+![Console OCI real: menu Regions com US Midwest Chicago selecionada](docs/images/console/01-regiao-chicago.png)
+
+*O seletor fica no cabeçalho da Console. **US Midwest (Chicago)** é a região
+deste roteiro; a indicação **Home region** pode aparecer em outra região.*
 
 A **home region pode ser diferente**. IAM é global e o Terraform usa o endpoint
 da home region para criá-lo; VM, rede e inferência ficam na região da instalação.
@@ -60,6 +80,9 @@ em GRU nem cria cluster dedicado como alternativa automática.
 Grok é uma opção explícita no formulário em ORD, mas seus modelos são hospedados
 externamente pela xAI: escolher a região OCI não significa processamento
 exclusivamente dentro dela. Veja as [notas de chamadas externas da OCI](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm#xai-models).
+
+**Antes de continuar:** você consegue entrar na Console e vê a região desejada
+no cabeçalho. A próxima etapa acontece no Telegram, sem fechar este guia.
 
 ## 2. Crie seu bot no Telegram
 
@@ -76,14 +99,63 @@ Não envie o token ao facilitador, ao próprio bot ou ao GitHub. Use um bot excl
 **Não precisa descobrir chat ID nem criar API key OCI:** o vínculo identifica
 seu usuário, e a VM acessa o modelo com Instance Principals.
 
+**Antes de continuar:** guarde tanto o token quanto o link do **seu** bot.
+O BotFather cria o bot; a conversa com o Hermes acontecerá no outro chat,
+depois do pareamento na [etapa 7](#7-vincule-sua-conta-ao-bot).
+
 ## 3. Abra Create Stack na Console OCI
+
+### Antes de abrir a Console
+
+Confira se você já tem:
+
+- A conta OCI conectada, a região da instalação selecionada e créditos/permissões disponíveis.
+- Um **bot exclusivo**, seu token e o link de conversa guardados em local privado.
+- Este guia aberto, para voltar a ele a cada etapa.
 
 ### Pelo botão de implantação
 
-Clique em [Começar pela Console](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https%3A%2F%2Fgithub.com%2Frafaelrdias%2Foci-hermes-workshop%2Farchive%2Frefs%2Fheads%2Fresource-manager.zip).
-O pacote Terraform é selecionado automaticamente. Confira a região antes de avançar.
+**Abra o botão abaixo em uma nova aba:** botão direito → **Abrir link em nova
+aba**, ou `Ctrl` + clique no Windows/Linux e `⌘` + clique no macOS. Assim esta
+página continua no ponto em que você parou.
 
-### Pela pasta, sem comandos
+[![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://cloud.oracle.com/resourcemanager/stacks/create?zipUrl=https%3A%2F%2Fgithub.com%2Frafaelrdias%2Foci-hermes-workshop%2Farchive%2Frefs%2Fheads%2Fresource-manager.zip)
+
+**O que acontece ao clicar?** A Console OCI abre o assistente **Create stack**
+com o pacote Terraform deste repositório pré-selecionado. O pacote vem da branch
+`resource-manager`, que contém somente os arquivos necessários à implantação.
+Você **não precisa baixar nem enviar uma pasta por este caminho**.
+
+![Console OCI real: Welcome com Package URL e pacote Hermes no Telegram](docs/images/console/03-deploy-pacote.png)
+
+*Na tela **Welcome!**, confira **Package URL** terminando em
+`oci-hermes-workshop/archive/refs/heads/resource-manager.zip`, o título
+**Hermes no Telegram — eventos OCI** e o diretório
+`oci-hermes-workshop-resource-manager`. Leia os **Oracle Terms of Use** e
+prossiga somente se concordar. Não é a tela de upload por Folder.*
+
+O botão não cria uma conta OCI, não copia o token do Telegram e não instala
+o Hermes imediatamente. Você ainda conferirá as variáveis e autorizará a
+execução. Se a Console pedir login, entre na **sua tenancy**, confira a região
+e verifique se voltou a **Create stack** com o pacote selecionado. Se cair na
+página inicial, volte a esta etapa e abra o botão novamente — antes de criar
+qualquer Stack.
+
+> **Ponto de retorno:** ao abrir o formulário, mantenha a aba da Console aberta
+> e continue lendo aqui. Primeiro confira os dados abaixo; depois siga para
+> [4. Variáveis e aceites](#4-preencha-as-variáveis-e-os-aceites).
+
+<details>
+<summary>Alternativa: enviar a pasta pela Console, sem comandos</summary>
+
+Use esta alternativa apenas se preferir upload manual ou se o pacote não
+carregar pelo botão. **Escolha um caminho; não crie duas Stacks.**
+
+![Console OCI real: Developer Services com Resource Manager e Stacks](docs/images/console/02-menu-resource-manager.png)
+
+*No menu principal, **Developer Services → Resource Manager → Stacks**.
+Talvez seja necessário rolar o menu. Não confunda com o item **Stacks** de
+outro serviço. Na lista, escolha **Create Stack**.*
 
 1. [Baixe a pasta Terraform](https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager.zip).
    O GitHub a transporta em ZIP: **extraia uma vez**.
@@ -94,16 +166,53 @@ O pacote Terraform é selecionado automaticamente. Confira a região antes de av
 4. Não selecione o repositório inteiro nem uma pasta com `.terraform`.
    O pacote leve não inclui imagens ou binários de providers.
 
-![Console OCI: criar Stack com Folder](docs/images/03-oci-create-stack.svg)
+![Console OCI real: My configuration e Folder no assistente Create stack](docs/images/console/04-alternativa-folder.png)
 
-Em **Stack information**, use o nome `hermes-evento` e coloque **a Stack no
-compartimento raiz** da tenancy, não no compartment que ela criará.
-Selecione Terraform **>= 1.5 e < 2.0** entre as versões oferecidas e clique **Next**.
-`tenancy_ocid` é preenchido pela Console; o compartment da VM será criado automaticamente.
+*Captura real: a opção **Folder** fica em **Stack configuration**. O link
+**Browse** recebe a pasta extraída, não o repositório completo.*
+
+</details>
+
+### Confira os dados da Stack
+
+Role a etapa **Stack information** para encontrar os campos abaixo:
+
+1. **Name:** sugerimos `hermes-evento`. Pelo botão, a Console propõe um nome
+   derivado do arquivo e da data; você pode substituí-lo por esse nome mais fácil
+   de localizar depois. **Description** pode ficar com a descrição do pacote.
+
+   ![Console OCI real: Name preenchido com hermes-evento e Description](docs/images/console/05-nome-stack.png)
+
+2. **Create in compartment:** escolha **o compartimento raiz da sua tenancy**,
+   identificado pelo sufixo **`(root)`**. O nome será o da sua conta, não
+   necessariamente igual ao de outro participante. Esse é o local da **Stack**;
+   o Terraform criará um compartment separado para a VM.
+3. **Terraform version:** na captura, a opção oferecida é **1.5.x**, compatível
+   com este pacote (>= 1.5 e < 2.0). Deixe **Use custom Terraform providers**
+   desmarcado. Não é necessário preencher **Tags** para este laboratório.
+
+   ![Console OCI real: Terraform version 1.5.x](docs/images/console/06-versao-terraform.png)
+
+4. Clique **Next**. `tenancy_ocid` é preenchido automaticamente pela Console;
+   não é necessário copiar OCIDs manualmente neste fluxo.
+
+**Ponto de conferência:** a lateral agora destaca **Configure variables**.
+Continue na etapa 4 deste guia; o número da etapa da Console é diferente do
+número das etapas aqui.
 
 ## 4. Preencha as variáveis e os aceites
 
-Em **Configure variables**, confira **versão 1.5.0**:
+Em **Configure variables**, os campos são organizados em quatro grupos.
+Este guia corresponde ao pacote **1.5.0**; essa versão é a do laboratório,
+não a versão **1.5.x** do Terraform.
+
+### Região e modelo
+
+![Console OCI real: grupo Região da instalação com GPT-OSS 120B e transcrição local](docs/images/console/07-variaveis-regiao-modelo.png)
+
+*Confira a região **no cabeçalho e no formulário**. Em Chicago, o modelo padrão
+é `openai.gpt-oss-120b`. **Nome do ambiente** nomeia os recursos criados; é um
+campo diferente do **Name** da Stack, embora ambos possam ser `hermes-evento`.*
 
 | Campo | Como preencher |
 |---|---|
@@ -116,16 +225,43 @@ Em **Configure variables**, confira **versão 1.5.0**:
 | Shape | E5.Flex padrão: 1 OCPU / 8 GB / 50 GB; consome créditos |
 | Availability domain | `0` para o primeiro AD; outro índice somente se disponível |
 
-![Console OCI: variáveis e aceite do token](docs/images/04-oci-variaveis.svg)
+### Token e consentimento
+
+![Console OCI real: Enter the password, Re-enter the password e aceite de persistência do token](docs/images/console/08-token-e-aceite.png)
+
+*Dentro de **Token do BotFather (bot novo e exclusivo)**, cole o mesmo token
+em **Enter the password** e **Re-enter the password**. A captura mostra ambos
+vazios de propósito. Leia o aviso e marque **Entendo e aceito a persistência do
+token no state e nos metadados** se concordar.*
 
 **São três aceites distintos:** token no state/metadados (sempre), chave privada
 SSH no state (se gerar SSH) e SSH público (somente com `0.0.0.0/0`).
 Marcar o aceite SSH não marca o do token. Sem aceite obrigatório, o Plan é
 bloqueado: corrija em **Edit Stack → Configure variables**.
 
+### Compute
+
+![Console OCI real: Shape E5.Flex e Availability domain 0](docs/images/console/09-compute.png)
+
+*O grupo **3. Compute — consome créditos do Trial** define a VM. A escolha
+do shape não garante capacidade disponível na região. Para o primeiro teste,
+recomendamos manter o padrão e conferir eventuais erros no job.*
+
+**Antes de avançar:** os dois campos de token devem coincidir e o aceite do
+token precisa estar marcado. Abaixo de Compute fica o grupo opcional de SSH.
+
 ## 5. Escolha se quer SSH — opcional
 
 Para usar só Telegram, deixe geração desmarcada e chave pública/CIDR vazios.
+
+![Console OCI real: grupo SSH com opções desmarcadas e campos vazios](docs/images/console/10-ssh-fechado.png)
+
+*Esse é o caminho sem SSH: geração desmarcada, chave pública e origem IPv4
+vazias. O Telegram não depende de abrir a porta 22.*
+
+<details>
+<summary>Quero gerar uma chave para administrar a VM depois</summary>
+
 Para administrar a VM posteriormente:
 
 1. Marque **Gerar chave SSH automaticamente para esta Stack**.
@@ -135,36 +271,99 @@ Para administrar a VM posteriormente:
 4. Para qualquer IPv4 no evento, informe `0.0.0.0/0` e aceite a exposição.
    Qualquer IPv4 poderá tentar conectar; a liberação não expira automaticamente.
 
-![Console OCI: geração da chave e acesso SSH](docs/images/05-oci-ssh.svg)
+![Console OCI real: geração automática e aceite da chave privada marcados](docs/images/console/11-ssh-gerar-chave.png)
+
+*Na captura, a geração e seu aceite estão marcados, mas o CIDR continua vazio:
+a chave será instalada e **a porta permanecerá fechada**. Abrir o acesso agora
+exige também configurar a origem IPv4.*
 
 Você também pode **não gerar** e fornecer sua chave pública `.pub`. Não escolha
 os dois caminhos. A privada nunca deve ser colada como variável.
 [Como recuperar a chave e acessar a VM](docs/SSH.md).
 
+</details>
+
+Ao terminar as variáveis, clique **Next** na Console. Você chegará a **Review**;
+continue a leitura abaixo antes de clicar em **Create**.
+
 ## 6. Execute Plan e Apply
 
-1. Em **Review**, deixe **Run apply** desmarcado e clique **Create**.
-2. Na Stack, clique **Plan** e aguarde o job **Succeeded**.
-3. Revise logs, recursos e custos: uma VM, disco, rede, compartment, DG/policy
-   e, se escolhido, par SSH. Não deve haver GPU ou cluster dedicado.
-4. Clique **Apply**, selecione o plano revisado quando oferecido e confirme.
-   Aguarde **Succeeded**; em caso de falha, confira os logs antes de repetir.
+### Criar a Stack sem executar automaticamente
 
-![Console OCI: Plan e Apply](docs/images/06-oci-plan-apply.svg)
+Em **Review**, confira nome, região e aceite do token. A Console informa que
+essa revisão mostra apenas variáveis sem padrão ou que você alterou; por isso,
+nem todos os campos aparecerão. Use **Previous** para conferir algo que faltar.
+
+**Desmarque Run apply**, que vem marcado por padrão ao abrir pelo botão.
+Recomendamos separar a revisão do plano da execução neste laboratório.
+
+![Console OCI real: Review com Run apply desmarcado e botão Create](docs/images/console/12-review-sem-apply.png)
+
+*Somente depois dessa conferência, clique **Create**. Com **Run apply**
+desmarcado, você cria o registro da Stack, não a VM. O token está mascarado
+pela própria Console; não é necessário revelá-lo para revisar.*
+
+### Gerar e revisar o plano
+
+1. Na página da **Stack recém-criada**, clique **Plan**.
+2. No painel **Plan**, você pode manter o nome sugerido para o job e as opções
+   avançadas no padrão. Confirme em **Plan**.
+3. Abra o job em **Jobs**, acompanhe **Logs** e aguarde **Succeeded**.
+4. Revise o que será criado: VM, disco, rede, compartment, DG/policy e, se
+   escolhido, par SSH. Não deve haver GPU ou cluster dedicado. **Plan não cria
+   a VM e não valida uma conversa com o modelo.**
+
+### Aplicar o plano revisado
+
+1. Volte à **mesma Stack**, pelo nome/breadcrumb; não volte ao botão Deploy.
+2. Clique **Apply**. Em **Apply job plan resolution**, selecione o último job
+   **Plan** que você revisou. Se aparecer apenas **Automatically approve**,
+   confira se está na Stack correta e se gerou o Plan nela.
+3. Confirme em **Apply**. Acompanhe o novo job até **Succeeded**. Se falhar,
+   abra **Logs**, identifique o erro e consulte o [diagnóstico](docs/OPERACAO.md)
+   antes de criar outra Stack ou repetir a execução.
+
+Referências da Oracle para os painéis: [Plan](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-plan.htm)
+e [Apply](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/create-job-apply.htm).
 
 **Apply concluído não significa Hermes pronto.** Ainda pode haver instalação
 de dependências, download da transcrição, propagação IAM e testes do agente.
 Cadastro, downloads, capacidade e quotas variam: não há prazo fixo garantido.
 Não dispare instalações duplicadas para tentar acelerar.
 
+| Confirmação | O que ela significa | Próximo passo |
+|---|---|---|
+| Job Plan: **Succeeded** | O plano foi gerado | Revisar e executar Apply |
+| Job Apply: **Succeeded** | O Terraform concluiu o provisionamento | Buscar o comando na própria Stack |
+| Telegram: **Conta vinculada!** | Seu usuário foi vinculado | Aguardar validações do instalador |
+| Telegram: **Configuração concluída!** | Os testes iniciais terminaram | Enviar `/new` e fazer o teste final |
+
+**Ponto de retorno:** com Apply concluído, continue na etapa 7. A página da VM
+não é o lugar de recuperar o comando do Telegram.
+
 ## 7. Vincule sua conta ao bot
 
 1. Abra **Resource Manager → Stacks → a Stack que acabou de executar**.
 2. Na página **da Stack**, abra **Application information** — não procure
    essa informação na VM, no BotFather ou apenas nos logs do job.
-3. Em **Próximo passo no Telegram**, revele e copie **`telegram_pairing_command`**.
+3. Em **Próximo passo no Telegram**, localize **Desbloqueie, copie e envie este
+   comando em DM ao seu bot**. Esse é o título da saída **`telegram_pairing_command`**.
+   Desbloqueie/revele e copie seu valor completo.
 
-![Console OCI: comando privado em Application information](docs/images/07-oci-application-information.svg)
+O caminho é **Resource Manager → Stacks → nome da sua Stack → Application
+information → Próximo passo no Telegram**. Se estiver na página de um job,
+volte primeiro ao nome da **Stack**. Se a lista estiver vazia, confira a região
+e o filtro de compartment — este guia cria a Stack no compartimento **`(root)`**.
+
+| Título definido no formulário | Nome técnico da saída | Para que serve |
+|---|---|---|
+| Desbloqueie, copie e envie este comando em DM ao seu bot | `telegram_pairing_command` | Comando privado completo a enviar ao seu bot |
+| Como concluir | `next_step` | Orientação para continuar após o Apply |
+| Modelo OCI on-demand | `model` | Identificador real do modelo OCI selecionado |
+| IPv4 da VM (sem serviço web público) | `public_ip` | Endereço da VM, apenas para administração opcional |
+
+A saída de pareamento é sensível: use o controle de revelar/copiar da Console
+sem projetar o valor na tela. Não copie tokens ou comandos de imagens de exemplo.
 
 4. Abra **seu bot**, pelo link recebido do BotFather. Toque **Start / Iniciar**
    se necessário e envie **o comando completo copiado**, incluindo o código.
@@ -209,8 +408,6 @@ Para remover os recursos:
 4. Só então exclua a Stack, se desejar. Excluir sem Destroy não garante remover
    os recursos. O bot é separado: gerencie/revogue seu token no BotFather.
 
-![Console OCI: Destroy após guardar os dados](docs/images/11-oci-destroy.svg)
-
 Históricos de jobs/state e cópias locais podem reter segredos. Destroy não apaga
 arquivos baixados nem revoga o token Telegram.
 
@@ -220,6 +417,7 @@ arquivos baixados nem revoga o token Telegram.
 - [Problemas, limites e operação](docs/OPERACAO.md)
 - [Arquitetura e segurança](docs/ARQUITETURA.md)
 - [Validação e manutenção](docs/MANUTENCAO.md)
+- [Origem e cobertura das capturas da Console](docs/TELAS.md)
 
 O [Hermes Agent](https://github.com/NousResearch/hermes-agent) combina LLM e
 ferramentas: o modelo decide ações e o agente as executa. Este ambiente é uma
@@ -229,6 +427,7 @@ ações reais; não habilite acesso irrestrito nem use documentos sigilosos.
 ## Referências
 
 - [OCI Resource Manager](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/home.htm)
+- [Como funciona o botão Deploy to Oracle Cloud](https://docs.oracle.com/en-us/iaas/Content/ResourceManager/Tasks/deploybutton.htm)
 - [Modelos Generative AI por região](https://docs.oracle.com/en-us/iaas/Content/generative-ai/model-endpoint-regions.htm)
 - [BotFather — documentação Telegram](https://core.telegram.org/bots/features#botfather)
 - [Agent Station Experience — referência de organização do guia](https://github.com/MachadoAmanda/oracle/tree/main/Agent%20Station%20Experience)

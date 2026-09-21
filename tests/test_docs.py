@@ -1,10 +1,11 @@
 """Documentation and deployment-package checks; no external calls."""
 import io
 import re
+import struct
 import unittest
 import zipfile
 from pathlib import Path
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote, urlparse
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,9 +30,12 @@ class DocumentationTests(unittest.TestCase):
                     if anchor and target.suffix == ".md":
                         self.assertIn(unquote(anchor), anchors(target.read_text()))
 
-    def test_illustrations_are_valid_safe_svg_and_linked(self):
+    def test_only_telegram_remains_illustrated(self):
         images = sorted((ROOT / "docs/images").glob("*.svg"))
-        self.assertEqual(len(images), 11)
+        self.assertEqual({p.name for p in images}, {
+            "01-telegram-botfather.svg", "08-telegram-pareamento.svg",
+            "09-telegram-conversa.svg",
+        })
         guide = "\n".join(path.read_text() for path in DOCS)
         for path in images:
             with self.subTest(image=path.name):
@@ -41,6 +45,57 @@ class DocumentationTests(unittest.TestCase):
                 self.assertIn(path.name, guide)
                 self.assertNotIn("<script", path.read_text().lower())
                 self.assertNotIn("https://api.telegram.org/bot", path.read_text())
+
+    def test_console_captures_are_documented_pngs_outside_terraform(self):
+        images = sorted((ROOT / "docs/images/console").glob("*.png"))
+        self.assertGreaterEqual(len(images), 12)
+        guide = (ROOT / "README.md").read_text()
+        provenance = (ROOT / "docs/TELAS.md").read_text()
+        for path in images:
+            with self.subTest(image=path.name):
+                content = path.read_bytes()
+                self.assertEqual(content[:8], b"\x89PNG\r\n\x1a\n")
+                width, height = struct.unpack(">II", content[16:24])
+                self.assertGreaterEqual(width, 240)
+                self.assertGreaterEqual(height, 120)
+                self.assertLess(len(content), 1_000_000)
+                self.assertIn(path.name, guide)
+                self.assertIn(path.name, provenance)
+        self.assertIn("21/09/2026", provenance)
+        self.assertIn("não reconstruções", provenance)
+        self.assertIn("não há capturas próprias dos resultados de Plan/Apply", provenance)
+        self.assertFalse(list((ROOT / "terraform").rglob("*.png")))
+
+    def test_deploy_button_is_only_after_prerequisites_and_preserves_context(self):
+        guide = (ROOT / "README.md").read_text()
+        deploy_urls = re.findall(
+            r"https://cloud\.oracle\.com/resourcemanager/stacks/create\?[^)\s]+", guide)
+        self.assertEqual(len(deploy_urls), 1)
+        button_position = guide.index("[![Deploy to Oracle Cloud]")
+        self.assertGreater(button_position, guide.index("## 2. Crie seu bot no Telegram"))
+        self.assertGreater(button_position, guide.index("### Antes de abrir a Console"))
+        self.assertLess(button_position, guide.index("## 4. Preencha as variáveis"))
+        query = parse_qs(urlparse(deploy_urls[0]).query)
+        self.assertEqual(query, {"zipUrl": [
+            "https://github.com/rafaelrdias/oci-hermes-workshop/archive/refs/heads/resource-manager.zip"
+        ]})
+        for phrase in ["GitHub = instruções", "Console OCI = execução", "nova aba",
+                       "Ponto de retorno", "Desmarque Run apply", "Welcome!",
+                       "Package URL", "Automatically approve"]:
+            self.assertIn(phrase, guide)
+
+    def test_output_titles_match_actual_schema_labels(self):
+        schema = (ROOT / "terraform/schema.yaml").read_text()
+        guide = (ROOT / "README.md").read_text().replace("\n   ", " ")
+        ssh = (ROOT / "docs/SSH.md").read_text().replace("\n   ", " ")
+        for title in ["Desbloqueie, copie e envie este comando em DM ao seu bot",
+                      "Como concluir", "Modelo OCI on-demand"]:
+            self.assertIn(title, schema)
+            self.assertIn(title, guide)
+        for title in ["SSH opcional — guarde sua chave privada em segurança",
+                      "Chave PRIVADA gerada: revelar, copiar e salvar como hermes.key (vazio se não gerada)"]:
+            self.assertIn(title, schema)
+            self.assertIn(title, ssh)
 
     def test_deployment_branch_and_version_are_consistent(self):
         schema = (ROOT / "terraform/schema.yaml").read_text()

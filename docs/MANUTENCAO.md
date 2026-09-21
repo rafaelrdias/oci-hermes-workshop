@@ -9,7 +9,8 @@
 | `terraform/` | Módulo completo para Resource Manager, schema e bootstrap |
 | `terraform/tests/` | Testes de infraestrutura com providers simulados |
 | `tests/` | Testes Python, contrato Hermes e consistência do guia |
-| `docs/` | Operação, SSH, arquitetura e telas ilustrativas SVG |
+| `docs/` | Operação, SSH, arquitetura e documentação das capturas |
+| `docs/images/console/` | Capturas reais da Console OCI, fora do pacote Terraform |
 
 A branch **`resource-manager`** contém somente o conteúdo de `terraform/`.
 O download dessa branch é o pacote leve usado na Console. Não inclua binários,
@@ -43,7 +44,10 @@ ferramentas Telegram e política de respostas em texto.
 ## Antes de publicar
 
 1. Execute testes Python, contrato Hermes, `fmt`, `validate` e `terraform test`.
-2. Confira screenshots/ilustrações e todos os links relativos no guia.
+2. Confira screenshots/ilustrações e todos os links relativos no guia. Siga
+   [a origem e os critérios das capturas](TELAS.md): não desenhe uma tela OCI
+   e a apresente como screenshot. O botão Deploy deve existir uma única vez
+   no README, depois dos pré-requisitos, acompanhado da orientação de nova aba.
 3. Verifique que não há credenciais, state, IPs de participantes ou arquivos
    privados preparados para commit.
 4. Sincronize versão do `schema.yaml` e documentação.
